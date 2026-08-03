@@ -1,5 +1,6 @@
-# Repo-STORIO
+## Estructura del repositorio
 
+```text
 upb-cientifica/
 ├── docs/
 │   ├── arquitectura/
@@ -56,3 +57,4 @@ upb-cientifica/
 │
 └── .github/
     └── workflows/
+```
