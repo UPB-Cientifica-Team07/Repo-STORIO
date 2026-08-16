@@ -1,0 +1,172 @@
+syntax = "proto3";
+
+package monitoring;
+
+option go_package = "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/generated;generated";
+
+service MonitoringService {
+
+    // Registro de métricas
+    rpc ReportMetrics(MetricsRequest)
+        returns (MetricsResponse);
+
+    // Consulta de métricas registradas
+    rpc GetMetrics(GetMetricsRequest)
+        returns (GetMetricsResponse);
+
+    // Registro de estado
+    rpc ReportStatus(StatusRequest)
+        returns (StatusResponse);
+
+    // Consulta del estado de un servicio
+    rpc GetServiceStatus(ServiceRequest)
+        returns (ServiceResponse);
+
+    // Consulta del estado de un nodo HPC
+    rpc GetNodeStatus(NodeRequest)
+        returns (NodeResponse);
+}
+
+
+// ==============================
+// MÉTRICAS
+// ==============================
+
+message MetricsRequest {
+
+    string component_id = 1;
+
+    string component_name = 2;
+
+    double cpu_usage = 3;
+
+    double memory_usage = 4;
+
+    int64 active_connections = 5;
+
+    int64 total_requests = 6;
+
+    int64 timestamp = 7;
+}
+
+
+message MetricsResponse {
+
+    bool success = 1;
+
+    string message = 2;
+}
+
+
+// Solicitud para consultar métricas.
+//
+// Por ahora no recibe filtros. Devuelve todas las métricas
+// almacenadas en el repositorio temporal.
+message GetMetricsRequest {
+}
+
+
+// Representa una métrica devuelta por el Monitoring Service.
+message Metric {
+
+    string component_id = 1;
+
+    string component_name = 2;
+
+    double cpu_usage = 3;
+
+    double memory_usage = 4;
+
+    int64 active_connections = 5;
+
+    int64 total_requests = 6;
+
+    int64 timestamp = 7;
+}
+
+
+// Respuesta con las métricas registradas.
+message GetMetricsResponse {
+
+    repeated Metric metrics = 1;
+}
+
+
+// ==============================
+// ESTADO DE COMPONENTES
+// ==============================
+
+message StatusRequest {
+
+    string component_id = 1;
+
+    string component_name = 2;
+
+    string status = 3;
+
+    string message = 4;
+
+    int64 timestamp = 5;
+}
+
+
+message StatusResponse {
+
+    bool success = 1;
+
+    string message = 2;
+}
+
+
+// ==============================
+// CONSULTA DE SERVICIOS
+// ==============================
+
+message ServiceRequest {
+
+    string component_name = 1;
+}
+
+
+message ServiceResponse {
+
+    string component_id = 1;
+
+    string component_name = 2;
+
+    string status = 3;
+
+    string message = 4;
+
+    int64 last_updated = 5;
+}
+
+
+// ==============================
+// CONSULTA DE NODOS HPC
+// ==============================
+
+message NodeRequest {
+
+    string node_id = 1;
+}
+
+
+message NodeResponse {
+
+    string node_id = 1;
+
+    string hostname = 2;
+
+    string status = 3;
+
+    int32 cpu_cores = 4;
+
+    int64 memory = 5;
+
+    double cpu_usage = 6;
+
+    double memory_usage = 7;
+
+    int64 last_updated = 8;
+}
