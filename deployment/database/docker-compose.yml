@@ -1,0 +1,22 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: upb-cientifica-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: upb_cientifica
+      POSTGRES_USER: upb_admin
+      POSTGRES_PASSWORD: upb_cientifica_2026
+
+    ports:
+      - "5432:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+      - ../../database/schemas/initial_schema.sql:/docker-entrypoint-initdb.d/01_initial_schema.sql:ro
+      - ../../database/seeds/initial_data.sql:/docker-entrypoint-initdb.d/02_initial_data.sql:ro
+
+volumes:
+  postgres_data:
