@@ -1,6 +1,11 @@
 package service
 
 import (
+	"errors"
+	"time"
+
+	"github.com/google/uuid"
+
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/repository"
 )
 
@@ -18,31 +23,62 @@ func NewFileService(
 }
 
 func (s *FileService) UploadFile(
+	userID string,
 	name string,
-	content string,
-) repository.File {
+	fileType string,
+	content []byte,
+) (*repository.File, error) {
 
-	return s.repository.Save(
-		name,
-		content,
-	)
+	if userID == "" {
+		return nil, errors.New("el user ID es obligatorio")
+	}
+
+	if name == "" {
+		return nil, errors.New("el nombre del archivo es obligatorio")
+	}
+
+	file := &repository.File{
+		ID:        uuid.New().String(),
+		UserID:    userID,
+		Name:      name,
+		Type:      fileType,
+		Content:   content,
+		Size:      int64(len(content)),
+		CreatedAt: time.Now(),
+	}
+
+	err := s.repository.Save(file)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return file, nil
 }
 
 func (s *FileService) GetFile(
-	id string,
-) (repository.File, error) {
+	fileID string,
+) (*repository.File, error) {
 
-	return s.repository.Get(id)
+	return s.repository.FindByID(
+		fileID,
+	)
+}
+
+func (s *FileService) ListFiles(
+	userID string,
+) []*repository.File {
+
+	return s.repository.FindByUserID(
+		userID,
+	)
 }
 
 func (s *FileService) DeleteFile(
-	id string,
+	fileID string,
 ) error {
 
-	return s.repository.Delete(id)
-}
-
-func (s *FileService) ListFiles() []repository.File {
-
-	return s.repository.List()
+	return s.repository.Delete(
+		fileID,
+	)
 }

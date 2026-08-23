@@ -1,0 +1,197 @@
+syntax = "proto3";
+
+package sync;
+
+option go_package = "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/proto;generated";
+
+service SyncService {
+
+  // Identifica un dispositivo/usuario.
+  rpc Authenticate(AuthenticateRequest)
+      returns (AuthenticateResponse);
+
+  // Consulta el estado de sincronización.
+  rpc Sync(SyncRequest)
+      returns (SyncResponse);
+
+  // Lista archivos asociados al usuario.
+  rpc ListFiles(ListFilesRequest)
+      returns (ListFilesResponse);
+
+  // Carga de archivos mediante client streaming.
+  rpc Upload(stream UploadRequest)
+      returns (UploadResponse);
+
+  // Descarga mediante server streaming.
+  rpc Download(DownloadRequest)
+      returns (stream DownloadResponse);
+
+  // Elimina un archivo.
+  rpc DeleteFile(DeleteFileRequest)
+      returns (DeleteFileResponse);
+
+  // Canal persistente de notificaciones.
+  rpc WatchChanges(WatchChangesRequest)
+      returns (stream FileChange);
+}
+
+
+// =====================================
+// AUTENTICACIÓN
+// =====================================
+
+message AuthenticateRequest {
+  string token = 1;
+  string device_id = 2;
+}
+
+message AuthenticateResponse {
+  bool success = 1;
+  string message = 2;
+  string user_id = 3;
+}
+
+
+// =====================================
+// SINCRONIZACIÓN
+// =====================================
+
+message SyncRequest {
+  string user_id = 1;
+  string device_id = 2;
+}
+
+message SyncResponse {
+  bool success = 1;
+  string message = 2;
+
+  repeated FileChange changes = 3;
+}
+
+
+// =====================================
+// LISTAR ARCHIVOS
+// =====================================
+
+message ListFilesRequest {
+  string user_id = 1;
+}
+
+message ListFilesResponse {
+  bool success = 1;
+  string message = 2;
+
+  repeated FileMetadata files = 3;
+}
+
+
+// =====================================
+// UPLOAD
+// =====================================
+
+// El primer mensaje contiene metadatos.
+// Los mensajes siguientes contienen chunks.
+message UploadRequest {
+
+  oneof data {
+
+    UploadMetadata metadata = 1;
+
+    bytes chunk = 2;
+  }
+}
+
+message UploadMetadata {
+  string user_id = 1;
+  string device_id = 2;
+
+  string file_name = 3;
+  string file_type = 4;
+
+  int64 size = 5;
+}
+
+message UploadResponse {
+  bool success = 1;
+  string message = 2;
+
+  string file_id = 3;
+  int64 bytes_received = 4;
+}
+
+
+// =====================================
+// DOWNLOAD
+// =====================================
+
+message DownloadRequest {
+  string user_id = 1;
+  string file_id = 2;
+}
+
+message DownloadResponse {
+
+  oneof data {
+
+    FileMetadata metadata = 1;
+
+    bytes chunk = 2;
+  }
+}
+
+
+// =====================================
+// DELETE
+// =====================================
+
+message DeleteFileRequest {
+  string user_id = 1;
+  string device_id = 2;
+
+  string file_id = 3;
+}
+
+message DeleteFileResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+
+// =====================================
+// NOTIFICACIONES
+// =====================================
+
+message WatchChangesRequest {
+  string user_id = 1;
+  string device_id = 2;
+}
+
+message FileChange {
+  string type = 1;
+
+  string file_id = 2;
+  string file_name = 3;
+
+  string origin_device_id = 4;
+
+  int64 timestamp = 5;
+}
+
+
+// =====================================
+// ARCHIVO
+// =====================================
+
+message FileMetadata {
+  string file_id = 1;
+
+  string user_id = 2;
+
+  string file_name = 3;
+  string file_type = 4;
+
+  int64 size = 5;
+
+  int64 created_at = 6;
+  int64 updated_at = 7;
+}

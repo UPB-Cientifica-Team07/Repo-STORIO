@@ -5,6 +5,7 @@ import (
 
 	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/proto"
 
+	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/repository"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/service"
 )
 
@@ -27,10 +28,20 @@ func (s *Server) UploadFile(
 	request *pb.UploadFileRequest,
 ) (*pb.UploadFileResponse, error) {
 
-	file := s.fileService.UploadFile(
-		request.Name,
+	file, err := s.fileService.UploadFile(
+		request.UserId,
+		request.FileName,
+		request.FileType,
 		request.Content,
 	)
+
+	if err != nil {
+
+		return &pb.UploadFileResponse{
+			Success: false,
+			Message: err.Error(),
+		}, nil
+	}
 
 	return &pb.UploadFileResponse{
 		Success: true,
@@ -59,14 +70,7 @@ func (s *Server) GetFile(
 	return &pb.GetFileResponse{
 		Success: true,
 		Message: "Archivo encontrado",
-		File: &pb.File{
-			Id:      file.ID,
-			Name:    file.Name,
-			Content: file.Content,
-			CreatedAt: file.CreatedAt.Format(
-				"2006-01-02 15:04:05",
-			),
-		},
+		File:    toProtoFile(file),
 	}, nil
 }
 
@@ -98,10 +102,12 @@ func (s *Server) ListFiles(
 	request *pb.ListFilesRequest,
 ) (*pb.ListFilesResponse, error) {
 
-	files := s.fileService.ListFiles()
+	files := s.fileService.ListFiles(
+		request.UserId,
+	)
 
 	responseFiles := make(
-		[]*pb.File,
+		[]*pb.FileData,
 		0,
 		len(files),
 	)
@@ -110,18 +116,30 @@ func (s *Server) ListFiles(
 
 		responseFiles = append(
 			responseFiles,
-			&pb.File{
-				Id:      file.ID,
-				Name:    file.Name,
-				Content: file.Content,
-				CreatedAt: file.CreatedAt.Format(
-					"2006-01-02 15:04:05",
-				),
-			},
+			toProtoFile(file),
 		)
 	}
 
 	return &pb.ListFilesResponse{
-		Files: responseFiles,
+		Success: true,
+		Message: "Archivos encontrados correctamente",
+		Files:   responseFiles,
 	}, nil
+}
+
+func toProtoFile(
+	file *repository.File,
+) *pb.FileData {
+
+	return &pb.FileData{
+		FileId:   file.ID,
+		UserId:   file.UserID,
+		FileName: file.Name,
+		FileType: file.Type,
+		Content:  file.Content,
+		Size:     file.Size,
+		CreatedAt: file.CreatedAt.Format(
+			"2006-01-02 15:04:05",
+		),
+	}
 }

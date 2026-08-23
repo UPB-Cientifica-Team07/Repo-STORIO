@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v3.21.12
-// source: monitoring.proto
+// source: proto/monitoring.proto
 
 package generated
 
@@ -30,15 +30,15 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MonitoringServiceClient interface {
-	// Registro de métricas
+	// Registro de métricas de componentes.
 	ReportMetrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*MetricsResponse, error)
-	// Consulta de métricas registradas
+	// Consulta de métricas registradas.
 	GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (*GetMetricsResponse, error)
-	// Registro de estado
+	// Registro del estado de un componente.
 	ReportStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
-	// Consulta del estado de un servicio
+	// Consulta del estado de un servicio.
 	GetServiceStatus(ctx context.Context, in *ServiceRequest, opts ...grpc.CallOption) (*ServiceResponse, error)
-	// Consulta del estado de un nodo HPC
+	// Consulta del estado de un nodo HPC.
 	GetNodeStatus(ctx context.Context, in *NodeRequest, opts ...grpc.CallOption) (*NodeResponse, error)
 }
 
@@ -104,15 +104,15 @@ func (c *monitoringServiceClient) GetNodeStatus(ctx context.Context, in *NodeReq
 // All implementations must embed UnimplementedMonitoringServiceServer
 // for forward compatibility.
 type MonitoringServiceServer interface {
-	// Registro de métricas
+	// Registro de métricas de componentes.
 	ReportMetrics(context.Context, *MetricsRequest) (*MetricsResponse, error)
-	// Consulta de métricas registradas
+	// Consulta de métricas registradas.
 	GetMetrics(context.Context, *GetMetricsRequest) (*GetMetricsResponse, error)
-	// Registro de estado
+	// Registro del estado de un componente.
 	ReportStatus(context.Context, *StatusRequest) (*StatusResponse, error)
-	// Consulta del estado de un servicio
+	// Consulta del estado de un servicio.
 	GetServiceStatus(context.Context, *ServiceRequest) (*ServiceResponse, error)
-	// Consulta del estado de un nodo HPC
+	// Consulta del estado de un nodo HPC.
 	GetNodeStatus(context.Context, *NodeRequest) (*NodeResponse, error)
 	mustEmbedUnimplementedMonitoringServiceServer()
 }
@@ -279,5 +279,5 @@ var MonitoringService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "monitoring.proto",
+	Metadata: "proto/monitoring.proto",
 }

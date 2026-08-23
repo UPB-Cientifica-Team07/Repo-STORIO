@@ -2,15 +2,78 @@ package main
 
 import (
 	"log"
+	"net"
 	"os"
 	"os/signal"
 	"syscall"
 	"time"
 
+	grpcServer "google.golang.org/grpc"
+
+	filegrpc "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/grpc"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/monitoring"
+	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/repository"
+	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/service"
+
+	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/proto"
 )
 
 func main() {
+
+	// =====================================
+	// CREAR REPOSITORIO Y SERVICIO
+	// =====================================
+
+	fileRepository := repository.NewFileRepository()
+
+	fileService := service.NewFileService(
+		fileRepository,
+	)
+
+	// =====================================
+	// CREAR LISTENER gRPC
+	// =====================================
+
+	listener, err := net.Listen(
+		"tcp",
+		":50053",
+	)
+
+	if err != nil {
+		log.Fatalf(
+			"No se pudo iniciar File Service: %v",
+			err,
+		)
+	}
+
+	// =====================================
+	// CREAR SERVIDOR gRPC
+	// =====================================
+
+	grpcSrv := grpcServer.NewServer()
+
+	fileGRPCServer := filegrpc.NewServer(
+		fileService,
+	)
+
+	pb.RegisterFileServiceServer(
+		grpcSrv,
+		fileGRPCServer,
+	)
+
+	// =====================================
+	// INICIAR SERVIDOR gRPC
+	// =====================================
+
+	go func() {
+
+		if err := grpcSrv.Serve(listener); err != nil {
+			log.Printf(
+				"Error ejecutando servidor gRPC: %v",
+				err,
+			)
+		}
+	}()
 
 	// =====================================
 	// CREAR CLIENTE DE MONITOREO
@@ -32,6 +95,8 @@ func main() {
 
 	log.Println("===================================")
 	log.Println(" FILE SERVICE")
+	log.Println(" Protocolo: gRPC")
+	log.Println(" Puerto: 50053")
 	log.Println(" Estado: INICIANDO")
 	log.Println("===================================")
 
@@ -57,6 +122,7 @@ func main() {
 
 	log.Println("===================================")
 	log.Println(" FILE SERVICE ACTIVO")
+	log.Println(" Escuchando en :50053")
 	log.Println("===================================")
 
 	// =====================================
@@ -72,14 +138,20 @@ func main() {
 	// ENVIAR MÉTRICAS CADA 5 SEGUNDOS
 	// =====================================
 
-	ticker := time.NewTicker(5 * time.Second)
+	ticker := time.NewTicker(
+		5 * time.Second,
+	)
+
 	defer ticker.Stop()
 
 	// =====================================
 	// DETECTAR CTRL + C
 	// =====================================
 
-	signals := make(chan os.Signal, 1)
+	signals := make(
+		chan os.Signal,
+		1,
+	)
 
 	signal.Notify(
 		signals,
@@ -92,12 +164,10 @@ func main() {
 
 		case <-ticker.C:
 
-			// Simulación temporal de métricas.
 			cpuUsage += 1.5
 			memoryUsage += 0.8
 			totalRequests += 10
 
-			// Evitar valores irreales.
 			if cpuUsage > 90 {
 				cpuUsage = 25.0
 			}
@@ -139,6 +209,15 @@ func main() {
 			} else {
 				log.Println(
 					"Estado INACTIVE enviado correctamente",
+				)
+			}
+
+			grpcSrv.GracefulStop()
+
+			if err := listener.Close(); err != nil {
+				log.Printf(
+					"Error cerrando listener: %v",
+					err,
 				)
 			}
 

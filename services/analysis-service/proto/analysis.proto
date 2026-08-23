@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package analysis;
+
+option go_package = "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/analysis-service/proto;generated";
+
+service AnalysisService {
+
+  rpc AnalyzeFile(AnalyzeFileRequest) returns (AnalyzeFileResponse);
+
+  rpc GetAnalysis(GetAnalysisRequest) returns (GetAnalysisResponse);
+
+  rpc ListAnalyses(ListAnalysesRequest) returns (ListAnalysesResponse);
+}
+
+message AnalyzeFileRequest {
+  string user_id = 1;
+  string file_id = 2;
+}
+
+message AnalyzeFileResponse {
+  bool success = 1;
+  string message = 2;
+  string analysis_id = 3;
+  string summary = 4;
+}
+
+message GetAnalysisRequest {
+  string analysis_id = 1;
+}
+
+message GetAnalysisResponse {
+  bool success = 1;
+  string message = 2;
+  AnalysisData analysis = 3;
+}
+
+message ListAnalysesRequest {
+  string user_id = 1;
+}
+
+message ListAnalysesResponse {
+  bool success = 1;
+  string message = 2;
+  repeated AnalysisData analyses = 3;
+}
+
+message AnalysisData {
+  string analysis_id = 1;
+  string user_id = 2;
+  string file_id = 3;
+  string summary = 4;
+  string created_at = 5;
+}

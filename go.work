@@ -1,0 +1,9 @@
+go 1.25.13
+
+use (
+	./integration-client
+	./services/analysis-service
+	./services/file-service
+	./services/monitoring-service
+	./services/sync-service
+)

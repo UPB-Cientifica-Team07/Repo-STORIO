@@ -6,50 +6,66 @@ option go_package = "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monit
 
 service MonitoringService {
 
-    // Registro de métricas
+    // Registro de métricas de componentes.
     rpc ReportMetrics(MetricsRequest)
         returns (MetricsResponse);
 
-    // Consulta de métricas registradas
+    // Consulta de métricas registradas.
     rpc GetMetrics(GetMetricsRequest)
         returns (GetMetricsResponse);
 
-    // Registro de estado
+    // Registro del estado de un componente.
     rpc ReportStatus(StatusRequest)
         returns (StatusResponse);
 
-    // Consulta del estado de un servicio
+    // Consulta del estado de un servicio.
     rpc GetServiceStatus(ServiceRequest)
         returns (ServiceResponse);
 
-    // Consulta del estado de un nodo HPC
+    // Consulta del estado de un nodo HPC.
     rpc GetNodeStatus(NodeRequest)
         returns (NodeResponse);
 }
 
 
-// ==============================
+// ============================================================
 // MÉTRICAS
-// ==============================
+// ============================================================
 
+// Métricas enviadas por un componente al Monitoring Service.
 message MetricsRequest {
 
+    // Identificador técnico del componente.
+    // Ejemplo: sync-service
     string component_id = 1;
 
+    // Nombre legible del componente.
+    // Ejemplo: Sync Service
     string component_name = 2;
 
+    // Uso de CPU del componente en porcentaje.
     double cpu_usage = 3;
 
+    // Uso de memoria del componente.
+    // Actualmente se reporta en MB.
     double memory_usage = 4;
 
+    // Número de conexiones activas.
     int64 active_connections = 5;
 
+    // Número acumulado de solicitudes procesadas.
     int64 total_requests = 6;
 
+    // Timestamp Unix del momento de la medición.
     int64 timestamp = 7;
+
+    // Espacio ocupado por los recursos administrados
+    // por el componente, expresado en bytes.
+    int64 storage_usage = 8;
 }
 
 
+// Respuesta al registro de una métrica.
 message MetricsResponse {
 
     bool success = 1;
@@ -58,15 +74,23 @@ message MetricsResponse {
 }
 
 
-// Solicitud para consultar métricas.
+// ============================================================
+// CONSULTA DE MÉTRICAS
+// ============================================================
+
+// Por ahora no recibe filtros.
 //
-// Por ahora no recibe filtros. Devuelve todas las métricas
-// almacenadas en el repositorio temporal.
+// Devuelve las métricas almacenadas por el
+// Monitoring Service.
 message GetMetricsRequest {
 }
 
 
-// Representa una métrica devuelta por el Monitoring Service.
+// Representa una métrica almacenada y posteriormente
+// devuelta por GetMetrics.
+//
+// Debe conservar los mismos datos principales que
+// MetricsRequest para no perder información.
 message Metric {
 
     string component_id = 1;
@@ -82,34 +106,45 @@ message Metric {
     int64 total_requests = 6;
 
     int64 timestamp = 7;
+
+    // Uso de almacenamiento en bytes.
+    int64 storage_usage = 8;
 }
 
 
-// Respuesta con las métricas registradas.
+// Lista de métricas registradas.
 message GetMetricsResponse {
 
     repeated Metric metrics = 1;
 }
 
 
-// ==============================
+// ============================================================
 // ESTADO DE COMPONENTES
-// ==============================
+// ============================================================
 
+// Permite a un componente informar su estado actual.
 message StatusRequest {
 
     string component_id = 1;
 
     string component_name = 2;
 
+    // Ejemplos:
+    // ACTIVE
+    // INACTIVE
+    // DEGRADED
+    // ERROR
     string status = 3;
 
     string message = 4;
 
+    // Timestamp Unix.
     int64 timestamp = 5;
 }
 
 
+// Respuesta al registro de estado.
 message StatusResponse {
 
     bool success = 1;
@@ -118,16 +153,18 @@ message StatusResponse {
 }
 
 
-// ==============================
-// CONSULTA DE SERVICIOS
-// ==============================
+// ============================================================
+// CONSULTA DE ESTADO DE SERVICIOS
+// ============================================================
 
+// Solicitud para consultar un servicio registrado.
 message ServiceRequest {
 
     string component_name = 1;
 }
 
 
+// Estado actual de un componente.
 message ServiceResponse {
 
     string component_id = 1;
@@ -138,20 +175,24 @@ message ServiceResponse {
 
     string message = 4;
 
+    // Última actualización en timestamp Unix.
     int64 last_updated = 5;
 }
 
 
-// ==============================
+// ============================================================
 // CONSULTA DE NODOS HPC
-// ==============================
+// ============================================================
 
+// Identifica el nodo HPC que se desea consultar.
 message NodeRequest {
 
     string node_id = 1;
 }
 
 
+// Información de monitoreo de un nodo perteneciente
+// al clúster HPC.
 message NodeResponse {
 
     string node_id = 1;
@@ -160,13 +201,20 @@ message NodeResponse {
 
     string status = 3;
 
+    // Cantidad total de núcleos disponibles.
     int32 cpu_cores = 4;
 
+    // Memoria total del nodo.
+    // La unidad deberá mantenerse consistente
+    // en toda la implementación.
     int64 memory = 5;
 
+    // Uso actual de CPU en porcentaje.
     double cpu_usage = 6;
 
+    // Uso actual de memoria.
     double memory_usage = 7;
 
+    // Última actualización en timestamp Unix.
     int64 last_updated = 8;
 }

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: monitoring.proto
+// source: proto/monitoring.proto
 
 package generated
 
@@ -21,22 +21,36 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// Métricas enviadas por un componente al Monitoring Service.
 type MetricsRequest struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	ComponentId       string                 `protobuf:"bytes,1,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
-	ComponentName     string                 `protobuf:"bytes,2,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
-	CpuUsage          float64                `protobuf:"fixed64,3,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
-	MemoryUsage       float64                `protobuf:"fixed64,4,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
-	ActiveConnections int64                  `protobuf:"varint,5,opt,name=active_connections,json=activeConnections,proto3" json:"active_connections,omitempty"`
-	TotalRequests     int64                  `protobuf:"varint,6,opt,name=total_requests,json=totalRequests,proto3" json:"total_requests,omitempty"`
-	Timestamp         int64                  `protobuf:"varint,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Identificador técnico del componente.
+	// Ejemplo: sync-service
+	ComponentId string `protobuf:"bytes,1,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
+	// Nombre legible del componente.
+	// Ejemplo: Sync Service
+	ComponentName string `protobuf:"bytes,2,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
+	// Uso de CPU del componente en porcentaje.
+	CpuUsage float64 `protobuf:"fixed64,3,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
+	// Uso de memoria del componente.
+	// Actualmente se reporta en MB.
+	MemoryUsage float64 `protobuf:"fixed64,4,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
+	// Número de conexiones activas.
+	ActiveConnections int64 `protobuf:"varint,5,opt,name=active_connections,json=activeConnections,proto3" json:"active_connections,omitempty"`
+	// Número acumulado de solicitudes procesadas.
+	TotalRequests int64 `protobuf:"varint,6,opt,name=total_requests,json=totalRequests,proto3" json:"total_requests,omitempty"`
+	// Timestamp Unix del momento de la medición.
+	Timestamp int64 `protobuf:"varint,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Espacio ocupado por los recursos administrados
+	// por el componente, expresado en bytes.
+	StorageUsage  int64 `protobuf:"varint,8,opt,name=storage_usage,json=storageUsage,proto3" json:"storage_usage,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *MetricsRequest) Reset() {
 	*x = MetricsRequest{}
-	mi := &file_monitoring_proto_msgTypes[0]
+	mi := &file_proto_monitoring_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -48,7 +62,7 @@ func (x *MetricsRequest) String() string {
 func (*MetricsRequest) ProtoMessage() {}
 
 func (x *MetricsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[0]
+	mi := &file_proto_monitoring_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -61,7 +75,7 @@ func (x *MetricsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricsRequest.ProtoReflect.Descriptor instead.
 func (*MetricsRequest) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{0}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *MetricsRequest) GetComponentId() string {
@@ -113,6 +127,14 @@ func (x *MetricsRequest) GetTimestamp() int64 {
 	return 0
 }
 
+func (x *MetricsRequest) GetStorageUsage() int64 {
+	if x != nil {
+		return x.StorageUsage
+	}
+	return 0
+}
+
+// Respuesta al registro de una métrica.
 type MetricsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -123,7 +145,7 @@ type MetricsResponse struct {
 
 func (x *MetricsResponse) Reset() {
 	*x = MetricsResponse{}
-	mi := &file_monitoring_proto_msgTypes[1]
+	mi := &file_proto_monitoring_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -135,7 +157,7 @@ func (x *MetricsResponse) String() string {
 func (*MetricsResponse) ProtoMessage() {}
 
 func (x *MetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[1]
+	mi := &file_proto_monitoring_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -148,7 +170,7 @@ func (x *MetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricsResponse.ProtoReflect.Descriptor instead.
 func (*MetricsResponse) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{1}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *MetricsResponse) GetSuccess() bool {
@@ -165,10 +187,10 @@ func (x *MetricsResponse) GetMessage() string {
 	return ""
 }
 
-// Solicitud para consultar métricas.
+// Por ahora no recibe filtros.
 //
-// Por ahora no recibe filtros. Devuelve todas las métricas
-// almacenadas en el repositorio temporal.
+// Devuelve las métricas almacenadas por el
+// Monitoring Service.
 type GetMetricsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -177,7 +199,7 @@ type GetMetricsRequest struct {
 
 func (x *GetMetricsRequest) Reset() {
 	*x = GetMetricsRequest{}
-	mi := &file_monitoring_proto_msgTypes[2]
+	mi := &file_proto_monitoring_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -189,7 +211,7 @@ func (x *GetMetricsRequest) String() string {
 func (*GetMetricsRequest) ProtoMessage() {}
 
 func (x *GetMetricsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[2]
+	mi := &file_proto_monitoring_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -202,10 +224,14 @@ func (x *GetMetricsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMetricsRequest.ProtoReflect.Descriptor instead.
 func (*GetMetricsRequest) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{2}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{2}
 }
 
-// Representa una métrica devuelta por el Monitoring Service.
+// Representa una métrica almacenada y posteriormente
+// devuelta por GetMetrics.
+//
+// Debe conservar los mismos datos principales que
+// MetricsRequest para no perder información.
 type Metric struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	ComponentId       string                 `protobuf:"bytes,1,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
@@ -215,13 +241,15 @@ type Metric struct {
 	ActiveConnections int64                  `protobuf:"varint,5,opt,name=active_connections,json=activeConnections,proto3" json:"active_connections,omitempty"`
 	TotalRequests     int64                  `protobuf:"varint,6,opt,name=total_requests,json=totalRequests,proto3" json:"total_requests,omitempty"`
 	Timestamp         int64                  `protobuf:"varint,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	// Uso de almacenamiento en bytes.
+	StorageUsage  int64 `protobuf:"varint,8,opt,name=storage_usage,json=storageUsage,proto3" json:"storage_usage,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *Metric) Reset() {
 	*x = Metric{}
-	mi := &file_monitoring_proto_msgTypes[3]
+	mi := &file_proto_monitoring_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -233,7 +261,7 @@ func (x *Metric) String() string {
 func (*Metric) ProtoMessage() {}
 
 func (x *Metric) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[3]
+	mi := &file_proto_monitoring_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -246,7 +274,7 @@ func (x *Metric) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Metric.ProtoReflect.Descriptor instead.
 func (*Metric) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{3}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Metric) GetComponentId() string {
@@ -298,7 +326,14 @@ func (x *Metric) GetTimestamp() int64 {
 	return 0
 }
 
-// Respuesta con las métricas registradas.
+func (x *Metric) GetStorageUsage() int64 {
+	if x != nil {
+		return x.StorageUsage
+	}
+	return 0
+}
+
+// Lista de métricas registradas.
 type GetMetricsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Metrics       []*Metric              `protobuf:"bytes,1,rep,name=metrics,proto3" json:"metrics,omitempty"`
@@ -308,7 +343,7 @@ type GetMetricsResponse struct {
 
 func (x *GetMetricsResponse) Reset() {
 	*x = GetMetricsResponse{}
-	mi := &file_monitoring_proto_msgTypes[4]
+	mi := &file_proto_monitoring_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -320,7 +355,7 @@ func (x *GetMetricsResponse) String() string {
 func (*GetMetricsResponse) ProtoMessage() {}
 
 func (x *GetMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[4]
+	mi := &file_proto_monitoring_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -333,7 +368,7 @@ func (x *GetMetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMetricsResponse.ProtoReflect.Descriptor instead.
 func (*GetMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{4}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetMetricsResponse) GetMetrics() []*Metric {
@@ -343,20 +378,27 @@ func (x *GetMetricsResponse) GetMetrics() []*Metric {
 	return nil
 }
 
+// Permite a un componente informar su estado actual.
 type StatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ComponentId   string                 `protobuf:"bytes,1,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
 	ComponentName string                 `protobuf:"bytes,2,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
-	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Message       string                 `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
-	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Ejemplos:
+	// ACTIVE
+	// INACTIVE
+	// DEGRADED
+	// ERROR
+	Status  string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	Message string `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
+	// Timestamp Unix.
+	Timestamp     int64 `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *StatusRequest) Reset() {
 	*x = StatusRequest{}
-	mi := &file_monitoring_proto_msgTypes[5]
+	mi := &file_proto_monitoring_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -368,7 +410,7 @@ func (x *StatusRequest) String() string {
 func (*StatusRequest) ProtoMessage() {}
 
 func (x *StatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[5]
+	mi := &file_proto_monitoring_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -381,7 +423,7 @@ func (x *StatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
 func (*StatusRequest) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{5}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *StatusRequest) GetComponentId() string {
@@ -419,6 +461,7 @@ func (x *StatusRequest) GetTimestamp() int64 {
 	return 0
 }
 
+// Respuesta al registro de estado.
 type StatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -429,7 +472,7 @@ type StatusResponse struct {
 
 func (x *StatusResponse) Reset() {
 	*x = StatusResponse{}
-	mi := &file_monitoring_proto_msgTypes[6]
+	mi := &file_proto_monitoring_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -441,7 +484,7 @@ func (x *StatusResponse) String() string {
 func (*StatusResponse) ProtoMessage() {}
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[6]
+	mi := &file_proto_monitoring_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -454,7 +497,7 @@ func (x *StatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
 func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{6}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *StatusResponse) GetSuccess() bool {
@@ -471,6 +514,7 @@ func (x *StatusResponse) GetMessage() string {
 	return ""
 }
 
+// Solicitud para consultar un servicio registrado.
 type ServiceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ComponentName string                 `protobuf:"bytes,1,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
@@ -480,7 +524,7 @@ type ServiceRequest struct {
 
 func (x *ServiceRequest) Reset() {
 	*x = ServiceRequest{}
-	mi := &file_monitoring_proto_msgTypes[7]
+	mi := &file_proto_monitoring_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -492,7 +536,7 @@ func (x *ServiceRequest) String() string {
 func (*ServiceRequest) ProtoMessage() {}
 
 func (x *ServiceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[7]
+	mi := &file_proto_monitoring_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -505,7 +549,7 @@ func (x *ServiceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServiceRequest.ProtoReflect.Descriptor instead.
 func (*ServiceRequest) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{7}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ServiceRequest) GetComponentName() string {
@@ -515,20 +559,22 @@ func (x *ServiceRequest) GetComponentName() string {
 	return ""
 }
 
+// Estado actual de un componente.
 type ServiceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ComponentId   string                 `protobuf:"bytes,1,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
 	ComponentName string                 `protobuf:"bytes,2,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
 	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
 	Message       string                 `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
-	LastUpdated   int64                  `protobuf:"varint,5,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
+	// Última actualización en timestamp Unix.
+	LastUpdated   int64 `protobuf:"varint,5,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *ServiceResponse) Reset() {
 	*x = ServiceResponse{}
-	mi := &file_monitoring_proto_msgTypes[8]
+	mi := &file_proto_monitoring_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -540,7 +586,7 @@ func (x *ServiceResponse) String() string {
 func (*ServiceResponse) ProtoMessage() {}
 
 func (x *ServiceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[8]
+	mi := &file_proto_monitoring_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -553,7 +599,7 @@ func (x *ServiceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServiceResponse.ProtoReflect.Descriptor instead.
 func (*ServiceResponse) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{8}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ServiceResponse) GetComponentId() string {
@@ -591,6 +637,7 @@ func (x *ServiceResponse) GetLastUpdated() int64 {
 	return 0
 }
 
+// Identifica el nodo HPC que se desea consultar.
 type NodeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
@@ -600,7 +647,7 @@ type NodeRequest struct {
 
 func (x *NodeRequest) Reset() {
 	*x = NodeRequest{}
-	mi := &file_monitoring_proto_msgTypes[9]
+	mi := &file_proto_monitoring_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -612,7 +659,7 @@ func (x *NodeRequest) String() string {
 func (*NodeRequest) ProtoMessage() {}
 
 func (x *NodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[9]
+	mi := &file_proto_monitoring_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -625,7 +672,7 @@ func (x *NodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeRequest.ProtoReflect.Descriptor instead.
 func (*NodeRequest) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{9}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *NodeRequest) GetNodeId() string {
@@ -635,23 +682,32 @@ func (x *NodeRequest) GetNodeId() string {
 	return ""
 }
 
+// Información de monitoreo de un nodo perteneciente
+// al clúster HPC.
 type NodeResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	Hostname      string                 `protobuf:"bytes,2,opt,name=hostname,proto3" json:"hostname,omitempty"`
-	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	CpuCores      int32                  `protobuf:"varint,4,opt,name=cpu_cores,json=cpuCores,proto3" json:"cpu_cores,omitempty"`
-	Memory        int64                  `protobuf:"varint,5,opt,name=memory,proto3" json:"memory,omitempty"`
-	CpuUsage      float64                `protobuf:"fixed64,6,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
-	MemoryUsage   float64                `protobuf:"fixed64,7,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
-	LastUpdated   int64                  `protobuf:"varint,8,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	NodeId   string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Hostname string                 `protobuf:"bytes,2,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Status   string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	// Cantidad total de núcleos disponibles.
+	CpuCores int32 `protobuf:"varint,4,opt,name=cpu_cores,json=cpuCores,proto3" json:"cpu_cores,omitempty"`
+	// Memoria total del nodo.
+	// La unidad deberá mantenerse consistente
+	// en toda la implementación.
+	Memory int64 `protobuf:"varint,5,opt,name=memory,proto3" json:"memory,omitempty"`
+	// Uso actual de CPU en porcentaje.
+	CpuUsage float64 `protobuf:"fixed64,6,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
+	// Uso actual de memoria.
+	MemoryUsage float64 `protobuf:"fixed64,7,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
+	// Última actualización en timestamp Unix.
+	LastUpdated   int64 `protobuf:"varint,8,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *NodeResponse) Reset() {
 	*x = NodeResponse{}
-	mi := &file_monitoring_proto_msgTypes[10]
+	mi := &file_proto_monitoring_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -663,7 +719,7 @@ func (x *NodeResponse) String() string {
 func (*NodeResponse) ProtoMessage() {}
 
 func (x *NodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_monitoring_proto_msgTypes[10]
+	mi := &file_proto_monitoring_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -676,7 +732,7 @@ func (x *NodeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeResponse.ProtoReflect.Descriptor instead.
 func (*NodeResponse) Descriptor() ([]byte, []int) {
-	return file_monitoring_proto_rawDescGZIP(), []int{10}
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *NodeResponse) GetNodeId() string {
@@ -735,12 +791,12 @@ func (x *NodeResponse) GetLastUpdated() int64 {
 	return 0
 }
 
-var File_monitoring_proto protoreflect.FileDescriptor
+var File_proto_monitoring_proto protoreflect.FileDescriptor
 
-const file_monitoring_proto_rawDesc = "" +
+const file_proto_monitoring_proto_rawDesc = "" +
 	"\n" +
-	"\x10monitoring.proto\x12\n" +
-	"monitoring\"\x8e\x02\n" +
+	"\x16proto/monitoring.proto\x12\n" +
+	"monitoring\"\xb3\x02\n" +
 	"\x0eMetricsRequest\x12!\n" +
 	"\fcomponent_id\x18\x01 \x01(\tR\vcomponentId\x12%\n" +
 	"\x0ecomponent_name\x18\x02 \x01(\tR\rcomponentName\x12\x1b\n" +
@@ -748,11 +804,12 @@ const file_monitoring_proto_rawDesc = "" +
 	"\fmemory_usage\x18\x04 \x01(\x01R\vmemoryUsage\x12-\n" +
 	"\x12active_connections\x18\x05 \x01(\x03R\x11activeConnections\x12%\n" +
 	"\x0etotal_requests\x18\x06 \x01(\x03R\rtotalRequests\x12\x1c\n" +
-	"\ttimestamp\x18\a \x01(\x03R\ttimestamp\"E\n" +
+	"\ttimestamp\x18\a \x01(\x03R\ttimestamp\x12#\n" +
+	"\rstorage_usage\x18\b \x01(\x03R\fstorageUsage\"E\n" +
 	"\x0fMetricsResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"\x13\n" +
-	"\x11GetMetricsRequest\"\x86\x02\n" +
+	"\x11GetMetricsRequest\"\xab\x02\n" +
 	"\x06Metric\x12!\n" +
 	"\fcomponent_id\x18\x01 \x01(\tR\vcomponentId\x12%\n" +
 	"\x0ecomponent_name\x18\x02 \x01(\tR\rcomponentName\x12\x1b\n" +
@@ -760,7 +817,8 @@ const file_monitoring_proto_rawDesc = "" +
 	"\fmemory_usage\x18\x04 \x01(\x01R\vmemoryUsage\x12-\n" +
 	"\x12active_connections\x18\x05 \x01(\x03R\x11activeConnections\x12%\n" +
 	"\x0etotal_requests\x18\x06 \x01(\x03R\rtotalRequests\x12\x1c\n" +
-	"\ttimestamp\x18\a \x01(\x03R\ttimestamp\"B\n" +
+	"\ttimestamp\x18\a \x01(\x03R\ttimestamp\x12#\n" +
+	"\rstorage_usage\x18\b \x01(\x03R\fstorageUsage\"B\n" +
 	"\x12GetMetricsResponse\x12,\n" +
 	"\ametrics\x18\x01 \x03(\v2\x12.monitoring.MetricR\ametrics\"\xa9\x01\n" +
 	"\rStatusRequest\x12!\n" +
@@ -800,19 +858,19 @@ const file_monitoring_proto_rawDesc = "" +
 	"\rGetNodeStatus\x12\x17.monitoring.NodeRequest\x1a\x18.monitoring.NodeResponseB^Z\\github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/generated;generatedb\x06proto3"
 
 var (
-	file_monitoring_proto_rawDescOnce sync.Once
-	file_monitoring_proto_rawDescData []byte
+	file_proto_monitoring_proto_rawDescOnce sync.Once
+	file_proto_monitoring_proto_rawDescData []byte
 )
 
-func file_monitoring_proto_rawDescGZIP() []byte {
-	file_monitoring_proto_rawDescOnce.Do(func() {
-		file_monitoring_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_monitoring_proto_rawDesc), len(file_monitoring_proto_rawDesc)))
+func file_proto_monitoring_proto_rawDescGZIP() []byte {
+	file_proto_monitoring_proto_rawDescOnce.Do(func() {
+		file_proto_monitoring_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_monitoring_proto_rawDesc), len(file_proto_monitoring_proto_rawDesc)))
 	})
-	return file_monitoring_proto_rawDescData
+	return file_proto_monitoring_proto_rawDescData
 }
 
-var file_monitoring_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_monitoring_proto_goTypes = []any{
+var file_proto_monitoring_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_proto_monitoring_proto_goTypes = []any{
 	(*MetricsRequest)(nil),     // 0: monitoring.MetricsRequest
 	(*MetricsResponse)(nil),    // 1: monitoring.MetricsResponse
 	(*GetMetricsRequest)(nil),  // 2: monitoring.GetMetricsRequest
@@ -825,7 +883,7 @@ var file_monitoring_proto_goTypes = []any{
 	(*NodeRequest)(nil),        // 9: monitoring.NodeRequest
 	(*NodeResponse)(nil),       // 10: monitoring.NodeResponse
 }
-var file_monitoring_proto_depIdxs = []int32{
+var file_proto_monitoring_proto_depIdxs = []int32{
 	3,  // 0: monitoring.GetMetricsResponse.metrics:type_name -> monitoring.Metric
 	0,  // 1: monitoring.MonitoringService.ReportMetrics:input_type -> monitoring.MetricsRequest
 	2,  // 2: monitoring.MonitoringService.GetMetrics:input_type -> monitoring.GetMetricsRequest
@@ -844,26 +902,26 @@ var file_monitoring_proto_depIdxs = []int32{
 	0,  // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_monitoring_proto_init() }
-func file_monitoring_proto_init() {
-	if File_monitoring_proto != nil {
+func init() { file_proto_monitoring_proto_init() }
+func file_proto_monitoring_proto_init() {
+	if File_proto_monitoring_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_monitoring_proto_rawDesc), len(file_monitoring_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_monitoring_proto_rawDesc), len(file_proto_monitoring_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_monitoring_proto_goTypes,
-		DependencyIndexes: file_monitoring_proto_depIdxs,
-		MessageInfos:      file_monitoring_proto_msgTypes,
+		GoTypes:           file_proto_monitoring_proto_goTypes,
+		DependencyIndexes: file_proto_monitoring_proto_depIdxs,
+		MessageInfos:      file_proto_monitoring_proto_msgTypes,
 	}.Build()
-	File_monitoring_proto = out.File
-	file_monitoring_proto_goTypes = nil
-	file_monitoring_proto_depIdxs = nil
+	File_proto_monitoring_proto = out.File
+	file_proto_monitoring_proto_goTypes = nil
+	file_proto_monitoring_proto_depIdxs = nil
 }

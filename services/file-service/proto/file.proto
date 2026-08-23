@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package files;
+package file;
 
-option go_package = "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/generated";
+option go_package = "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/proto;generated";
 
 service FileService {
 
@@ -10,21 +10,16 @@ service FileService {
 
   rpc GetFile(GetFileRequest) returns (GetFileResponse);
 
-  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
-
   rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
-}
 
-message File {
-  string id = 1;
-  string name = 2;
-  string content = 3;
-  string created_at = 4;
+  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
 }
 
 message UploadFileRequest {
-  string name = 1;
-  string content = 2;
+  string user_id = 1;
+  string file_name = 2;
+  string file_type = 3;
+  bytes content = 4;
 }
 
 message UploadFileResponse {
@@ -40,7 +35,19 @@ message GetFileRequest {
 message GetFileResponse {
   bool success = 1;
   string message = 2;
-  File file = 3;
+
+  FileData file = 3;
+}
+
+message ListFilesRequest {
+  string user_id = 1;
+}
+
+message ListFilesResponse {
+  bool success = 1;
+  string message = 2;
+
+  repeated FileData files = 3;
 }
 
 message DeleteFileRequest {
@@ -52,9 +59,12 @@ message DeleteFileResponse {
   string message = 2;
 }
 
-message ListFilesRequest {
-}
-
-message ListFilesResponse {
-  repeated File files = 1;
+message FileData {
+  string file_id = 1;
+  string user_id = 2;
+  string file_name = 3;
+  string file_type = 4;
+  bytes content = 5;
+  int64 size = 6;
+  string created_at = 7;
 }
