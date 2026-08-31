@@ -6,12 +6,20 @@ class PhotoRepository {
   async create({
     fileId,
     directorioId,
-    name,
-    mimeType,
-    size,
-    path,
     tags = []
   }) {
+
+    if (!fileId) {
+      throw new Error(
+        "fileId es obligatorio"
+      );
+    }
+
+    if (!directorioId) {
+      throw new Error(
+        "directorioId es obligatorio"
+      );
+    }
 
     const client =
       await pool.connect();
@@ -23,77 +31,90 @@ class PhotoRepository {
       );
 
       // =====================================
-      // USUARIO + HOME
+      // VALIDAR ARCHIVO CREADO POR FILE SERVICE
       // =====================================
 
-      const userResult =
+      const fileResult =
         await client.query(
           `
           SELECT
-            u.id_usuario,
-            h.id_home
-          FROM usuario u
-          JOIN home h
-            ON h.id_usuario =
-               u.id_usuario
-          WHERE u.directorio_id = $1
+            a.id_archivo,
+            a.id_home,
+            a.id_usuario,
+            a.nombre,
+            a.ruta_relativa,
+            a.tamano,
+            a.mime_type,
+            a.tipo_archivo,
+
+            u.directorio_id
+
+          FROM archivo a
+
+          JOIN usuario u
+            ON u.id_usuario =
+               a.id_usuario
+
+          WHERE
+            a.id_archivo = $1
+            AND
+            u.directorio_id = $2
+
+          FOR UPDATE
           `,
           [
+            fileId,
             directorioId
           ]
         );
 
       if (
-        userResult.rowCount === 0
+        fileResult.rowCount === 0
       ) {
         throw new Error(
-          "Usuario o Home no encontrado"
+          "El archivo no existe en File Service o no pertenece al usuario autenticado"
         );
       }
 
-      const {
-        id_usuario: userId,
-        id_home: homeId
-      } =
-        userResult.rows[0];
+      const file =
+        fileResult.rows[0];
+
+      if (
+        !file.mime_type ||
+        !file.mime_type.startsWith(
+          "image/"
+        )
+      ) {
+        throw new Error(
+          "El archivo registrado en File Service no es una imagen"
+        );
+      }
 
       // =====================================
-      // ARCHIVO
+      // NORMALIZAR CLASIFICACIÓN DEL ARCHIVO
       // =====================================
 
-      await client.query(
-        `
-        INSERT INTO archivo (
-          id_archivo,
-          id_home,
-          id_usuario,
-          nombre,
-          ruta_relativa,
-          tamano,
-          mime_type,
-          tipo_archivo
-        )
-        VALUES (
-          $1,
-          $2,
-          $3,
-          $4,
-          $5,
-          $6,
-          $7,
-          'IMAGEN'
-        )
-        `,
-        [
-          fileId,
-          homeId,
-          userId,
-          name,
-          path,
-          size,
-          mimeType
-        ]
-      );
+      if (
+        file.tipo_archivo !==
+        "IMAGEN"
+      ) {
+
+        await client.query(
+          `
+          UPDATE archivo
+          SET
+            tipo_archivo =
+              'IMAGEN',
+            fecha_modificacion =
+              CURRENT_TIMESTAMP
+          WHERE
+            id_archivo = $1
+          `,
+          [
+            fileId
+          ]
+        );
+      }
 
       // =====================================
       // IMAGEN
@@ -110,12 +131,20 @@ class PhotoRepository {
             $1,
             $2
           )
-          RETURNING id_imagen
+          ON CONFLICT (
+            id_archivo
+          )
+          DO UPDATE
+          SET
+            formato =
+              EXCLUDED.formato
+          RETURNING
+            id_imagen
           `,
           [
             fileId,
             this.extractFormat(
-              mimeType
+              file.mime_type
             )
           ]
         );
@@ -150,12 +179,18 @@ class PhotoRepository {
             INSERT INTO tag (
               nombre
             )
-            VALUES ($1)
-            ON CONFLICT (nombre)
+            VALUES (
+              $1
+            )
+            ON CONFLICT (
+              nombre
+            )
             DO UPDATE
-            SET nombre =
+            SET
+              nombre =
                 EXCLUDED.nombre
-            RETURNING id_tag
+            RETURNING
+              id_tag
             `,
             [
               normalizedTag
@@ -176,7 +211,8 @@ class PhotoRepository {
             $1,
             $2
           )
-          ON CONFLICT DO NOTHING
+          ON CONFLICT
+          DO NOTHING
           `,
           [
             imageId,
@@ -213,7 +249,8 @@ class PhotoRepository {
       await pool.query(
         `
         SELECT
-          i.id_imagen AS id,
+          i.id_imagen
+            AS id,
 
           a.id_archivo
             AS "fileId",
@@ -233,6 +270,15 @@ class PhotoRepository {
           a.ruta_relativa
             AS path,
 
+          i.ancho
+            AS width,
+
+          i.alto
+            AS height,
+
+          i.formato
+            AS format,
+
           i.fecha_registro
             AS "createdAt",
 
@@ -244,13 +290,16 @@ class PhotoRepository {
                   ORDER BY
                     ai.fecha_agregada
                 )
+
               FROM album_imagen ai
+
               WHERE
                 ai.id_imagen =
                 i.id_imagen
             ),
             '{}'
-          ) AS "albumIds",
+          )
+            AS "albumIds",
 
           COALESCE(
             (
@@ -260,16 +309,20 @@ class PhotoRepository {
                   ORDER BY
                     t.nombre
                 )
+
               FROM imagen_tag it
+
               JOIN tag t
                 ON t.id_tag =
                    it.id_tag
+
               WHERE
                 it.id_imagen =
                 i.id_imagen
             ),
             '{}'
-          ) AS tags
+          )
+            AS tags
 
         FROM imagen i
 
@@ -304,8 +357,11 @@ class PhotoRepository {
       await pool.query(
         `
         SELECT
-          i.id_imagen AS id
+          i.id_imagen
+            AS id
+
         FROM imagen i
+
         ORDER BY
           i.fecha_registro
         `
@@ -324,6 +380,7 @@ class PhotoRepository {
         );
 
       if (photo) {
+
         photos.push(
           photo
         );
@@ -343,7 +400,8 @@ class PhotoRepository {
       await pool.query(
         `
         SELECT DISTINCT
-          i.id_imagen AS id
+          i.id_imagen
+            AS id
 
         FROM imagen i
 
@@ -369,23 +427,37 @@ class PhotoRepository {
             OR
             u.directorio_id = $1
           )
+
           AND
+
           (
             $2::text IS NULL
             OR
-            LOWER(a.nombre)
-            LIKE LOWER(
+            LOWER(
+              a.nombre
+            )
+            LIKE
+            LOWER(
               '%' || $2 || '%'
             )
           )
+
           AND
+
           (
             $3::text IS NULL
             OR
-            LOWER(t.nombre)
+            LOWER(
+              t.nombre
+            )
             =
-            LOWER($3)
+            LOWER(
+              $3
+            )
           )
+
+        ORDER BY
+          id
         `,
         [
           ownerId || null,
@@ -407,6 +479,7 @@ class PhotoRepository {
         );
 
       if (photo) {
+
         photos.push(
           photo
         );
@@ -417,19 +490,15 @@ class PhotoRepository {
   }
 
   async delete(id) {
-    
 
     const result =
       await pool.query(
         `
-        DELETE FROM archivo
-        WHERE id_archivo = (
-          SELECT
-            id_archivo
-          FROM imagen
-          WHERE
-            id_imagen = $1
-        )
+        DELETE FROM imagen
+
+        WHERE
+          id_imagen = $1
+
         RETURNING
           id_archivo
         `,
@@ -457,7 +526,9 @@ class PhotoRepository {
     }
 
     const parts =
-      mimeType.split("/");
+      mimeType.split(
+        "/"
+      );
 
     if (
       parts.length !== 2

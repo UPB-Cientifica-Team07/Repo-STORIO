@@ -11,6 +11,7 @@ const {
   createPhoto,
   listPhotos,
   getPhoto,
+  getPhotoContent,
   deletePhoto
 } =
   require("../controllers/photoController");
@@ -33,6 +34,14 @@ router.post(
 router.get(
   "/",
   listPhotos
+);
+
+// IMPORTANTE:
+// /:id/content debe ir antes de /:id
+
+router.get(
+  "/:id/content",
+  getPhotoContent
 );
 
 router.get(

@@ -4,21 +4,34 @@ import (
 	"context"
 	"log"
 	"os"
+	"strings"
 	"time"
+
+	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/proto"
 
 	grpcClient "google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-
-	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/proto"
+	"google.golang.org/grpc/metadata"
 )
 
 func main() {
+	fileID := strings.TrimSpace(
+		os.Getenv("FILE_ID"),
+	)
 
-	fileID := os.Getenv("FILE_ID")
+	token := strings.TrimSpace(
+		os.Getenv("TOKEN_USER"),
+	)
 
 	if fileID == "" {
 		log.Fatal(
 			"Debe definir la variable FILE_ID",
+		)
+	}
+
+	if token == "" {
+		log.Fatal(
+			"Debe definir la variable TOKEN_USER",
 		)
 	}
 
@@ -35,7 +48,6 @@ func main() {
 		)
 
 	if err != nil {
-
 		log.Fatalf(
 			"No se pudo conectar con File Service: %v",
 			err,
@@ -49,7 +61,7 @@ func main() {
 			connection,
 		)
 
-	ctx,
+	baseCtx,
 		cancel :=
 		context.WithTimeout(
 			context.Background(),
@@ -57,6 +69,19 @@ func main() {
 		)
 
 	defer cancel()
+
+	// =====================================
+	// AUTENTICACIÓN BEARER
+	// =====================================
+
+	ctx :=
+		metadata.NewOutgoingContext(
+			baseCtx,
+			metadata.Pairs(
+				"authorization",
+				"Bearer "+token,
+			),
+		)
 
 	// =====================================
 	// CONSULTAR ARCHIVO EXISTENTE
@@ -76,7 +101,6 @@ func main() {
 		)
 
 	if err != nil {
-
 		log.Fatalf(
 			"Error consultando archivo: %v",
 			err,

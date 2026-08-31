@@ -221,6 +221,102 @@ async function getPhoto(
 }
 
 // =====================================
+// CONTENT
+// =====================================
+
+async function getPhotoContent(
+  req,
+  res
+) {
+
+  try {
+
+    const photo =
+      await photoService.getPhoto(
+        req.params.id
+      );
+
+    if (!photo) {
+
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message:
+            "Foto no encontrada"
+        });
+    }
+
+    if (
+      photo.ownerId !==
+        req.user.userId &&
+      req.user.role !==
+        "ADMIN"
+    ) {
+
+      return res
+        .status(403)
+        .json({
+          success: false,
+          message:
+            "No tiene permisos para acceder a esta foto"
+        });
+    }
+
+    const result =
+      await photoService.getPhotoContent(
+        req.params.id,
+        req.user.token
+      );
+
+    if (!result) {
+
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message:
+            "Contenido de foto no encontrado"
+        });
+    }
+
+    res.setHeader(
+      "Content-Type",
+      result.mimeType ||
+      "application/octet-stream"
+    );
+
+    res.setHeader(
+      "Content-Length",
+      result.content.length
+    );
+
+    res.setHeader(
+      "Content-Disposition",
+      `inline; filename="${result.fileName}"`
+    );
+
+    return res
+      .status(200)
+      .send(
+        result.content
+      );
+
+  } catch (error) {
+
+    return res
+      .status(500)
+      .json({
+        success: false,
+        message:
+          "Error obteniendo contenido de foto",
+        detail:
+          error.message
+      });
+  }
+}
+
+// =====================================
 // DELETE
 // =====================================
 
@@ -304,5 +400,6 @@ module.exports = {
   createPhoto,
   listPhotos,
   getPhoto,
+  getPhotoContent,
   deletePhoto
 };

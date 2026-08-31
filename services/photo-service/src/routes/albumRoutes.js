@@ -1,4 +1,5 @@
-const express = require("express");
+const express =
+  require("express");
 
 const authMiddleware =
   require("../middleware/authMiddleware");
@@ -8,13 +9,17 @@ const {
   listAlbums,
   getAlbum,
   addPhotoToAlbum,
-  removePhotoFromAlbum
-} = require("../controllers/albumController");
+  removePhotoFromAlbum,
+  deleteAlbum
+} =
+  require("../controllers/albumController");
 
 const router =
   express.Router();
 
-router.use(authMiddleware);
+router.use(
+  authMiddleware
+);
 
 router.post(
   "/",
@@ -41,4 +46,10 @@ router.delete(
   removePhotoFromAlbum
 );
 
-module.exports = router;
+router.delete(
+  "/:id",
+  deleteAlbum
+);
+
+module.exports =
+  router;

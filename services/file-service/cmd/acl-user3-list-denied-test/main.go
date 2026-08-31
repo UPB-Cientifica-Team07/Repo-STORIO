@@ -20,6 +20,8 @@ func main() {
 		log.Fatal("TOKEN_USER3 es obligatorio")
 	}
 
+	const revokedFileID = "231a6faa-04e6-4751-a079-b28f6d83175b"
+
 	connection, err :=
 		grpcClient.NewClient(
 			"localhost:50053",
@@ -60,13 +62,16 @@ func main() {
 		)
 
 	log.Println("===================================")
-	log.Println(" USER-003 LIST DENIED TEST")
+	log.Println(" USER-003 LIST AFTER REVOKE TEST")
 	log.Println("===================================")
 	log.Println(" Usuario: user-003")
+	log.Printf(
+		" Archivo revocado: %s",
+		revokedFileID,
+	)
 	log.Println(" Esperado:")
-	log.Println(" - sin archivos propios")
-	log.Println(" - sin archivos compartidos")
-	log.Println(" - total = 0")
+	log.Println(" - archivos propios pueden permanecer visibles")
+	log.Println(" - archivo revocado NO debe aparecer")
 	log.Println("===================================")
 
 	response, err :=
@@ -100,19 +105,24 @@ func main() {
 	)
 
 	log.Printf(
-		"Archivos recibidos: %d",
+		"Archivos visibles: %d",
 		len(response.Files),
 	)
 
-	if len(response.Files) != 0 {
-		log.Fatalf(
-			"ERROR: se esperaban 0 archivos, pero se recibieron %d",
-			len(response.Files),
-		)
+	for _, file := range response.Files {
+		if file.FileId == revokedFileID {
+			log.Fatalf(
+				"ERROR DE ACL: el archivo revocado sigue visible | FileID=%s | Owner=%s | Nombre=%s",
+				file.FileId,
+				file.UserId,
+				file.FileName,
+			)
+		}
 	}
 
 	log.Println("===================================")
-	log.Println(" LISTADO VACÍO VALIDADO")
-	log.Println(" ACL REVOCADA CORRECTAMENTE")
+	log.Println(" LISTADO POST-REVOCACIÓN VALIDADO")
+	log.Println(" Archivo revocado: NO VISIBLE")
+	log.Println(" Archivos propios: CONSERVADOS")
 	log.Println("===================================")
 }

@@ -85,18 +85,6 @@ class PhotoService {
         directorioId:
           ownerId,
 
-        name:
-          file.originalname,
-
-        mimeType:
-          file.mimetype,
-
-        size:
-          file.size,
-
-        path:
-          `files/${fileId}.bin`,
-
         tags
       });
 
@@ -145,6 +133,49 @@ class PhotoService {
   }
 
   // =====================================
+  // GET CONTENT
+  // =====================================
+
+  async getPhotoContent(
+    id,
+    token
+  ) {
+
+    if (!token) {
+      throw new Error(
+        "token es obligatorio"
+      );
+    }
+
+    const photo =
+      await photoRepository.findById(
+        id
+      );
+
+    if (!photo) {
+      return null;
+    }
+
+    const file =
+      await fileClient.getFile(
+        photo.fileId,
+        token
+      );
+
+    return {
+      photo,
+      content:
+        file.content,
+      mimeType:
+        file.fileType ||
+        photo.mimeType,
+      fileName:
+        file.fileName ||
+        photo.name
+    };
+  }
+
+  // =====================================
   // LIST
   // =====================================
 
@@ -182,7 +213,7 @@ class PhotoService {
     }
 
     // =====================================
-    // 1. LEER METADATA POSTGRESQL
+    // 1. LEER METADATA DE LA FOTO
     // =====================================
 
     const photo =
@@ -195,17 +226,16 @@ class PhotoService {
     }
 
     // =====================================
-    // 2. LEER ARCHIVO DESDE FILE SERVICE
-    // =====================================
-
-    const physicalFile =
-      await fileClient.getFile(
-        photo.fileId,
-        token
-      );
-
-    // =====================================
-    // 3. BORRAR ARCHIVO FÍSICO
+    // 2. FILE SERVICE ES LA AUTORIDAD
+    //
+    // DeleteFile elimina:
+    // - archivo físico
+    // - metadata archivo
+    // - uso de cuota
+    //
+    // PostgreSQL elimina imagen,
+    // imagen_tag y album_imagen mediante
+    // ON DELETE CASCADE.
     // =====================================
 
     await fileClient.deleteFile(
@@ -213,84 +243,26 @@ class PhotoService {
       token
     );
 
-    try {
+    // =====================================
+    // 3. VERIFICACIÓN POST-DELETE
+    // =====================================
 
-      // =====================================
-      // 4. BORRAR POSTGRESQL
-      // =====================================
-
-      const deletedFileId =
-        await photoRepository.delete(
-          id
-        );
-
-      if (!deletedFileId) {
-
-        throw new Error(
-          "No se pudo eliminar la metadata de PostgreSQL"
-        );
-      }
-
-      if (
-        deletedFileId !==
-        photo.fileId
-      ) {
-
-        throw new Error(
-          "El fileId eliminado en PostgreSQL no coincide con File Service"
-        );
-      }
-
-      console.log(
-        `[Photo] DELETE completado | Photo: ${id} | File: ${photo.fileId}`
+    const remainingPhoto =
+      await photoRepository.findById(
+        id
       );
 
-      return true;
-
-    } catch (error) {
-
-      // =====================================
-      // 5. COMPENSACIÓN
-      // =====================================
-
-      try {
-
-        const restored =
-          await fileClient.restoreFile({
-            token,
-
-            fileId:
-              photo.fileId,
-
-            userId:
-              physicalFile.userId,
-
-            fileName:
-              physicalFile.fileName,
-
-            fileType:
-              physicalFile.fileType,
-
-            content:
-              physicalFile.content
-          });
-
-        console.warn(
-          `[Photo] DELETE compensado | Archivo restaurado: ${restored.fileId}`
-        );
-
-      } catch (
-        compensationError
-      ) {
-
-        console.error(
-          "[Photo] ERROR CRÍTICO: falló PostgreSQL y también RestoreFile:",
-          compensationError.message
-        );
-      }
-
-      throw error;
+    if (remainingPhoto) {
+      throw new Error(
+        "La metadata de imagen permaneció después de DeleteFile"
+      );
     }
+
+    console.log(
+      `[Photo] DELETE completado | Photo: ${id} | File: ${photo.fileId}`
+    );
+
+    return true;
   }
 }
 
