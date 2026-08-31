@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
+
+  <title>
+    UPB-CIENTÍFICA
+  </title>
+
+  <link
+    rel="stylesheet"
+    href="/css/styles.css"
+  >
+</head>
+
+<body>
+
+  <header class="topbar">
+    <div>
+      <h1>
+        UPB-CIENTÍFICA
+      </h1>
+
+      <p>
+        Plataforma Distribuida
+      </p>
+    </div>
+
+    <button
+      id="logoutButton"
+      class="hidden"
+    >
+      Cerrar sesión
+    </button>
+  </header>
+
+  <main>
+
+    <section
+      id="loginView"
+      class="card login-card"
+    >
+
+      <h2>
+        Iniciar sesión
+      </h2>
+
+      <form
+        id="loginForm"
+      >
+
+        <label>
+          Usuario
+
+          <input
+            id="username"
+            type="text"
+            required
+          >
+        </label>
+
+        <label>
+          Contraseña
+
+          <input
+            id="password"
+            type="password"
+            required
+          >
+        </label>
+
+        <button
+          type="submit"
+        >
+          Ingresar
+        </button>
+
+      </form>
+
+      <p
+        id="loginMessage"
+        class="message"
+      ></p>
+
+    </section>
+
+    <section
+      id="dashboardView"
+      class="hidden"
+    >
+
+      <div class="dashboard-header">
+        <div>
+          <h2>
+            Panel principal
+          </h2>
+
+          <p id="userInfo"></p>
+        </div>
+      </div>
+
+      <div class="modules">
+
+        <button
+          class="module-card"
+          data-module="files"
+        >
+          <h3>
+            Mis archivos
+          </h3>
+
+          <p>
+            Administrar archivos del Home.
+          </p>
+        </button>
+
+        <button
+          class="module-card"
+          data-module="photos"
+        >
+          <h3>
+            Mis fotos
+          </h3>
+
+          <p>
+            Explorar y subir imágenes.
+          </p>
+        </button>
+
+        <button
+          class="module-card"
+          data-module="albums"
+        >
+          <h3>
+            Mis álbumes
+          </h3>
+
+          <p>
+            Organizar fotografías en álbumes.
+          </p>
+        </button>
+
+      </div>
+
+      <section
+        id="contentView"
+        class="card"
+      >
+        <h3>
+          Seleccione un módulo
+        </h3>
+      </section>
+
+    </section>
+
+  </main>
+
+  <script src="/js/app.js?v=2"></script>
+
+</body>
+</html>

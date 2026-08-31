@@ -1070,7 +1070,8 @@ func (s *Server) ListFiles(
 	// =====================================
 
 	if identity.Role == "ADMIN" &&
-		request.UserId != "" {
+		request.UserId != "" &&
+		request.UserId != identity.UserID {
 
 		files :=
 			s.fileService.ListFiles(
@@ -1335,6 +1336,87 @@ func (s *Server) ListFiles(
 		Success: true,
 		Message: "Archivos propios y compartidos encontrados correctamente",
 		Files:   responseFiles,
+	}, nil
+}
+
+// =====================================
+// GET HOME / QUOTA
+// =====================================
+
+func (s *Server) GetHome(
+	ctx context.Context,
+	request *pb.GetHomeRequest,
+) (*pb.GetHomeResponse, error) {
+
+	identity,
+		err :=
+		authenticatedIdentity(
+			ctx,
+		)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if s.fileService == nil {
+
+		return nil,
+			status.Error(
+				codes.Internal,
+				"File Service no inicializado",
+			)
+	}
+
+	// =====================================
+	// IDENTIDAD OBJETIVO
+	// =====================================
+
+	userID :=
+		identity.UserID
+
+	// ADMIN puede consultar otro Home.
+	if identity.Role == "ADMIN" &&
+		request.UserId != "" {
+
+		userID =
+			request.UserId
+	}
+
+	// Usuario normal no puede consultar
+	// el Home de otro usuario.
+	if identity.Role != "ADMIN" &&
+		request.UserId != "" &&
+		request.UserId != identity.UserID {
+
+		return nil,
+			status.Error(
+				codes.PermissionDenied,
+				"no puede consultar el Home de otro usuario",
+			)
+	}
+
+	home, err :=
+		s.fileService.GetHome(
+			userID,
+		)
+
+	if err != nil {
+
+		return &pb.GetHomeResponse{
+			Success: false,
+			Message: err.Error(),
+		}, nil
+	}
+
+	return &pb.GetHomeResponse{
+		Success: true,
+		Message: "Home encontrado correctamente",
+		Home: &pb.HomeData{
+			UserId:     home.DirectoryID,
+			BasePath:   home.BasePath,
+			QuotaBytes: home.QuotaBytes,
+			UsedBytes:  home.UsedBytes,
+		},
 	}, nil
 }
 

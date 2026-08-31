@@ -612,6 +612,42 @@ func (s *FileService) ListFiles(
 }
 
 // =====================================
+// OBTENER HOME
+// =====================================
+
+func (s *FileService) GetHome(
+	userID string,
+) (*repository.Home, error) {
+
+	if userID == "" {
+		return nil,
+			errors.New(
+				"el user ID es obligatorio",
+			)
+	}
+
+	if s.homeRepository == nil {
+		return nil,
+			errors.New(
+				"Home Repository no inicializado",
+			)
+	}
+
+	ctx, cancel :=
+		context.WithTimeout(
+			context.Background(),
+			5*time.Second,
+		)
+
+	defer cancel()
+
+	return s.homeRepository.FindByDirectoryID(
+		ctx,
+		userID,
+	)
+}
+
+// =====================================
 // ACTUALIZAR CONTENIDO
 // =====================================
 //

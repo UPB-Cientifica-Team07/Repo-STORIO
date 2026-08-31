@@ -29,6 +29,9 @@ service FileService {
   rpc ListFiles(ListFilesRequest)
       returns (ListFilesResponse);
 
+  rpc GetHome(GetHomeRequest)
+      returns (GetHomeResponse);
+
   rpc DeleteFile(DeleteFileRequest)
       returns (DeleteFileResponse);
 
@@ -153,6 +156,27 @@ message ListFilesResponse {
   bool success = 1;
   string message = 2;
   repeated FileData files = 3;
+}
+
+// =====================================
+// HOME / QUOTA
+// =====================================
+
+message GetHomeRequest {
+  string user_id = 1;
+}
+
+message GetHomeResponse {
+  bool success = 1;
+  string message = 2;
+  HomeData home = 3;
+}
+
+message HomeData {
+  string user_id = 1;
+  string base_path = 2;
+  int64 quota_bytes = 3;
+  int64 used_bytes = 4;
 }
 
 // =====================================

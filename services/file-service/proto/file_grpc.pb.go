@@ -24,6 +24,7 @@ const (
 	FileService_GetFile_FullMethodName          = "/file.FileService/GetFile"
 	FileService_UpdateFile_FullMethodName       = "/file.FileService/UpdateFile"
 	FileService_ListFiles_FullMethodName        = "/file.FileService/ListFiles"
+	FileService_GetHome_FullMethodName          = "/file.FileService/GetHome"
 	FileService_DeleteFile_FullMethodName       = "/file.FileService/DeleteFile"
 	FileService_ShareFile_FullMethodName        = "/file.FileService/ShareFile"
 	FileService_RevokeFileAccess_FullMethodName = "/file.FileService/RevokeFileAccess"
@@ -38,6 +39,7 @@ type FileServiceClient interface {
 	GetFile(ctx context.Context, in *GetFileRequest, opts ...grpc.CallOption) (*GetFileResponse, error)
 	UpdateFile(ctx context.Context, in *UpdateFileRequest, opts ...grpc.CallOption) (*UpdateFileResponse, error)
 	ListFiles(ctx context.Context, in *ListFilesRequest, opts ...grpc.CallOption) (*ListFilesResponse, error)
+	GetHome(ctx context.Context, in *GetHomeRequest, opts ...grpc.CallOption) (*GetHomeResponse, error)
 	DeleteFile(ctx context.Context, in *DeleteFileRequest, opts ...grpc.CallOption) (*DeleteFileResponse, error)
 	ShareFile(ctx context.Context, in *ShareFileRequest, opts ...grpc.CallOption) (*ShareFileResponse, error)
 	RevokeFileAccess(ctx context.Context, in *RevokeFileAccessRequest, opts ...grpc.CallOption) (*RevokeFileAccessResponse, error)
@@ -101,6 +103,16 @@ func (c *fileServiceClient) ListFiles(ctx context.Context, in *ListFilesRequest,
 	return out, nil
 }
 
+func (c *fileServiceClient) GetHome(ctx context.Context, in *GetHomeRequest, opts ...grpc.CallOption) (*GetHomeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetHomeResponse)
+	err := c.cc.Invoke(ctx, FileService_GetHome_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *fileServiceClient) DeleteFile(ctx context.Context, in *DeleteFileRequest, opts ...grpc.CallOption) (*DeleteFileResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteFileResponse)
@@ -140,6 +152,7 @@ type FileServiceServer interface {
 	GetFile(context.Context, *GetFileRequest) (*GetFileResponse, error)
 	UpdateFile(context.Context, *UpdateFileRequest) (*UpdateFileResponse, error)
 	ListFiles(context.Context, *ListFilesRequest) (*ListFilesResponse, error)
+	GetHome(context.Context, *GetHomeRequest) (*GetHomeResponse, error)
 	DeleteFile(context.Context, *DeleteFileRequest) (*DeleteFileResponse, error)
 	ShareFile(context.Context, *ShareFileRequest) (*ShareFileResponse, error)
 	RevokeFileAccess(context.Context, *RevokeFileAccessRequest) (*RevokeFileAccessResponse, error)
@@ -167,6 +180,9 @@ func (UnimplementedFileServiceServer) UpdateFile(context.Context, *UpdateFileReq
 }
 func (UnimplementedFileServiceServer) ListFiles(context.Context, *ListFilesRequest) (*ListFilesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListFiles not implemented")
+}
+func (UnimplementedFileServiceServer) GetHome(context.Context, *GetHomeRequest) (*GetHomeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetHome not implemented")
 }
 func (UnimplementedFileServiceServer) DeleteFile(context.Context, *DeleteFileRequest) (*DeleteFileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteFile not implemented")
@@ -288,6 +304,24 @@ func _FileService_ListFiles_Handler(srv interface{}, ctx context.Context, dec fu
 	return interceptor(ctx, in, info, handler)
 }
 
+func _FileService_GetHome_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHomeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(FileServiceServer).GetHome(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: FileService_GetHome_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(FileServiceServer).GetHome(ctx, req.(*GetHomeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _FileService_DeleteFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteFileRequest)
 	if err := dec(in); err != nil {
@@ -368,6 +402,10 @@ var FileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListFiles",
 			Handler:    _FileService_ListFiles_Handler,
+		},
+		{
+			MethodName: "GetHome",
+			Handler:    _FileService_GetHome_Handler,
 		},
 		{
 			MethodName: "DeleteFile",

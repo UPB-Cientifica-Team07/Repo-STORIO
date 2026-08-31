@@ -627,6 +627,178 @@ func (x *ListFilesResponse) GetFiles() []*FileData {
 	return nil
 }
 
+type GetHomeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetHomeRequest) Reset() {
+	*x = GetHomeRequest{}
+	mi := &file_services_file_service_proto_file_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetHomeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetHomeRequest) ProtoMessage() {}
+
+func (x *GetHomeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_services_file_service_proto_file_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetHomeRequest.ProtoReflect.Descriptor instead.
+func (*GetHomeRequest) Descriptor() ([]byte, []int) {
+	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *GetHomeRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetHomeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	Home          *HomeData              `protobuf:"bytes,3,opt,name=home,proto3" json:"home,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetHomeResponse) Reset() {
+	*x = GetHomeResponse{}
+	mi := &file_services_file_service_proto_file_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetHomeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetHomeResponse) ProtoMessage() {}
+
+func (x *GetHomeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_services_file_service_proto_file_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetHomeResponse.ProtoReflect.Descriptor instead.
+func (*GetHomeResponse) Descriptor() ([]byte, []int) {
+	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *GetHomeResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *GetHomeResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *GetHomeResponse) GetHome() *HomeData {
+	if x != nil {
+		return x.Home
+	}
+	return nil
+}
+
+type HomeData struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	BasePath      string                 `protobuf:"bytes,2,opt,name=base_path,json=basePath,proto3" json:"base_path,omitempty"`
+	QuotaBytes    int64                  `protobuf:"varint,3,opt,name=quota_bytes,json=quotaBytes,proto3" json:"quota_bytes,omitempty"`
+	UsedBytes     int64                  `protobuf:"varint,4,opt,name=used_bytes,json=usedBytes,proto3" json:"used_bytes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *HomeData) Reset() {
+	*x = HomeData{}
+	mi := &file_services_file_service_proto_file_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HomeData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HomeData) ProtoMessage() {}
+
+func (x *HomeData) ProtoReflect() protoreflect.Message {
+	mi := &file_services_file_service_proto_file_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HomeData.ProtoReflect.Descriptor instead.
+func (*HomeData) Descriptor() ([]byte, []int) {
+	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *HomeData) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *HomeData) GetBasePath() string {
+	if x != nil {
+		return x.BasePath
+	}
+	return ""
+}
+
+func (x *HomeData) GetQuotaBytes() int64 {
+	if x != nil {
+		return x.QuotaBytes
+	}
+	return 0
+}
+
+func (x *HomeData) GetUsedBytes() int64 {
+	if x != nil {
+		return x.UsedBytes
+	}
+	return 0
+}
+
 type DeleteFileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	FileId        string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
@@ -636,7 +808,7 @@ type DeleteFileRequest struct {
 
 func (x *DeleteFileRequest) Reset() {
 	*x = DeleteFileRequest{}
-	mi := &file_services_file_service_proto_file_proto_msgTypes[10]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -648,7 +820,7 @@ func (x *DeleteFileRequest) String() string {
 func (*DeleteFileRequest) ProtoMessage() {}
 
 func (x *DeleteFileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_service_proto_file_proto_msgTypes[10]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -661,7 +833,7 @@ func (x *DeleteFileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFileRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFileRequest) Descriptor() ([]byte, []int) {
-	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{10}
+	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *DeleteFileRequest) GetFileId() string {
@@ -681,7 +853,7 @@ type DeleteFileResponse struct {
 
 func (x *DeleteFileResponse) Reset() {
 	*x = DeleteFileResponse{}
-	mi := &file_services_file_service_proto_file_proto_msgTypes[11]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -693,7 +865,7 @@ func (x *DeleteFileResponse) String() string {
 func (*DeleteFileResponse) ProtoMessage() {}
 
 func (x *DeleteFileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_service_proto_file_proto_msgTypes[11]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -706,7 +878,7 @@ func (x *DeleteFileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFileResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFileResponse) Descriptor() ([]byte, []int) {
-	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{11}
+	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *DeleteFileResponse) GetSuccess() bool {
@@ -736,7 +908,7 @@ type ShareFileRequest struct {
 
 func (x *ShareFileRequest) Reset() {
 	*x = ShareFileRequest{}
-	mi := &file_services_file_service_proto_file_proto_msgTypes[12]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -748,7 +920,7 @@ func (x *ShareFileRequest) String() string {
 func (*ShareFileRequest) ProtoMessage() {}
 
 func (x *ShareFileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_service_proto_file_proto_msgTypes[12]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -761,7 +933,7 @@ func (x *ShareFileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShareFileRequest.ProtoReflect.Descriptor instead.
 func (*ShareFileRequest) Descriptor() ([]byte, []int) {
-	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{12}
+	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ShareFileRequest) GetFileId() string {
@@ -809,7 +981,7 @@ type ShareFileResponse struct {
 
 func (x *ShareFileResponse) Reset() {
 	*x = ShareFileResponse{}
-	mi := &file_services_file_service_proto_file_proto_msgTypes[13]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -821,7 +993,7 @@ func (x *ShareFileResponse) String() string {
 func (*ShareFileResponse) ProtoMessage() {}
 
 func (x *ShareFileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_service_proto_file_proto_msgTypes[13]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -834,7 +1006,7 @@ func (x *ShareFileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShareFileResponse.ProtoReflect.Descriptor instead.
 func (*ShareFileResponse) Descriptor() ([]byte, []int) {
-	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{13}
+	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ShareFileResponse) GetSuccess() bool {
@@ -861,7 +1033,7 @@ type RevokeFileAccessRequest struct {
 
 func (x *RevokeFileAccessRequest) Reset() {
 	*x = RevokeFileAccessRequest{}
-	mi := &file_services_file_service_proto_file_proto_msgTypes[14]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -873,7 +1045,7 @@ func (x *RevokeFileAccessRequest) String() string {
 func (*RevokeFileAccessRequest) ProtoMessage() {}
 
 func (x *RevokeFileAccessRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_service_proto_file_proto_msgTypes[14]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -886,7 +1058,7 @@ func (x *RevokeFileAccessRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeFileAccessRequest.ProtoReflect.Descriptor instead.
 func (*RevokeFileAccessRequest) Descriptor() ([]byte, []int) {
-	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{14}
+	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *RevokeFileAccessRequest) GetFileId() string {
@@ -913,7 +1085,7 @@ type RevokeFileAccessResponse struct {
 
 func (x *RevokeFileAccessResponse) Reset() {
 	*x = RevokeFileAccessResponse{}
-	mi := &file_services_file_service_proto_file_proto_msgTypes[15]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -925,7 +1097,7 @@ func (x *RevokeFileAccessResponse) String() string {
 func (*RevokeFileAccessResponse) ProtoMessage() {}
 
 func (x *RevokeFileAccessResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_service_proto_file_proto_msgTypes[15]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -938,7 +1110,7 @@ func (x *RevokeFileAccessResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RevokeFileAccessResponse.ProtoReflect.Descriptor instead.
 func (*RevokeFileAccessResponse) Descriptor() ([]byte, []int) {
-	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{15}
+	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *RevokeFileAccessResponse) GetSuccess() bool {
@@ -970,7 +1142,7 @@ type FileData struct {
 
 func (x *FileData) Reset() {
 	*x = FileData{}
-	mi := &file_services_file_service_proto_file_proto_msgTypes[16]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -982,7 +1154,7 @@ func (x *FileData) String() string {
 func (*FileData) ProtoMessage() {}
 
 func (x *FileData) ProtoReflect() protoreflect.Message {
-	mi := &file_services_file_service_proto_file_proto_msgTypes[16]
+	mi := &file_services_file_service_proto_file_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -995,7 +1167,7 @@ func (x *FileData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileData.ProtoReflect.Descriptor instead.
 func (*FileData) Descriptor() ([]byte, []int) {
-	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{16}
+	return file_services_file_service_proto_file_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *FileData) GetFileId() string {
@@ -1090,7 +1262,20 @@ const file_services_file_service_proto_file_proto_rawDesc = "" +
 	"\x11ListFilesResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12$\n" +
-	"\x05files\x18\x03 \x03(\v2\x0e.file.FileDataR\x05files\",\n" +
+	"\x05files\x18\x03 \x03(\v2\x0e.file.FileDataR\x05files\")\n" +
+	"\x0eGetHomeRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"i\n" +
+	"\x0fGetHomeResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\"\n" +
+	"\x04home\x18\x03 \x01(\v2\x0e.file.HomeDataR\x04home\"\x80\x01\n" +
+	"\bHomeData\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
+	"\tbase_path\x18\x02 \x01(\tR\bbasePath\x12\x1f\n" +
+	"\vquota_bytes\x18\x03 \x01(\x03R\n" +
+	"quotaBytes\x12\x1d\n" +
+	"\n" +
+	"used_bytes\x18\x04 \x01(\x03R\tusedBytes\",\n" +
 	"\x11DeleteFileRequest\x12\x17\n" +
 	"\afile_id\x18\x01 \x01(\tR\x06fileId\"H\n" +
 	"\x12DeleteFileResponse\x12\x18\n" +
@@ -1119,7 +1304,7 @@ const file_services_file_service_proto_file_proto_rawDesc = "" +
 	"\acontent\x18\x05 \x01(\fR\acontent\x12\x12\n" +
 	"\x04size\x18\x06 \x01(\x03R\x04size\x12\x1d\n" +
 	"\n" +
-	"created_at\x18\a \x01(\tR\tcreatedAt2\x9b\x04\n" +
+	"created_at\x18\a \x01(\tR\tcreatedAt2\xd3\x04\n" +
 	"\vFileService\x12?\n" +
 	"\n" +
 	"UploadFile\x12\x17.file.UploadFileRequest\x1a\x18.file.UploadFileResponse\x12B\n" +
@@ -1127,7 +1312,8 @@ const file_services_file_service_proto_file_proto_rawDesc = "" +
 	"\aGetFile\x12\x14.file.GetFileRequest\x1a\x15.file.GetFileResponse\x12?\n" +
 	"\n" +
 	"UpdateFile\x12\x17.file.UpdateFileRequest\x1a\x18.file.UpdateFileResponse\x12<\n" +
-	"\tListFiles\x12\x16.file.ListFilesRequest\x1a\x17.file.ListFilesResponse\x12?\n" +
+	"\tListFiles\x12\x16.file.ListFilesRequest\x1a\x17.file.ListFilesResponse\x126\n" +
+	"\aGetHome\x12\x14.file.GetHomeRequest\x1a\x15.file.GetHomeResponse\x12?\n" +
 	"\n" +
 	"DeleteFile\x12\x17.file.DeleteFileRequest\x1a\x18.file.DeleteFileResponse\x12<\n" +
 	"\tShareFile\x12\x16.file.ShareFileRequest\x1a\x17.file.ShareFileResponse\x12Q\n" +
@@ -1145,7 +1331,7 @@ func file_services_file_service_proto_file_proto_rawDescGZIP() []byte {
 	return file_services_file_service_proto_file_proto_rawDescData
 }
 
-var file_services_file_service_proto_file_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
+var file_services_file_service_proto_file_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_services_file_service_proto_file_proto_goTypes = []any{
 	(*UploadFileRequest)(nil),        // 0: file.UploadFileRequest
 	(*UploadFileResponse)(nil),       // 1: file.UploadFileResponse
@@ -1157,39 +1343,45 @@ var file_services_file_service_proto_file_proto_goTypes = []any{
 	(*UpdateFileResponse)(nil),       // 7: file.UpdateFileResponse
 	(*ListFilesRequest)(nil),         // 8: file.ListFilesRequest
 	(*ListFilesResponse)(nil),        // 9: file.ListFilesResponse
-	(*DeleteFileRequest)(nil),        // 10: file.DeleteFileRequest
-	(*DeleteFileResponse)(nil),       // 11: file.DeleteFileResponse
-	(*ShareFileRequest)(nil),         // 12: file.ShareFileRequest
-	(*ShareFileResponse)(nil),        // 13: file.ShareFileResponse
-	(*RevokeFileAccessRequest)(nil),  // 14: file.RevokeFileAccessRequest
-	(*RevokeFileAccessResponse)(nil), // 15: file.RevokeFileAccessResponse
-	(*FileData)(nil),                 // 16: file.FileData
+	(*GetHomeRequest)(nil),           // 10: file.GetHomeRequest
+	(*GetHomeResponse)(nil),          // 11: file.GetHomeResponse
+	(*HomeData)(nil),                 // 12: file.HomeData
+	(*DeleteFileRequest)(nil),        // 13: file.DeleteFileRequest
+	(*DeleteFileResponse)(nil),       // 14: file.DeleteFileResponse
+	(*ShareFileRequest)(nil),         // 15: file.ShareFileRequest
+	(*ShareFileResponse)(nil),        // 16: file.ShareFileResponse
+	(*RevokeFileAccessRequest)(nil),  // 17: file.RevokeFileAccessRequest
+	(*RevokeFileAccessResponse)(nil), // 18: file.RevokeFileAccessResponse
+	(*FileData)(nil),                 // 19: file.FileData
 }
 var file_services_file_service_proto_file_proto_depIdxs = []int32{
-	16, // 0: file.GetFileResponse.file:type_name -> file.FileData
-	16, // 1: file.UpdateFileResponse.file:type_name -> file.FileData
-	16, // 2: file.ListFilesResponse.files:type_name -> file.FileData
-	0,  // 3: file.FileService.UploadFile:input_type -> file.UploadFileRequest
-	2,  // 4: file.FileService.RestoreFile:input_type -> file.RestoreFileRequest
-	4,  // 5: file.FileService.GetFile:input_type -> file.GetFileRequest
-	6,  // 6: file.FileService.UpdateFile:input_type -> file.UpdateFileRequest
-	8,  // 7: file.FileService.ListFiles:input_type -> file.ListFilesRequest
-	10, // 8: file.FileService.DeleteFile:input_type -> file.DeleteFileRequest
-	12, // 9: file.FileService.ShareFile:input_type -> file.ShareFileRequest
-	14, // 10: file.FileService.RevokeFileAccess:input_type -> file.RevokeFileAccessRequest
-	1,  // 11: file.FileService.UploadFile:output_type -> file.UploadFileResponse
-	3,  // 12: file.FileService.RestoreFile:output_type -> file.RestoreFileResponse
-	5,  // 13: file.FileService.GetFile:output_type -> file.GetFileResponse
-	7,  // 14: file.FileService.UpdateFile:output_type -> file.UpdateFileResponse
-	9,  // 15: file.FileService.ListFiles:output_type -> file.ListFilesResponse
-	11, // 16: file.FileService.DeleteFile:output_type -> file.DeleteFileResponse
-	13, // 17: file.FileService.ShareFile:output_type -> file.ShareFileResponse
-	15, // 18: file.FileService.RevokeFileAccess:output_type -> file.RevokeFileAccessResponse
-	11, // [11:19] is the sub-list for method output_type
-	3,  // [3:11] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	19, // 0: file.GetFileResponse.file:type_name -> file.FileData
+	19, // 1: file.UpdateFileResponse.file:type_name -> file.FileData
+	19, // 2: file.ListFilesResponse.files:type_name -> file.FileData
+	12, // 3: file.GetHomeResponse.home:type_name -> file.HomeData
+	0,  // 4: file.FileService.UploadFile:input_type -> file.UploadFileRequest
+	2,  // 5: file.FileService.RestoreFile:input_type -> file.RestoreFileRequest
+	4,  // 6: file.FileService.GetFile:input_type -> file.GetFileRequest
+	6,  // 7: file.FileService.UpdateFile:input_type -> file.UpdateFileRequest
+	8,  // 8: file.FileService.ListFiles:input_type -> file.ListFilesRequest
+	10, // 9: file.FileService.GetHome:input_type -> file.GetHomeRequest
+	13, // 10: file.FileService.DeleteFile:input_type -> file.DeleteFileRequest
+	15, // 11: file.FileService.ShareFile:input_type -> file.ShareFileRequest
+	17, // 12: file.FileService.RevokeFileAccess:input_type -> file.RevokeFileAccessRequest
+	1,  // 13: file.FileService.UploadFile:output_type -> file.UploadFileResponse
+	3,  // 14: file.FileService.RestoreFile:output_type -> file.RestoreFileResponse
+	5,  // 15: file.FileService.GetFile:output_type -> file.GetFileResponse
+	7,  // 16: file.FileService.UpdateFile:output_type -> file.UpdateFileResponse
+	9,  // 17: file.FileService.ListFiles:output_type -> file.ListFilesResponse
+	11, // 18: file.FileService.GetHome:output_type -> file.GetHomeResponse
+	14, // 19: file.FileService.DeleteFile:output_type -> file.DeleteFileResponse
+	16, // 20: file.FileService.ShareFile:output_type -> file.ShareFileResponse
+	18, // 21: file.FileService.RevokeFileAccess:output_type -> file.RevokeFileAccessResponse
+	13, // [13:22] is the sub-list for method output_type
+	4,  // [4:13] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_services_file_service_proto_file_proto_init() }
@@ -1203,7 +1395,7 @@ func file_services_file_service_proto_file_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_services_file_service_proto_file_proto_rawDesc), len(file_services_file_service_proto_file_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   17,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
