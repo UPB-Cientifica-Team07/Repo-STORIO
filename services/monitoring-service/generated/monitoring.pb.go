@@ -21,31 +21,18 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Métricas enviadas por un componente al Monitoring Service.
 type MetricsRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Identificador técnico del componente.
-	// Ejemplo: sync-service
-	ComponentId string `protobuf:"bytes,1,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
-	// Nombre legible del componente.
-	// Ejemplo: Sync Service
-	ComponentName string `protobuf:"bytes,2,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
-	// Uso de CPU del componente en porcentaje.
-	CpuUsage float64 `protobuf:"fixed64,3,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
-	// Uso de memoria del componente.
-	// Actualmente se reporta en MB.
-	MemoryUsage float64 `protobuf:"fixed64,4,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
-	// Número de conexiones activas.
-	ActiveConnections int64 `protobuf:"varint,5,opt,name=active_connections,json=activeConnections,proto3" json:"active_connections,omitempty"`
-	// Número acumulado de solicitudes procesadas.
-	TotalRequests int64 `protobuf:"varint,6,opt,name=total_requests,json=totalRequests,proto3" json:"total_requests,omitempty"`
-	// Timestamp Unix del momento de la medición.
-	Timestamp int64 `protobuf:"varint,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	// Espacio ocupado por los recursos administrados
-	// por el componente, expresado en bytes.
-	StorageUsage  int64 `protobuf:"varint,8,opt,name=storage_usage,json=storageUsage,proto3" json:"storage_usage,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	ComponentId       string                 `protobuf:"bytes,1,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
+	ComponentName     string                 `protobuf:"bytes,2,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
+	CpuUsage          float64                `protobuf:"fixed64,3,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
+	MemoryUsage       float64                `protobuf:"fixed64,4,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
+	ActiveConnections int64                  `protobuf:"varint,5,opt,name=active_connections,json=activeConnections,proto3" json:"active_connections,omitempty"`
+	TotalRequests     int64                  `protobuf:"varint,6,opt,name=total_requests,json=totalRequests,proto3" json:"total_requests,omitempty"`
+	Timestamp         int64                  `protobuf:"varint,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	StorageUsage      int64                  `protobuf:"varint,8,opt,name=storage_usage,json=storageUsage,proto3" json:"storage_usage,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *MetricsRequest) Reset() {
@@ -134,7 +121,6 @@ func (x *MetricsRequest) GetStorageUsage() int64 {
 	return 0
 }
 
-// Respuesta al registro de una métrica.
 type MetricsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -187,10 +173,6 @@ func (x *MetricsResponse) GetMessage() string {
 	return ""
 }
 
-// Por ahora no recibe filtros.
-//
-// Devuelve las métricas almacenadas por el
-// Monitoring Service.
 type GetMetricsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -227,11 +209,6 @@ func (*GetMetricsRequest) Descriptor() ([]byte, []int) {
 	return file_proto_monitoring_proto_rawDescGZIP(), []int{2}
 }
 
-// Representa una métrica almacenada y posteriormente
-// devuelta por GetMetrics.
-//
-// Debe conservar los mismos datos principales que
-// MetricsRequest para no perder información.
 type Metric struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	ComponentId       string                 `protobuf:"bytes,1,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
@@ -241,10 +218,9 @@ type Metric struct {
 	ActiveConnections int64                  `protobuf:"varint,5,opt,name=active_connections,json=activeConnections,proto3" json:"active_connections,omitempty"`
 	TotalRequests     int64                  `protobuf:"varint,6,opt,name=total_requests,json=totalRequests,proto3" json:"total_requests,omitempty"`
 	Timestamp         int64                  `protobuf:"varint,7,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	// Uso de almacenamiento en bytes.
-	StorageUsage  int64 `protobuf:"varint,8,opt,name=storage_usage,json=storageUsage,proto3" json:"storage_usage,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	StorageUsage      int64                  `protobuf:"varint,8,opt,name=storage_usage,json=storageUsage,proto3" json:"storage_usage,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *Metric) Reset() {
@@ -333,7 +309,6 @@ func (x *Metric) GetStorageUsage() int64 {
 	return 0
 }
 
-// Lista de métricas registradas.
 type GetMetricsResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Metrics       []*Metric              `protobuf:"bytes,1,rep,name=metrics,proto3" json:"metrics,omitempty"`
@@ -378,20 +353,13 @@ func (x *GetMetricsResponse) GetMetrics() []*Metric {
 	return nil
 }
 
-// Permite a un componente informar su estado actual.
 type StatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ComponentId   string                 `protobuf:"bytes,1,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
 	ComponentName string                 `protobuf:"bytes,2,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
-	// Ejemplos:
-	// ACTIVE
-	// INACTIVE
-	// DEGRADED
-	// ERROR
-	Status  string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Message string `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
-	// Timestamp Unix.
-	Timestamp     int64 `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	Message       string                 `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
+	Timestamp     int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -461,7 +429,6 @@ func (x *StatusRequest) GetTimestamp() int64 {
 	return 0
 }
 
-// Respuesta al registro de estado.
 type StatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -514,7 +481,6 @@ func (x *StatusResponse) GetMessage() string {
 	return ""
 }
 
-// Solicitud para consultar un servicio registrado.
 type ServiceRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ComponentName string                 `protobuf:"bytes,1,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
@@ -559,15 +525,13 @@ func (x *ServiceRequest) GetComponentName() string {
 	return ""
 }
 
-// Estado actual de un componente.
 type ServiceResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	ComponentId   string                 `protobuf:"bytes,1,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
 	ComponentName string                 `protobuf:"bytes,2,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
 	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
 	Message       string                 `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"`
-	// Última actualización en timestamp Unix.
-	LastUpdated   int64 `protobuf:"varint,5,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
+	LastUpdated   int64                  `protobuf:"varint,5,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -637,7 +601,6 @@ func (x *ServiceResponse) GetLastUpdated() int64 {
 	return 0
 }
 
-// Identifica el nodo HPC que se desea consultar.
 type NodeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
@@ -682,25 +645,16 @@ func (x *NodeRequest) GetNodeId() string {
 	return ""
 }
 
-// Información de monitoreo de un nodo perteneciente
-// al clúster HPC.
 type NodeResponse struct {
-	state    protoimpl.MessageState `protogen:"open.v1"`
-	NodeId   string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	Hostname string                 `protobuf:"bytes,2,opt,name=hostname,proto3" json:"hostname,omitempty"`
-	Status   string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	// Cantidad total de núcleos disponibles.
-	CpuCores int32 `protobuf:"varint,4,opt,name=cpu_cores,json=cpuCores,proto3" json:"cpu_cores,omitempty"`
-	// Memoria total del nodo.
-	// La unidad deberá mantenerse consistente
-	// en toda la implementación.
-	Memory int64 `protobuf:"varint,5,opt,name=memory,proto3" json:"memory,omitempty"`
-	// Uso actual de CPU en porcentaje.
-	CpuUsage float64 `protobuf:"fixed64,6,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
-	// Uso actual de memoria.
-	MemoryUsage float64 `protobuf:"fixed64,7,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
-	// Última actualización en timestamp Unix.
-	LastUpdated   int64 `protobuf:"varint,8,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	NodeId        string                 `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	Hostname      string                 `protobuf:"bytes,2,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Status        string                 `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	CpuCores      int32                  `protobuf:"varint,4,opt,name=cpu_cores,json=cpuCores,proto3" json:"cpu_cores,omitempty"`
+	Memory        int64                  `protobuf:"varint,5,opt,name=memory,proto3" json:"memory,omitempty"`
+	CpuUsage      float64                `protobuf:"fixed64,6,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
+	MemoryUsage   float64                `protobuf:"fixed64,7,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
+	LastUpdated   int64                  `protobuf:"varint,8,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -791,6 +745,811 @@ func (x *NodeResponse) GetLastUpdated() int64 {
 	return 0
 }
 
+type AlertRule struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Metric        string                 `protobuf:"bytes,3,opt,name=metric,proto3" json:"metric,omitempty"`
+	Operator      string                 `protobuf:"bytes,4,opt,name=operator,proto3" json:"operator,omitempty"`
+	Threshold     float64                `protobuf:"fixed64,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	ComponentName string                 `protobuf:"bytes,6,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
+	Enabled       bool                   `protobuf:"varint,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AlertRule) Reset() {
+	*x = AlertRule{}
+	mi := &file_proto_monitoring_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AlertRule) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AlertRule) ProtoMessage() {}
+
+func (x *AlertRule) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AlertRule.ProtoReflect.Descriptor instead.
+func (*AlertRule) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *AlertRule) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AlertRule) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *AlertRule) GetMetric() string {
+	if x != nil {
+		return x.Metric
+	}
+	return ""
+}
+
+func (x *AlertRule) GetOperator() string {
+	if x != nil {
+		return x.Operator
+	}
+	return ""
+}
+
+func (x *AlertRule) GetThreshold() float64 {
+	if x != nil {
+		return x.Threshold
+	}
+	return 0
+}
+
+func (x *AlertRule) GetComponentName() string {
+	if x != nil {
+		return x.ComponentName
+	}
+	return ""
+}
+
+func (x *AlertRule) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+type CreateAlertRuleRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Puede enviarse vacío.
+	// En ese caso el servidor genera UUID.
+	Id            string  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string  `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Metric        string  `protobuf:"bytes,3,opt,name=metric,proto3" json:"metric,omitempty"`
+	Operator      string  `protobuf:"bytes,4,opt,name=operator,proto3" json:"operator,omitempty"`
+	Threshold     float64 `protobuf:"fixed64,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	ComponentName string  `protobuf:"bytes,6,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
+	Enabled       bool    `protobuf:"varint,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateAlertRuleRequest) Reset() {
+	*x = CreateAlertRuleRequest{}
+	mi := &file_proto_monitoring_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateAlertRuleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateAlertRuleRequest) ProtoMessage() {}
+
+func (x *CreateAlertRuleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateAlertRuleRequest.ProtoReflect.Descriptor instead.
+func (*CreateAlertRuleRequest) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *CreateAlertRuleRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CreateAlertRuleRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *CreateAlertRuleRequest) GetMetric() string {
+	if x != nil {
+		return x.Metric
+	}
+	return ""
+}
+
+func (x *CreateAlertRuleRequest) GetOperator() string {
+	if x != nil {
+		return x.Operator
+	}
+	return ""
+}
+
+func (x *CreateAlertRuleRequest) GetThreshold() float64 {
+	if x != nil {
+		return x.Threshold
+	}
+	return 0
+}
+
+func (x *CreateAlertRuleRequest) GetComponentName() string {
+	if x != nil {
+		return x.ComponentName
+	}
+	return ""
+}
+
+func (x *CreateAlertRuleRequest) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+type CreateAlertRuleResponse struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Success bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	// ID definitivo de la regla.
+	// Puede ser el enviado por el cliente
+	// o el UUID generado por el servidor.
+	RuleId        string `protobuf:"bytes,3,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateAlertRuleResponse) Reset() {
+	*x = CreateAlertRuleResponse{}
+	mi := &file_proto_monitoring_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateAlertRuleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateAlertRuleResponse) ProtoMessage() {}
+
+func (x *CreateAlertRuleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateAlertRuleResponse.ProtoReflect.Descriptor instead.
+func (*CreateAlertRuleResponse) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *CreateAlertRuleResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *CreateAlertRuleResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *CreateAlertRuleResponse) GetRuleId() string {
+	if x != nil {
+		return x.RuleId
+	}
+	return ""
+}
+
+type UpdateAlertRuleRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// ID obligatorio de la regla
+	// que se desea actualizar.
+	Id            string  `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Name          string  `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Metric        string  `protobuf:"bytes,3,opt,name=metric,proto3" json:"metric,omitempty"`
+	Operator      string  `protobuf:"bytes,4,opt,name=operator,proto3" json:"operator,omitempty"`
+	Threshold     float64 `protobuf:"fixed64,5,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	ComponentName string  `protobuf:"bytes,6,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
+	Enabled       bool    `protobuf:"varint,7,opt,name=enabled,proto3" json:"enabled,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateAlertRuleRequest) Reset() {
+	*x = UpdateAlertRuleRequest{}
+	mi := &file_proto_monitoring_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAlertRuleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAlertRuleRequest) ProtoMessage() {}
+
+func (x *UpdateAlertRuleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAlertRuleRequest.ProtoReflect.Descriptor instead.
+func (*UpdateAlertRuleRequest) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *UpdateAlertRuleRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *UpdateAlertRuleRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateAlertRuleRequest) GetMetric() string {
+	if x != nil {
+		return x.Metric
+	}
+	return ""
+}
+
+func (x *UpdateAlertRuleRequest) GetOperator() string {
+	if x != nil {
+		return x.Operator
+	}
+	return ""
+}
+
+func (x *UpdateAlertRuleRequest) GetThreshold() float64 {
+	if x != nil {
+		return x.Threshold
+	}
+	return 0
+}
+
+func (x *UpdateAlertRuleRequest) GetComponentName() string {
+	if x != nil {
+		return x.ComponentName
+	}
+	return ""
+}
+
+func (x *UpdateAlertRuleRequest) GetEnabled() bool {
+	if x != nil {
+		return x.Enabled
+	}
+	return false
+}
+
+type UpdateAlertRuleResponse struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Success bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	// Devuelve la regla ya actualizada.
+	Rule          *AlertRule `protobuf:"bytes,3,opt,name=rule,proto3" json:"rule,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateAlertRuleResponse) Reset() {
+	*x = UpdateAlertRuleResponse{}
+	mi := &file_proto_monitoring_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateAlertRuleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateAlertRuleResponse) ProtoMessage() {}
+
+func (x *UpdateAlertRuleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateAlertRuleResponse.ProtoReflect.Descriptor instead.
+func (*UpdateAlertRuleResponse) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *UpdateAlertRuleResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *UpdateAlertRuleResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UpdateAlertRuleResponse) GetRule() *AlertRule {
+	if x != nil {
+		return x.Rule
+	}
+	return nil
+}
+
+type DeleteAlertRuleRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// ID obligatorio de la regla
+	// que se desea eliminar.
+	Id            string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAlertRuleRequest) Reset() {
+	*x = DeleteAlertRuleRequest{}
+	mi := &file_proto_monitoring_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAlertRuleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAlertRuleRequest) ProtoMessage() {}
+
+func (x *DeleteAlertRuleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAlertRuleRequest.ProtoReflect.Descriptor instead.
+func (*DeleteAlertRuleRequest) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *DeleteAlertRuleRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type DeleteAlertRuleResponse struct {
+	state   protoimpl.MessageState `protogen:"open.v1"`
+	Success bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	// ID de la regla eliminada.
+	RuleId        string `protobuf:"bytes,3,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *DeleteAlertRuleResponse) Reset() {
+	*x = DeleteAlertRuleResponse{}
+	mi := &file_proto_monitoring_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *DeleteAlertRuleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*DeleteAlertRuleResponse) ProtoMessage() {}
+
+func (x *DeleteAlertRuleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use DeleteAlertRuleResponse.ProtoReflect.Descriptor instead.
+func (*DeleteAlertRuleResponse) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *DeleteAlertRuleResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *DeleteAlertRuleResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *DeleteAlertRuleResponse) GetRuleId() string {
+	if x != nil {
+		return x.RuleId
+	}
+	return ""
+}
+
+type GetAlertRulesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAlertRulesRequest) Reset() {
+	*x = GetAlertRulesRequest{}
+	mi := &file_proto_monitoring_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAlertRulesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAlertRulesRequest) ProtoMessage() {}
+
+func (x *GetAlertRulesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAlertRulesRequest.ProtoReflect.Descriptor instead.
+func (*GetAlertRulesRequest) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{18}
+}
+
+type GetAlertRulesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Rules         []*AlertRule           `protobuf:"bytes,1,rep,name=rules,proto3" json:"rules,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAlertRulesResponse) Reset() {
+	*x = GetAlertRulesResponse{}
+	mi := &file_proto_monitoring_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAlertRulesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAlertRulesResponse) ProtoMessage() {}
+
+func (x *GetAlertRulesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAlertRulesResponse.ProtoReflect.Descriptor instead.
+func (*GetAlertRulesResponse) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetAlertRulesResponse) GetRules() []*AlertRule {
+	if x != nil {
+		return x.Rules
+	}
+	return nil
+}
+
+type Alert struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	RuleId        string                 `protobuf:"bytes,2,opt,name=rule_id,json=ruleId,proto3" json:"rule_id,omitempty"`
+	RuleName      string                 `protobuf:"bytes,3,opt,name=rule_name,json=ruleName,proto3" json:"rule_name,omitempty"`
+	ComponentId   string                 `protobuf:"bytes,4,opt,name=component_id,json=componentId,proto3" json:"component_id,omitempty"`
+	ComponentName string                 `protobuf:"bytes,5,opt,name=component_name,json=componentName,proto3" json:"component_name,omitempty"`
+	Metric        string                 `protobuf:"bytes,6,opt,name=metric,proto3" json:"metric,omitempty"`
+	CurrentValue  float64                `protobuf:"fixed64,7,opt,name=current_value,json=currentValue,proto3" json:"current_value,omitempty"`
+	Threshold     float64                `protobuf:"fixed64,8,opt,name=threshold,proto3" json:"threshold,omitempty"`
+	Message       string                 `protobuf:"bytes,9,opt,name=message,proto3" json:"message,omitempty"`
+	CreatedAt     int64                  `protobuf:"varint,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Active        bool                   `protobuf:"varint,11,opt,name=active,proto3" json:"active,omitempty"`
+	// 0 significa que la alerta
+	// todavía no ha sido resuelta.
+	ResolvedAt    int64 `protobuf:"varint,12,opt,name=resolved_at,json=resolvedAt,proto3" json:"resolved_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *Alert) Reset() {
+	*x = Alert{}
+	mi := &file_proto_monitoring_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Alert) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Alert) ProtoMessage() {}
+
+func (x *Alert) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Alert.ProtoReflect.Descriptor instead.
+func (*Alert) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *Alert) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *Alert) GetRuleId() string {
+	if x != nil {
+		return x.RuleId
+	}
+	return ""
+}
+
+func (x *Alert) GetRuleName() string {
+	if x != nil {
+		return x.RuleName
+	}
+	return ""
+}
+
+func (x *Alert) GetComponentId() string {
+	if x != nil {
+		return x.ComponentId
+	}
+	return ""
+}
+
+func (x *Alert) GetComponentName() string {
+	if x != nil {
+		return x.ComponentName
+	}
+	return ""
+}
+
+func (x *Alert) GetMetric() string {
+	if x != nil {
+		return x.Metric
+	}
+	return ""
+}
+
+func (x *Alert) GetCurrentValue() float64 {
+	if x != nil {
+		return x.CurrentValue
+	}
+	return 0
+}
+
+func (x *Alert) GetThreshold() float64 {
+	if x != nil {
+		return x.Threshold
+	}
+	return 0
+}
+
+func (x *Alert) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *Alert) GetCreatedAt() int64 {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return 0
+}
+
+func (x *Alert) GetActive() bool {
+	if x != nil {
+		return x.Active
+	}
+	return false
+}
+
+func (x *Alert) GetResolvedAt() int64 {
+	if x != nil {
+		return x.ResolvedAt
+	}
+	return 0
+}
+
+type GetAlertsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAlertsRequest) Reset() {
+	*x = GetAlertsRequest{}
+	mi := &file_proto_monitoring_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAlertsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAlertsRequest) ProtoMessage() {}
+
+func (x *GetAlertsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAlertsRequest.ProtoReflect.Descriptor instead.
+func (*GetAlertsRequest) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{21}
+}
+
+type GetAlertsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Alerts        []*Alert               `protobuf:"bytes,1,rep,name=alerts,proto3" json:"alerts,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetAlertsResponse) Reset() {
+	*x = GetAlertsResponse{}
+	mi := &file_proto_monitoring_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetAlertsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetAlertsResponse) ProtoMessage() {}
+
+func (x *GetAlertsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_monitoring_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetAlertsResponse.ProtoReflect.Descriptor instead.
+func (*GetAlertsResponse) Descriptor() ([]byte, []int) {
+	return file_proto_monitoring_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *GetAlertsResponse) GetAlerts() []*Alert {
+	if x != nil {
+		return x.Alerts
+	}
+	return nil
+}
+
 var File_proto_monitoring_proto protoreflect.FileDescriptor
 
 const file_proto_monitoring_proto_rawDesc = "" +
@@ -848,14 +1607,79 @@ const file_proto_monitoring_proto_rawDesc = "" +
 	"\x06memory\x18\x05 \x01(\x03R\x06memory\x12\x1b\n" +
 	"\tcpu_usage\x18\x06 \x01(\x01R\bcpuUsage\x12!\n" +
 	"\fmemory_usage\x18\a \x01(\x01R\vmemoryUsage\x12!\n" +
-	"\flast_updated\x18\b \x01(\x03R\vlastUpdated2\x82\x03\n" +
+	"\flast_updated\x18\b \x01(\x03R\vlastUpdated\"\xc2\x01\n" +
+	"\tAlertRule\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06metric\x18\x03 \x01(\tR\x06metric\x12\x1a\n" +
+	"\boperator\x18\x04 \x01(\tR\boperator\x12\x1c\n" +
+	"\tthreshold\x18\x05 \x01(\x01R\tthreshold\x12%\n" +
+	"\x0ecomponent_name\x18\x06 \x01(\tR\rcomponentName\x12\x18\n" +
+	"\aenabled\x18\a \x01(\bR\aenabled\"\xcf\x01\n" +
+	"\x16CreateAlertRuleRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06metric\x18\x03 \x01(\tR\x06metric\x12\x1a\n" +
+	"\boperator\x18\x04 \x01(\tR\boperator\x12\x1c\n" +
+	"\tthreshold\x18\x05 \x01(\x01R\tthreshold\x12%\n" +
+	"\x0ecomponent_name\x18\x06 \x01(\tR\rcomponentName\x12\x18\n" +
+	"\aenabled\x18\a \x01(\bR\aenabled\"f\n" +
+	"\x17CreateAlertRuleResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x17\n" +
+	"\arule_id\x18\x03 \x01(\tR\x06ruleId\"\xcf\x01\n" +
+	"\x16UpdateAlertRuleRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
+	"\x06metric\x18\x03 \x01(\tR\x06metric\x12\x1a\n" +
+	"\boperator\x18\x04 \x01(\tR\boperator\x12\x1c\n" +
+	"\tthreshold\x18\x05 \x01(\x01R\tthreshold\x12%\n" +
+	"\x0ecomponent_name\x18\x06 \x01(\tR\rcomponentName\x12\x18\n" +
+	"\aenabled\x18\a \x01(\bR\aenabled\"x\n" +
+	"\x17UpdateAlertRuleResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12)\n" +
+	"\x04rule\x18\x03 \x01(\v2\x15.monitoring.AlertRuleR\x04rule\"(\n" +
+	"\x16DeleteAlertRuleRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\"f\n" +
+	"\x17DeleteAlertRuleResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x17\n" +
+	"\arule_id\x18\x03 \x01(\tR\x06ruleId\"\x16\n" +
+	"\x14GetAlertRulesRequest\"D\n" +
+	"\x15GetAlertRulesResponse\x12+\n" +
+	"\x05rules\x18\x01 \x03(\v2\x15.monitoring.AlertRuleR\x05rules\"\xe4\x02\n" +
+	"\x05Alert\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\arule_id\x18\x02 \x01(\tR\x06ruleId\x12\x1b\n" +
+	"\trule_name\x18\x03 \x01(\tR\bruleName\x12!\n" +
+	"\fcomponent_id\x18\x04 \x01(\tR\vcomponentId\x12%\n" +
+	"\x0ecomponent_name\x18\x05 \x01(\tR\rcomponentName\x12\x16\n" +
+	"\x06metric\x18\x06 \x01(\tR\x06metric\x12#\n" +
+	"\rcurrent_value\x18\a \x01(\x01R\fcurrentValue\x12\x1c\n" +
+	"\tthreshold\x18\b \x01(\x01R\tthreshold\x12\x18\n" +
+	"\amessage\x18\t \x01(\tR\amessage\x12\x1d\n" +
+	"\n" +
+	"created_at\x18\n" +
+	" \x01(\x03R\tcreatedAt\x12\x16\n" +
+	"\x06active\x18\v \x01(\bR\x06active\x12\x1f\n" +
+	"\vresolved_at\x18\f \x01(\x03R\n" +
+	"resolvedAt\"\x12\n" +
+	"\x10GetAlertsRequest\">\n" +
+	"\x11GetAlertsResponse\x12)\n" +
+	"\x06alerts\x18\x01 \x03(\v2\x11.monitoring.AlertR\x06alerts2\xb6\x06\n" +
 	"\x11MonitoringService\x12H\n" +
 	"\rReportMetrics\x12\x1a.monitoring.MetricsRequest\x1a\x1b.monitoring.MetricsResponse\x12K\n" +
 	"\n" +
 	"GetMetrics\x12\x1d.monitoring.GetMetricsRequest\x1a\x1e.monitoring.GetMetricsResponse\x12E\n" +
 	"\fReportStatus\x12\x19.monitoring.StatusRequest\x1a\x1a.monitoring.StatusResponse\x12K\n" +
 	"\x10GetServiceStatus\x12\x1a.monitoring.ServiceRequest\x1a\x1b.monitoring.ServiceResponse\x12B\n" +
-	"\rGetNodeStatus\x12\x17.monitoring.NodeRequest\x1a\x18.monitoring.NodeResponseB^Z\\github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/generated;generatedb\x06proto3"
+	"\rGetNodeStatus\x12\x17.monitoring.NodeRequest\x1a\x18.monitoring.NodeResponse\x12Z\n" +
+	"\x0fCreateAlertRule\x12\".monitoring.CreateAlertRuleRequest\x1a#.monitoring.CreateAlertRuleResponse\x12Z\n" +
+	"\x0fUpdateAlertRule\x12\".monitoring.UpdateAlertRuleRequest\x1a#.monitoring.UpdateAlertRuleResponse\x12Z\n" +
+	"\x0fDeleteAlertRule\x12\".monitoring.DeleteAlertRuleRequest\x1a#.monitoring.DeleteAlertRuleResponse\x12T\n" +
+	"\rGetAlertRules\x12 .monitoring.GetAlertRulesRequest\x1a!.monitoring.GetAlertRulesResponse\x12H\n" +
+	"\tGetAlerts\x12\x1c.monitoring.GetAlertsRequest\x1a\x1d.monitoring.GetAlertsResponseB^Z\\github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/generated;generatedb\x06proto3"
 
 var (
 	file_proto_monitoring_proto_rawDescOnce sync.Once
@@ -869,37 +1693,62 @@ func file_proto_monitoring_proto_rawDescGZIP() []byte {
 	return file_proto_monitoring_proto_rawDescData
 }
 
-var file_proto_monitoring_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_proto_monitoring_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_proto_monitoring_proto_goTypes = []any{
-	(*MetricsRequest)(nil),     // 0: monitoring.MetricsRequest
-	(*MetricsResponse)(nil),    // 1: monitoring.MetricsResponse
-	(*GetMetricsRequest)(nil),  // 2: monitoring.GetMetricsRequest
-	(*Metric)(nil),             // 3: monitoring.Metric
-	(*GetMetricsResponse)(nil), // 4: monitoring.GetMetricsResponse
-	(*StatusRequest)(nil),      // 5: monitoring.StatusRequest
-	(*StatusResponse)(nil),     // 6: monitoring.StatusResponse
-	(*ServiceRequest)(nil),     // 7: monitoring.ServiceRequest
-	(*ServiceResponse)(nil),    // 8: monitoring.ServiceResponse
-	(*NodeRequest)(nil),        // 9: monitoring.NodeRequest
-	(*NodeResponse)(nil),       // 10: monitoring.NodeResponse
+	(*MetricsRequest)(nil),          // 0: monitoring.MetricsRequest
+	(*MetricsResponse)(nil),         // 1: monitoring.MetricsResponse
+	(*GetMetricsRequest)(nil),       // 2: monitoring.GetMetricsRequest
+	(*Metric)(nil),                  // 3: monitoring.Metric
+	(*GetMetricsResponse)(nil),      // 4: monitoring.GetMetricsResponse
+	(*StatusRequest)(nil),           // 5: monitoring.StatusRequest
+	(*StatusResponse)(nil),          // 6: monitoring.StatusResponse
+	(*ServiceRequest)(nil),          // 7: monitoring.ServiceRequest
+	(*ServiceResponse)(nil),         // 8: monitoring.ServiceResponse
+	(*NodeRequest)(nil),             // 9: monitoring.NodeRequest
+	(*NodeResponse)(nil),            // 10: monitoring.NodeResponse
+	(*AlertRule)(nil),               // 11: monitoring.AlertRule
+	(*CreateAlertRuleRequest)(nil),  // 12: monitoring.CreateAlertRuleRequest
+	(*CreateAlertRuleResponse)(nil), // 13: monitoring.CreateAlertRuleResponse
+	(*UpdateAlertRuleRequest)(nil),  // 14: monitoring.UpdateAlertRuleRequest
+	(*UpdateAlertRuleResponse)(nil), // 15: monitoring.UpdateAlertRuleResponse
+	(*DeleteAlertRuleRequest)(nil),  // 16: monitoring.DeleteAlertRuleRequest
+	(*DeleteAlertRuleResponse)(nil), // 17: monitoring.DeleteAlertRuleResponse
+	(*GetAlertRulesRequest)(nil),    // 18: monitoring.GetAlertRulesRequest
+	(*GetAlertRulesResponse)(nil),   // 19: monitoring.GetAlertRulesResponse
+	(*Alert)(nil),                   // 20: monitoring.Alert
+	(*GetAlertsRequest)(nil),        // 21: monitoring.GetAlertsRequest
+	(*GetAlertsResponse)(nil),       // 22: monitoring.GetAlertsResponse
 }
 var file_proto_monitoring_proto_depIdxs = []int32{
 	3,  // 0: monitoring.GetMetricsResponse.metrics:type_name -> monitoring.Metric
-	0,  // 1: monitoring.MonitoringService.ReportMetrics:input_type -> monitoring.MetricsRequest
-	2,  // 2: monitoring.MonitoringService.GetMetrics:input_type -> monitoring.GetMetricsRequest
-	5,  // 3: monitoring.MonitoringService.ReportStatus:input_type -> monitoring.StatusRequest
-	7,  // 4: monitoring.MonitoringService.GetServiceStatus:input_type -> monitoring.ServiceRequest
-	9,  // 5: monitoring.MonitoringService.GetNodeStatus:input_type -> monitoring.NodeRequest
-	1,  // 6: monitoring.MonitoringService.ReportMetrics:output_type -> monitoring.MetricsResponse
-	4,  // 7: monitoring.MonitoringService.GetMetrics:output_type -> monitoring.GetMetricsResponse
-	6,  // 8: monitoring.MonitoringService.ReportStatus:output_type -> monitoring.StatusResponse
-	8,  // 9: monitoring.MonitoringService.GetServiceStatus:output_type -> monitoring.ServiceResponse
-	10, // 10: monitoring.MonitoringService.GetNodeStatus:output_type -> monitoring.NodeResponse
-	6,  // [6:11] is the sub-list for method output_type
-	1,  // [1:6] is the sub-list for method input_type
-	1,  // [1:1] is the sub-list for extension type_name
-	1,  // [1:1] is the sub-list for extension extendee
-	0,  // [0:1] is the sub-list for field type_name
+	11, // 1: monitoring.UpdateAlertRuleResponse.rule:type_name -> monitoring.AlertRule
+	11, // 2: monitoring.GetAlertRulesResponse.rules:type_name -> monitoring.AlertRule
+	20, // 3: monitoring.GetAlertsResponse.alerts:type_name -> monitoring.Alert
+	0,  // 4: monitoring.MonitoringService.ReportMetrics:input_type -> monitoring.MetricsRequest
+	2,  // 5: monitoring.MonitoringService.GetMetrics:input_type -> monitoring.GetMetricsRequest
+	5,  // 6: monitoring.MonitoringService.ReportStatus:input_type -> monitoring.StatusRequest
+	7,  // 7: monitoring.MonitoringService.GetServiceStatus:input_type -> monitoring.ServiceRequest
+	9,  // 8: monitoring.MonitoringService.GetNodeStatus:input_type -> monitoring.NodeRequest
+	12, // 9: monitoring.MonitoringService.CreateAlertRule:input_type -> monitoring.CreateAlertRuleRequest
+	14, // 10: monitoring.MonitoringService.UpdateAlertRule:input_type -> monitoring.UpdateAlertRuleRequest
+	16, // 11: monitoring.MonitoringService.DeleteAlertRule:input_type -> monitoring.DeleteAlertRuleRequest
+	18, // 12: monitoring.MonitoringService.GetAlertRules:input_type -> monitoring.GetAlertRulesRequest
+	21, // 13: monitoring.MonitoringService.GetAlerts:input_type -> monitoring.GetAlertsRequest
+	1,  // 14: monitoring.MonitoringService.ReportMetrics:output_type -> monitoring.MetricsResponse
+	4,  // 15: monitoring.MonitoringService.GetMetrics:output_type -> monitoring.GetMetricsResponse
+	6,  // 16: monitoring.MonitoringService.ReportStatus:output_type -> monitoring.StatusResponse
+	8,  // 17: monitoring.MonitoringService.GetServiceStatus:output_type -> monitoring.ServiceResponse
+	10, // 18: monitoring.MonitoringService.GetNodeStatus:output_type -> monitoring.NodeResponse
+	13, // 19: monitoring.MonitoringService.CreateAlertRule:output_type -> monitoring.CreateAlertRuleResponse
+	15, // 20: monitoring.MonitoringService.UpdateAlertRule:output_type -> monitoring.UpdateAlertRuleResponse
+	17, // 21: monitoring.MonitoringService.DeleteAlertRule:output_type -> monitoring.DeleteAlertRuleResponse
+	19, // 22: monitoring.MonitoringService.GetAlertRules:output_type -> monitoring.GetAlertRulesResponse
+	22, // 23: monitoring.MonitoringService.GetAlerts:output_type -> monitoring.GetAlertsResponse
+	14, // [14:24] is the sub-list for method output_type
+	4,  // [4:14] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_proto_monitoring_proto_init() }
@@ -913,7 +1762,7 @@ func file_proto_monitoring_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_monitoring_proto_rawDesc), len(file_proto_monitoring_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   11,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

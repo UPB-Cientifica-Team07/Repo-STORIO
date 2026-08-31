@@ -24,22 +24,27 @@ const (
 	MonitoringService_ReportStatus_FullMethodName     = "/monitoring.MonitoringService/ReportStatus"
 	MonitoringService_GetServiceStatus_FullMethodName = "/monitoring.MonitoringService/GetServiceStatus"
 	MonitoringService_GetNodeStatus_FullMethodName    = "/monitoring.MonitoringService/GetNodeStatus"
+	MonitoringService_CreateAlertRule_FullMethodName  = "/monitoring.MonitoringService/CreateAlertRule"
+	MonitoringService_UpdateAlertRule_FullMethodName  = "/monitoring.MonitoringService/UpdateAlertRule"
+	MonitoringService_DeleteAlertRule_FullMethodName  = "/monitoring.MonitoringService/DeleteAlertRule"
+	MonitoringService_GetAlertRules_FullMethodName    = "/monitoring.MonitoringService/GetAlertRules"
+	MonitoringService_GetAlerts_FullMethodName        = "/monitoring.MonitoringService/GetAlerts"
 )
 
 // MonitoringServiceClient is the client API for MonitoringService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MonitoringServiceClient interface {
-	// Registro de métricas de componentes.
 	ReportMetrics(ctx context.Context, in *MetricsRequest, opts ...grpc.CallOption) (*MetricsResponse, error)
-	// Consulta de métricas registradas.
 	GetMetrics(ctx context.Context, in *GetMetricsRequest, opts ...grpc.CallOption) (*GetMetricsResponse, error)
-	// Registro del estado de un componente.
 	ReportStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
-	// Consulta del estado de un servicio.
 	GetServiceStatus(ctx context.Context, in *ServiceRequest, opts ...grpc.CallOption) (*ServiceResponse, error)
-	// Consulta del estado de un nodo HPC.
 	GetNodeStatus(ctx context.Context, in *NodeRequest, opts ...grpc.CallOption) (*NodeResponse, error)
+	CreateAlertRule(ctx context.Context, in *CreateAlertRuleRequest, opts ...grpc.CallOption) (*CreateAlertRuleResponse, error)
+	UpdateAlertRule(ctx context.Context, in *UpdateAlertRuleRequest, opts ...grpc.CallOption) (*UpdateAlertRuleResponse, error)
+	DeleteAlertRule(ctx context.Context, in *DeleteAlertRuleRequest, opts ...grpc.CallOption) (*DeleteAlertRuleResponse, error)
+	GetAlertRules(ctx context.Context, in *GetAlertRulesRequest, opts ...grpc.CallOption) (*GetAlertRulesResponse, error)
+	GetAlerts(ctx context.Context, in *GetAlertsRequest, opts ...grpc.CallOption) (*GetAlertsResponse, error)
 }
 
 type monitoringServiceClient struct {
@@ -100,20 +105,70 @@ func (c *monitoringServiceClient) GetNodeStatus(ctx context.Context, in *NodeReq
 	return out, nil
 }
 
+func (c *monitoringServiceClient) CreateAlertRule(ctx context.Context, in *CreateAlertRuleRequest, opts ...grpc.CallOption) (*CreateAlertRuleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateAlertRuleResponse)
+	err := c.cc.Invoke(ctx, MonitoringService_CreateAlertRule_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *monitoringServiceClient) UpdateAlertRule(ctx context.Context, in *UpdateAlertRuleRequest, opts ...grpc.CallOption) (*UpdateAlertRuleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateAlertRuleResponse)
+	err := c.cc.Invoke(ctx, MonitoringService_UpdateAlertRule_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *monitoringServiceClient) DeleteAlertRule(ctx context.Context, in *DeleteAlertRuleRequest, opts ...grpc.CallOption) (*DeleteAlertRuleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteAlertRuleResponse)
+	err := c.cc.Invoke(ctx, MonitoringService_DeleteAlertRule_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *monitoringServiceClient) GetAlertRules(ctx context.Context, in *GetAlertRulesRequest, opts ...grpc.CallOption) (*GetAlertRulesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAlertRulesResponse)
+	err := c.cc.Invoke(ctx, MonitoringService_GetAlertRules_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *monitoringServiceClient) GetAlerts(ctx context.Context, in *GetAlertsRequest, opts ...grpc.CallOption) (*GetAlertsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAlertsResponse)
+	err := c.cc.Invoke(ctx, MonitoringService_GetAlerts_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MonitoringServiceServer is the server API for MonitoringService service.
 // All implementations must embed UnimplementedMonitoringServiceServer
 // for forward compatibility.
 type MonitoringServiceServer interface {
-	// Registro de métricas de componentes.
 	ReportMetrics(context.Context, *MetricsRequest) (*MetricsResponse, error)
-	// Consulta de métricas registradas.
 	GetMetrics(context.Context, *GetMetricsRequest) (*GetMetricsResponse, error)
-	// Registro del estado de un componente.
 	ReportStatus(context.Context, *StatusRequest) (*StatusResponse, error)
-	// Consulta del estado de un servicio.
 	GetServiceStatus(context.Context, *ServiceRequest) (*ServiceResponse, error)
-	// Consulta del estado de un nodo HPC.
 	GetNodeStatus(context.Context, *NodeRequest) (*NodeResponse, error)
+	CreateAlertRule(context.Context, *CreateAlertRuleRequest) (*CreateAlertRuleResponse, error)
+	UpdateAlertRule(context.Context, *UpdateAlertRuleRequest) (*UpdateAlertRuleResponse, error)
+	DeleteAlertRule(context.Context, *DeleteAlertRuleRequest) (*DeleteAlertRuleResponse, error)
+	GetAlertRules(context.Context, *GetAlertRulesRequest) (*GetAlertRulesResponse, error)
+	GetAlerts(context.Context, *GetAlertsRequest) (*GetAlertsResponse, error)
 	mustEmbedUnimplementedMonitoringServiceServer()
 }
 
@@ -138,6 +193,21 @@ func (UnimplementedMonitoringServiceServer) GetServiceStatus(context.Context, *S
 }
 func (UnimplementedMonitoringServiceServer) GetNodeStatus(context.Context, *NodeRequest) (*NodeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetNodeStatus not implemented")
+}
+func (UnimplementedMonitoringServiceServer) CreateAlertRule(context.Context, *CreateAlertRuleRequest) (*CreateAlertRuleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateAlertRule not implemented")
+}
+func (UnimplementedMonitoringServiceServer) UpdateAlertRule(context.Context, *UpdateAlertRuleRequest) (*UpdateAlertRuleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateAlertRule not implemented")
+}
+func (UnimplementedMonitoringServiceServer) DeleteAlertRule(context.Context, *DeleteAlertRuleRequest) (*DeleteAlertRuleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteAlertRule not implemented")
+}
+func (UnimplementedMonitoringServiceServer) GetAlertRules(context.Context, *GetAlertRulesRequest) (*GetAlertRulesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAlertRules not implemented")
+}
+func (UnimplementedMonitoringServiceServer) GetAlerts(context.Context, *GetAlertsRequest) (*GetAlertsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAlerts not implemented")
 }
 func (UnimplementedMonitoringServiceServer) mustEmbedUnimplementedMonitoringServiceServer() {}
 func (UnimplementedMonitoringServiceServer) testEmbeddedByValue()                           {}
@@ -250,6 +320,96 @@ func _MonitoringService_GetNodeStatus_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MonitoringService_CreateAlertRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateAlertRuleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MonitoringServiceServer).CreateAlertRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MonitoringService_CreateAlertRule_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MonitoringServiceServer).CreateAlertRule(ctx, req.(*CreateAlertRuleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MonitoringService_UpdateAlertRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateAlertRuleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MonitoringServiceServer).UpdateAlertRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MonitoringService_UpdateAlertRule_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MonitoringServiceServer).UpdateAlertRule(ctx, req.(*UpdateAlertRuleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MonitoringService_DeleteAlertRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteAlertRuleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MonitoringServiceServer).DeleteAlertRule(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MonitoringService_DeleteAlertRule_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MonitoringServiceServer).DeleteAlertRule(ctx, req.(*DeleteAlertRuleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MonitoringService_GetAlertRules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAlertRulesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MonitoringServiceServer).GetAlertRules(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MonitoringService_GetAlertRules_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MonitoringServiceServer).GetAlertRules(ctx, req.(*GetAlertRulesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MonitoringService_GetAlerts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAlertsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MonitoringServiceServer).GetAlerts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MonitoringService_GetAlerts_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MonitoringServiceServer).GetAlerts(ctx, req.(*GetAlertsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // MonitoringService_ServiceDesc is the grpc.ServiceDesc for MonitoringService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -276,6 +436,26 @@ var MonitoringService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetNodeStatus",
 			Handler:    _MonitoringService_GetNodeStatus_Handler,
+		},
+		{
+			MethodName: "CreateAlertRule",
+			Handler:    _MonitoringService_CreateAlertRule_Handler,
+		},
+		{
+			MethodName: "UpdateAlertRule",
+			Handler:    _MonitoringService_UpdateAlertRule_Handler,
+		},
+		{
+			MethodName: "DeleteAlertRule",
+			Handler:    _MonitoringService_DeleteAlertRule_Handler,
+		},
+		{
+			MethodName: "GetAlertRules",
+			Handler:    _MonitoringService_GetAlertRules_Handler,
+		},
+		{
+			MethodName: "GetAlerts",
+			Handler:    _MonitoringService_GetAlerts_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

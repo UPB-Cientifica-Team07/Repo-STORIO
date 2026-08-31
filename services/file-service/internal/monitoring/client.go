@@ -37,7 +37,10 @@ func NewClient(
 		return nil, err
 	}
 
-	client := pb.NewMonitoringServiceClient(conn)
+	client :=
+		pb.NewMonitoringServiceClient(
+			conn,
+		)
 
 	return &Client{
 		conn:             conn,
@@ -48,11 +51,12 @@ func NewClient(
 }
 
 func (c *Client) Close() error {
+
 	return c.conn.Close()
 }
 
 // =====================================
-// REPORTAR ESTADO DEL SERVICIO
+// REPORTAR ESTADO
 // =====================================
 
 func (c *Client) ReportStatus(
@@ -60,28 +64,33 @@ func (c *Client) ReportStatus(
 	message string,
 ) error {
 
-	ctx, cancel := context.WithTimeout(
-		context.Background(),
-		5*time.Second,
-	)
+	ctx, cancel :=
+		context.WithTimeout(
+			context.Background(),
+			5*time.Second,
+		)
+
 	defer cancel()
 
-	response, err := c.monitoringClient.ReportStatus(
-		ctx,
-		&pb.StatusRequest{
-			ComponentId:   c.componentID,
-			ComponentName: c.componentName,
-			Status:        status,
-			Message:       message,
-			Timestamp:     time.Now().Unix(),
-		},
-	)
+	response, err :=
+		c.monitoringClient.ReportStatus(
+			ctx,
+			&pb.StatusRequest{
+				ComponentId:   c.componentID,
+				ComponentName: c.componentName,
+				Status:        status,
+				Message:       message,
+				Timestamp:     time.Now().Unix(),
+			},
+		)
 
 	if err != nil {
+
 		return err
 	}
 
 	if !response.GetSuccess() {
+
 		return fmt.Errorf(
 			"Monitoring Service rechazó el estado: %s",
 			response.GetMessage(),
@@ -89,7 +98,7 @@ func (c *Client) ReportStatus(
 	}
 
 	log.Printf(
-		"Estado reportado al Monitoring Service: %s - %s",
+		"Estado reportado | Estado: %s | Mensaje: %s",
 		status,
 		message,
 	)
@@ -104,34 +113,41 @@ func (c *Client) ReportStatus(
 func (c *Client) ReportMetrics(
 	cpuUsage float64,
 	memoryUsage float64,
+	storageUsage int64,
 	activeConnections int64,
 	totalRequests int64,
 ) error {
 
-	ctx, cancel := context.WithTimeout(
-		context.Background(),
-		5*time.Second,
-	)
+	ctx, cancel :=
+		context.WithTimeout(
+			context.Background(),
+			5*time.Second,
+		)
+
 	defer cancel()
 
-	response, err := c.monitoringClient.ReportMetrics(
-		ctx,
-		&pb.MetricsRequest{
-			ComponentId:       c.componentID,
-			ComponentName:     c.componentName,
-			CpuUsage:          cpuUsage,
-			MemoryUsage:       memoryUsage,
-			ActiveConnections: activeConnections,
-			TotalRequests:     totalRequests,
-			Timestamp:         time.Now().Unix(),
-		},
-	)
+	response, err :=
+		c.monitoringClient.ReportMetrics(
+			ctx,
+			&pb.MetricsRequest{
+				ComponentId:       c.componentID,
+				ComponentName:     c.componentName,
+				CpuUsage:          cpuUsage,
+				MemoryUsage:       memoryUsage,
+				StorageUsage:      storageUsage,
+				ActiveConnections: activeConnections,
+				TotalRequests:     totalRequests,
+				Timestamp:         time.Now().Unix(),
+			},
+		)
 
 	if err != nil {
+
 		return err
 	}
 
 	if !response.GetSuccess() {
+
 		return fmt.Errorf(
 			"Monitoring Service rechazó las métricas: %s",
 			response.GetMessage(),
@@ -139,9 +155,10 @@ func (c *Client) ReportMetrics(
 	}
 
 	log.Printf(
-		"Métricas reportadas | CPU: %.2f%% | Memoria: %.2f%% | Conexiones: %d | Solicitudes: %d",
+		"Métricas reales | CPU: %.2f%% | RAM: %.2f MB | Storage: %d bytes | Connections: %d | Requests: %d",
 		cpuUsage,
 		memoryUsage,
+		storageUsage,
 		activeConnections,
 		totalRequests,
 	)

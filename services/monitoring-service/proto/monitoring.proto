@@ -4,217 +4,323 @@ package monitoring;
 
 option go_package = "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/generated;generated";
 
+// =====================================
+// SERVICIO DE MONITOREO
+// =====================================
+
 service MonitoringService {
 
-    // Registro de métricas de componentes.
+    // =====================================
+    // MÉTRICAS
+    // =====================================
+
     rpc ReportMetrics(MetricsRequest)
         returns (MetricsResponse);
 
-    // Consulta de métricas registradas.
     rpc GetMetrics(GetMetricsRequest)
         returns (GetMetricsResponse);
 
-    // Registro del estado de un componente.
+    // =====================================
+    // ESTADOS DE SERVICIO
+    // =====================================
+
     rpc ReportStatus(StatusRequest)
         returns (StatusResponse);
 
-    // Consulta del estado de un servicio.
     rpc GetServiceStatus(ServiceRequest)
         returns (ServiceResponse);
 
-    // Consulta del estado de un nodo HPC.
+    // =====================================
+    // NODOS HPC
+    // =====================================
+
     rpc GetNodeStatus(NodeRequest)
         returns (NodeResponse);
+
+    // =====================================
+    // REGLAS DE ALERTA
+    // =====================================
+
+    rpc CreateAlertRule(CreateAlertRuleRequest)
+        returns (CreateAlertRuleResponse);
+
+    rpc UpdateAlertRule(UpdateAlertRuleRequest)
+        returns (UpdateAlertRuleResponse);
+
+    rpc DeleteAlertRule(DeleteAlertRuleRequest)
+        returns (DeleteAlertRuleResponse);
+
+    rpc GetAlertRules(GetAlertRulesRequest)
+        returns (GetAlertRulesResponse);
+
+    // =====================================
+    // ALERTAS GENERADAS
+    // =====================================
+
+    rpc GetAlerts(GetAlertsRequest)
+        returns (GetAlertsResponse);
 }
 
-
-// ============================================================
+// =====================================
 // MÉTRICAS
-// ============================================================
+// =====================================
 
-// Métricas enviadas por un componente al Monitoring Service.
 message MetricsRequest {
-
-    // Identificador técnico del componente.
-    // Ejemplo: sync-service
     string component_id = 1;
-
-    // Nombre legible del componente.
-    // Ejemplo: Sync Service
     string component_name = 2;
 
-    // Uso de CPU del componente en porcentaje.
     double cpu_usage = 3;
-
-    // Uso de memoria del componente.
-    // Actualmente se reporta en MB.
     double memory_usage = 4;
 
-    // Número de conexiones activas.
     int64 active_connections = 5;
-
-    // Número acumulado de solicitudes procesadas.
     int64 total_requests = 6;
 
-    // Timestamp Unix del momento de la medición.
     int64 timestamp = 7;
 
-    // Espacio ocupado por los recursos administrados
-    // por el componente, expresado en bytes.
     int64 storage_usage = 8;
 }
 
-
-// Respuesta al registro de una métrica.
 message MetricsResponse {
-
     bool success = 1;
-
     string message = 2;
 }
 
+// =====================================
+// CONSULTAR MÉTRICAS
+// =====================================
 
-// ============================================================
-// CONSULTA DE MÉTRICAS
-// ============================================================
-
-// Por ahora no recibe filtros.
-//
-// Devuelve las métricas almacenadas por el
-// Monitoring Service.
 message GetMetricsRequest {
 }
 
-
-// Representa una métrica almacenada y posteriormente
-// devuelta por GetMetrics.
-//
-// Debe conservar los mismos datos principales que
-// MetricsRequest para no perder información.
 message Metric {
-
     string component_id = 1;
-
     string component_name = 2;
 
     double cpu_usage = 3;
-
     double memory_usage = 4;
 
     int64 active_connections = 5;
-
     int64 total_requests = 6;
 
     int64 timestamp = 7;
 
-    // Uso de almacenamiento en bytes.
     int64 storage_usage = 8;
 }
 
-
-// Lista de métricas registradas.
 message GetMetricsResponse {
-
     repeated Metric metrics = 1;
 }
 
+// =====================================
+// ESTADOS DE SERVICIO
+// =====================================
 
-// ============================================================
-// ESTADO DE COMPONENTES
-// ============================================================
-
-// Permite a un componente informar su estado actual.
 message StatusRequest {
-
     string component_id = 1;
-
     string component_name = 2;
 
-    // Ejemplos:
-    // ACTIVE
-    // INACTIVE
-    // DEGRADED
-    // ERROR
     string status = 3;
-
     string message = 4;
 
-    // Timestamp Unix.
     int64 timestamp = 5;
 }
 
-
-// Respuesta al registro de estado.
 message StatusResponse {
-
     bool success = 1;
-
     string message = 2;
 }
 
+// =====================================
+// CONSULTAR ESTADO DE SERVICIO
+// =====================================
 
-// ============================================================
-// CONSULTA DE ESTADO DE SERVICIOS
-// ============================================================
-
-// Solicitud para consultar un servicio registrado.
 message ServiceRequest {
-
     string component_name = 1;
 }
 
-
-// Estado actual de un componente.
 message ServiceResponse {
-
     string component_id = 1;
-
     string component_name = 2;
 
     string status = 3;
-
     string message = 4;
 
-    // Última actualización en timestamp Unix.
     int64 last_updated = 5;
 }
 
+// =====================================
+// NODOS HPC
+// =====================================
 
-// ============================================================
-// CONSULTA DE NODOS HPC
-// ============================================================
-
-// Identifica el nodo HPC que se desea consultar.
 message NodeRequest {
-
     string node_id = 1;
 }
 
-
-// Información de monitoreo de un nodo perteneciente
-// al clúster HPC.
 message NodeResponse {
-
     string node_id = 1;
-
     string hostname = 2;
 
     string status = 3;
 
-    // Cantidad total de núcleos disponibles.
     int32 cpu_cores = 4;
-
-    // Memoria total del nodo.
-    // La unidad deberá mantenerse consistente
-    // en toda la implementación.
     int64 memory = 5;
 
-    // Uso actual de CPU en porcentaje.
     double cpu_usage = 6;
-
-    // Uso actual de memoria.
     double memory_usage = 7;
 
-    // Última actualización en timestamp Unix.
     int64 last_updated = 8;
+}
+
+// =====================================
+// MODELO DE REGLA DE ALERTA
+// =====================================
+
+message AlertRule {
+    string id = 1;
+
+    string name = 2;
+
+    string metric = 3;
+
+    string operator = 4;
+
+    double threshold = 5;
+
+    string component_name = 6;
+
+    bool enabled = 7;
+}
+
+// =====================================
+// CREAR REGLA DE ALERTA
+// =====================================
+
+message CreateAlertRuleRequest {
+    // Puede enviarse vacío.
+    // En ese caso el servidor genera UUID.
+    string id = 1;
+
+    string name = 2;
+
+    string metric = 3;
+
+    string operator = 4;
+
+    double threshold = 5;
+
+    string component_name = 6;
+
+    bool enabled = 7;
+}
+
+message CreateAlertRuleResponse {
+    bool success = 1;
+
+    string message = 2;
+
+    // ID definitivo de la regla.
+    // Puede ser el enviado por el cliente
+    // o el UUID generado por el servidor.
+    string rule_id = 3;
+}
+
+// =====================================
+// ACTUALIZAR REGLA DE ALERTA
+// =====================================
+
+message UpdateAlertRuleRequest {
+    // ID obligatorio de la regla
+    // que se desea actualizar.
+    string id = 1;
+
+    string name = 2;
+
+    string metric = 3;
+
+    string operator = 4;
+
+    double threshold = 5;
+
+    string component_name = 6;
+
+    bool enabled = 7;
+}
+
+message UpdateAlertRuleResponse {
+    bool success = 1;
+
+    string message = 2;
+
+    // Devuelve la regla ya actualizada.
+    AlertRule rule = 3;
+}
+
+// =====================================
+// ELIMINAR REGLA DE ALERTA
+// =====================================
+
+message DeleteAlertRuleRequest {
+    // ID obligatorio de la regla
+    // que se desea eliminar.
+    string id = 1;
+}
+
+message DeleteAlertRuleResponse {
+    bool success = 1;
+
+    string message = 2;
+
+    // ID de la regla eliminada.
+    string rule_id = 3;
+}
+
+// =====================================
+// CONSULTAR REGLAS DE ALERTA
+// =====================================
+
+message GetAlertRulesRequest {
+}
+
+message GetAlertRulesResponse {
+    repeated AlertRule rules = 1;
+}
+
+// =====================================
+// MODELO DE ALERTA GENERADA
+// =====================================
+
+message Alert {
+    string id = 1;
+
+    string rule_id = 2;
+    string rule_name = 3;
+
+    string component_id = 4;
+    string component_name = 5;
+
+    string metric = 6;
+
+    double current_value = 7;
+    double threshold = 8;
+
+    string message = 9;
+
+    int64 created_at = 10;
+
+    bool active = 11;
+
+    // 0 significa que la alerta
+    // todavía no ha sido resuelta.
+    int64 resolved_at = 12;
+}
+
+// =====================================
+// CONSULTAR ALERTAS
+// =====================================
+
+message GetAlertsRequest {
+}
+
+message GetAlertsResponse {
+    repeated Alert alerts = 1;
 }

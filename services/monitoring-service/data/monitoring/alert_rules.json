@@ -1,0 +1,29 @@
+[
+  {
+    "ID": "rule-cpu-high",
+    "Name": "CPU alta",
+    "Metric": "cpu_usage",
+    "Operator": "\u003e=",
+    "Threshold": 0.1,
+    "ComponentName": "Sync Service",
+    "Enabled": true
+  },
+  {
+    "ID": "rule-storage-active",
+    "Name": "Almacenamiento en uso",
+    "Metric": "storage_usage",
+    "Operator": "\u003e",
+    "Threshold": 0,
+    "ComponentName": "Sync Service",
+    "Enabled": true
+  },
+  {
+    "ID": "rule-connections-test",
+    "Name": "Muchas conexiones",
+    "Metric": "active_connections",
+    "Operator": "\u003e",
+    "Threshold": 8,
+    "ComponentName": "Sync Service",
+    "Enabled": false
+  }
+]

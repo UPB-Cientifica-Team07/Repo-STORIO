@@ -1,0 +1,14 @@
+{
+  "user-001": {
+    "home": "homes/user-001",
+    "quota_bytes": 1073741824,
+    "default_file_mode": "0640",
+    "default_directory_mode": "0750"
+  },
+  "user-002": {
+    "home": "homes/user-002",
+    "quota_bytes": 1073741824,
+    "default_file_mode": "0640",
+    "default_directory_mode": "0750"
+  }
+}

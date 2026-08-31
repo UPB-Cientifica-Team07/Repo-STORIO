@@ -9,11 +9,12 @@ import (
 	"time"
 
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/internal/auth"
+	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/internal/database"
+	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/internal/fileclient"
 	syncgrpc "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/internal/grpc"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/internal/monitoring"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/internal/repository"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/internal/service"
-	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/internal/storage"
 
 	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/proto"
 
@@ -21,12 +22,16 @@ import (
 )
 
 const (
-	port              = ":50055"
-	storagePath       = "data/shared-storage"
-	authURL           = "http://localhost:8081"
+	port = ":50055"
+
+	authURL = "http://localhost:8081"
+
+	fileServiceAddress = "localhost:50053"
+
 	monitoringAddress = "localhost:50051"
 
-	componentID   = "sync-service"
+	componentID = "sync-service"
+
 	componentName = "Sync Service"
 )
 
@@ -37,16 +42,79 @@ func main() {
 	log.Println(" Tecnología: Go + gRPC")
 	log.Println(" Puerto:", port)
 	log.Println(" Auth Service:", authURL)
+	log.Println(" File Service:", fileServiceAddress)
+	log.Println(" PostgreSQL: localhost:5434")
 	log.Println(" Monitoring:", monitoringAddress)
 	log.Println(" Estado: INICIANDO")
 	log.Println("===================================")
 
 	// =====================================
-	// REPOSITORY
+	// POSTGRESQL
+	// =====================================
+	//
+	// Sync Service mantiene en PostgreSQL:
+	//
+	// - metadata lógica de archivos sincronizados
+	// - relative_path
+	// - versiones
+	// - historial de cambios
+	// - cursores por dispositivo
+	//
+	// El contenido físico sigue perteneciendo
+	// exclusivamente a File Service.
+	//
+	// =====================================
+
+	db, err :=
+		database.Open()
+
+	if err != nil {
+
+		log.Fatalf(
+			"No se pudo inicializar PostgreSQL: %v",
+			err,
+		)
+	}
+
+	defer func() {
+
+		if closeErr :=
+			db.Close(); closeErr != nil {
+
+			log.Printf(
+				"Advertencia cerrando PostgreSQL: %v",
+				closeErr,
+			)
+		}
+	}()
+
+	log.Println(
+		"PostgreSQL Sync: CONECTADO",
+	)
+
+	// =====================================
+	// SYNC REPOSITORY PERSISTENTE
+	// =====================================
+	//
+	// PostgreSQL reemplaza los antiguos maps
+	// en memoria.
+	//
+	// Tablas utilizadas:
+	//
+	// - sync_file
+	// - sync_change
+	// - sync_device_cursor
+	//
 	// =====================================
 
 	repo :=
-		repository.NewSyncRepository()
+		repository.NewSyncRepository(
+			db,
+		)
+
+	log.Println(
+		"Sync Repository PostgreSQL: ACTIVO",
+	)
 
 	// =====================================
 	// DOMAIN SERVICE
@@ -57,30 +125,70 @@ func main() {
 			repo,
 		)
 
-	// =====================================
-	// STORAGE
-	// =====================================
-
-	fileStorage, err :=
-		storage.NewStorage(
-			storagePath,
-		)
-
-	if err != nil {
-		log.Fatalf(
-			"Error inicializando almacenamiento: %v",
-			err,
-		)
-	}
+	log.Println(
+		"Sync Domain Service: ACTIVO",
+	)
 
 	// =====================================
-	// AUTH
+	// AUTH CLIENT
 	// =====================================
 
 	authClient :=
 		auth.NewClient(
 			authURL,
 		)
+
+	// =====================================
+	// FILE SERVICE CLIENT
+	// =====================================
+	//
+	// File Service continúa siendo propietario
+	// exclusivo de:
+	//
+	// - almacenamiento físico
+	// - Home
+	// - cuotas
+	// - metadata física PostgreSQL
+	// - permisos Unix
+	// - ACL
+	//
+	// Sync Service coordina:
+	//
+	// - árbol lógico
+	// - historial de cambios
+	// - versiones
+	// - cursores
+	//
+	// =====================================
+
+	fileServiceClient, err :=
+		fileclient.NewClient(
+			fileServiceAddress,
+		)
+
+	if err != nil {
+
+		log.Fatalf(
+			"Error inicializando File Service Client: %v",
+			err,
+		)
+	}
+
+	defer func() {
+
+		if closeErr :=
+			fileServiceClient.Close(); closeErr != nil {
+
+			log.Printf(
+				"Advertencia cerrando File Service Client: %v",
+				closeErr,
+			)
+		}
+	}()
+
+	log.Println(
+		"File Service Client: ACTIVO",
+	)
 
 	// =====================================
 	// MONITORING CLIENT
@@ -98,12 +206,23 @@ func main() {
 			err,
 		)
 
-		monitoringClient = nil
+		monitoringClient =
+			nil
 	}
 
 	if monitoringClient != nil {
 
-		defer monitoringClient.Close()
+		defer func() {
+
+			if closeErr :=
+				monitoringClient.Close(); closeErr != nil {
+
+				log.Printf(
+					"Advertencia cerrando Monitoring Client: %v",
+					closeErr,
+				)
+			}
+		}()
 
 		err =
 			monitoringClient.ReportStatus(
@@ -114,6 +233,7 @@ func main() {
 			)
 
 		if err != nil {
+
 			log.Printf(
 				"Advertencia reportando ACTIVE: %v",
 				err,
@@ -123,7 +243,6 @@ func main() {
 
 	// =====================================
 	// RUNTIME METRICS
-	// requests y conexiones reales
 	// =====================================
 
 	runtimeMetrics :=
@@ -136,7 +255,6 @@ func main() {
 
 	// =====================================
 	// SYSTEM METRICS
-	// CPU y RAM reales
 	// =====================================
 
 	systemMetrics :=
@@ -145,11 +263,22 @@ func main() {
 	// =====================================
 	// SYNC GRPC IMPLEMENTATION
 	// =====================================
+	//
+	// El servidor gRPC recibe:
+	//
+	// - lógica de sincronización
+	// - cliente hacia File Service
+	// - cliente hacia Auth Service
+	//
+	// El repository PostgreSQL se utiliza
+	// desde SyncService.
+	//
+	// =====================================
 
 	grpcServerImpl :=
 		syncgrpc.NewServer(
 			syncService,
-			fileStorage,
+			fileServiceClient,
 			authClient,
 		)
 
@@ -164,12 +293,25 @@ func main() {
 		)
 
 	if err != nil {
+
 		log.Fatalf(
 			"Error abriendo puerto %s: %v",
 			port,
 			err,
 		)
 	}
+
+	defer func() {
+
+		if closeErr :=
+			listener.Close(); closeErr != nil {
+
+			log.Printf(
+				"Advertencia cerrando listener: %v",
+				closeErr,
+			)
+		}
+	}()
 
 	// =====================================
 	// GRPC SERVER
@@ -178,12 +320,18 @@ func main() {
 	grpcServer :=
 		grpc.NewServer(
 
-			grpc.UnaryInterceptor(
+			grpc.ChainUnaryInterceptor(
 				runtimeMetrics.UnaryInterceptor,
+				auth.UnaryServerInterceptor(
+					authClient,
+				),
 			),
 
-			grpc.StreamInterceptor(
+			grpc.ChainStreamInterceptor(
 				runtimeMetrics.StreamInterceptor,
+				auth.StreamServerInterceptor(
+					authClient,
+				),
 			),
 
 			grpc.StatsHandler(
@@ -201,7 +349,9 @@ func main() {
 	// =====================================
 
 	stopMetrics :=
-		make(chan struct{})
+		make(
+			chan struct{},
+		)
 
 	if monitoringClient != nil {
 
@@ -234,7 +384,8 @@ func main() {
 							cpuErr,
 						)
 
-						cpuUsage = 0
+						cpuUsage =
+							0
 					}
 
 					// =====================================
@@ -245,26 +396,21 @@ func main() {
 						systemMetrics.MemoryUsageMB()
 
 					// =====================================
-					// STORAGE REAL
+					// STORAGE
+					// =====================================
+					//
+					// Sync Service no almacena contenido
+					// físico.
+					//
+					// PostgreSQL contiene metadata de Sync,
+					// pero no se contabiliza aquí como Home.
+					//
 					// =====================================
 
-					storageBytes, storageErr :=
-						monitoring.StorageUsageBytes(
-							storagePath,
-						)
-
-					if storageErr != nil {
-
-						log.Printf(
-							"Error obteniendo almacenamiento: %v",
-							storageErr,
-						)
-
-						storageBytes = 0
-					}
+					var storageBytes int64 = 0
 
 					// =====================================
-					// REQUESTS Y CONEXIONES REALES
+					// REQUESTS / CONNECTIONS
 					// =====================================
 
 					activeConnections :=
@@ -278,7 +424,7 @@ func main() {
 					// =====================================
 
 					log.Printf(
-						"Métricas reales | CPU: %.2f%% | RAM: %.2f MB | Storage: %d bytes | Connections: %d | Requests: %d",
+						"Métricas reales | CPU: %.2f%% | RAM: %.2f MB | Storage propio: %d bytes | Connections: %d | Requests: %d",
 						cpuUsage,
 						memoryUsage,
 						storageBytes,
@@ -287,7 +433,7 @@ func main() {
 					)
 
 					// =====================================
-					// ENVIAR A MONITORING SERVICE
+					// REPORTAR A MONITORING
 					// =====================================
 
 					reportErr :=
@@ -326,21 +472,27 @@ func main() {
 		log.Println("===================================")
 		log.Println(" SYNC SERVICE ACTIVO")
 		log.Println(" Puerto:", port)
-		log.Println(" Storage:", storagePath)
+		log.Println(" File Service:", fileServiceAddress)
 		log.Println(" Auth Bridge:", authURL)
+		log.Println(" PostgreSQL Sync: ACTIVO")
 		log.Println(" Monitoring:", monitoringAddress)
+		log.Println(" Storage local: DESHABILITADO")
+		log.Println(" Home central: gestionado por File Service")
+		log.Println(" Metadata Sync: PostgreSQL")
+		log.Println(" Historial Sync: PERSISTENTE")
+		log.Println(" Cursores dispositivo: PERSISTENTES")
 		log.Println("===================================")
 
-		err :=
+		serveErr :=
 			grpcServer.Serve(
 				listener,
 			)
 
-		if err != nil {
+		if serveErr != nil {
 
 			log.Fatalf(
 				"Error ejecutando servidor gRPC: %v",
-				err,
+				serveErr,
 			)
 		}
 	}()
@@ -366,6 +518,17 @@ func main() {
 	log.Println(
 		"Deteniendo Sync Service...",
 	)
+
+	// Evita seguir recibiendo nuevas señales
+	// sobre el canal durante el cierre.
+
+	signal.Stop(
+		stop,
+	)
+
+	// =====================================
+	// DETENER LOOP DE MÉTRICAS
+	// =====================================
 
 	close(
 		stopMetrics,
@@ -399,6 +562,10 @@ func main() {
 	// =====================================
 
 	grpcServer.GracefulStop()
+
+	log.Println(
+		"Servidor gRPC detenido",
+	)
 
 	log.Println(
 		"Sync Service detenido correctamente",

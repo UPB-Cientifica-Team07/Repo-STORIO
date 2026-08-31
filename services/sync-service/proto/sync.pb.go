@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: proto/sync.proto
+// source: services/sync-service/proto/sync.proto
 
 package generated
 
@@ -31,7 +31,7 @@ type AuthenticateRequest struct {
 
 func (x *AuthenticateRequest) Reset() {
 	*x = AuthenticateRequest{}
-	mi := &file_proto_sync_proto_msgTypes[0]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *AuthenticateRequest) String() string {
 func (*AuthenticateRequest) ProtoMessage() {}
 
 func (x *AuthenticateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[0]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *AuthenticateRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthenticateRequest.ProtoReflect.Descriptor instead.
 func (*AuthenticateRequest) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{0}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *AuthenticateRequest) GetToken() string {
@@ -84,7 +84,7 @@ type AuthenticateResponse struct {
 
 func (x *AuthenticateResponse) Reset() {
 	*x = AuthenticateResponse{}
-	mi := &file_proto_sync_proto_msgTypes[1]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +96,7 @@ func (x *AuthenticateResponse) String() string {
 func (*AuthenticateResponse) ProtoMessage() {}
 
 func (x *AuthenticateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[1]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +109,7 @@ func (x *AuthenticateResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AuthenticateResponse.ProtoReflect.Descriptor instead.
 func (*AuthenticateResponse) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{1}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *AuthenticateResponse) GetSuccess() bool {
@@ -143,7 +143,7 @@ type SyncRequest struct {
 
 func (x *SyncRequest) Reset() {
 	*x = SyncRequest{}
-	mi := &file_proto_sync_proto_msgTypes[2]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -155,7 +155,7 @@ func (x *SyncRequest) String() string {
 func (*SyncRequest) ProtoMessage() {}
 
 func (x *SyncRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[2]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -168,7 +168,7 @@ func (x *SyncRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncRequest.ProtoReflect.Descriptor instead.
 func (*SyncRequest) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{2}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SyncRequest) GetUserId() string {
@@ -196,7 +196,7 @@ type SyncResponse struct {
 
 func (x *SyncResponse) Reset() {
 	*x = SyncResponse{}
-	mi := &file_proto_sync_proto_msgTypes[3]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -208,7 +208,7 @@ func (x *SyncResponse) String() string {
 func (*SyncResponse) ProtoMessage() {}
 
 func (x *SyncResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[3]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -221,7 +221,7 @@ func (x *SyncResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncResponse.ProtoReflect.Descriptor instead.
 func (*SyncResponse) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{3}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SyncResponse) GetSuccess() bool {
@@ -254,7 +254,7 @@ type ListFilesRequest struct {
 
 func (x *ListFilesRequest) Reset() {
 	*x = ListFilesRequest{}
-	mi := &file_proto_sync_proto_msgTypes[4]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -266,7 +266,7 @@ func (x *ListFilesRequest) String() string {
 func (*ListFilesRequest) ProtoMessage() {}
 
 func (x *ListFilesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[4]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -279,7 +279,7 @@ func (x *ListFilesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFilesRequest.ProtoReflect.Descriptor instead.
 func (*ListFilesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{4}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListFilesRequest) GetUserId() string {
@@ -300,7 +300,7 @@ type ListFilesResponse struct {
 
 func (x *ListFilesResponse) Reset() {
 	*x = ListFilesResponse{}
-	mi := &file_proto_sync_proto_msgTypes[5]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -312,7 +312,7 @@ func (x *ListFilesResponse) String() string {
 func (*ListFilesResponse) ProtoMessage() {}
 
 func (x *ListFilesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[5]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -325,7 +325,7 @@ func (x *ListFilesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListFilesResponse.ProtoReflect.Descriptor instead.
 func (*ListFilesResponse) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{5}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListFilesResponse) GetSuccess() bool {
@@ -349,8 +349,6 @@ func (x *ListFilesResponse) GetFiles() []*FileMetadata {
 	return nil
 }
 
-// El primer mensaje contiene metadatos.
-// Los mensajes siguientes contienen chunks.
 type UploadRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Types that are valid to be assigned to Data:
@@ -364,7 +362,7 @@ type UploadRequest struct {
 
 func (x *UploadRequest) Reset() {
 	*x = UploadRequest{}
-	mi := &file_proto_sync_proto_msgTypes[6]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -376,7 +374,7 @@ func (x *UploadRequest) String() string {
 func (*UploadRequest) ProtoMessage() {}
 
 func (x *UploadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[6]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -389,7 +387,7 @@ func (x *UploadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadRequest.ProtoReflect.Descriptor instead.
 func (*UploadRequest) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{6}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UploadRequest) GetData() isUploadRequest_Data {
@@ -434,19 +432,26 @@ func (*UploadRequest_Metadata) isUploadRequest_Data() {}
 func (*UploadRequest_Chunk) isUploadRequest_Data() {}
 
 type UploadMetadata struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	DeviceId      string                 `protobuf:"bytes,2,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
-	FileName      string                 `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	FileType      string                 `protobuf:"bytes,4,opt,name=file_type,json=fileType,proto3" json:"file_type,omitempty"`
-	Size          int64                  `protobuf:"varint,5,opt,name=size,proto3" json:"size,omitempty"`
+	state    protoimpl.MessageState `protogen:"open.v1"`
+	UserId   string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	DeviceId string                 `protobuf:"bytes,2,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	FileName string                 `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	FileType string                 `protobuf:"bytes,4,opt,name=file_type,json=fileType,proto3" json:"file_type,omitempty"`
+	Size     int64                  `protobuf:"varint,5,opt,name=size,proto3" json:"size,omitempty"`
+	// Ruta lógica respecto a la raíz
+	// sincronizada del dispositivo.
+	//
+	// Ejemplo:
+	//
+	// Universidad/proyecto/main.go
+	RelativePath  string `protobuf:"bytes,6,opt,name=relative_path,json=relativePath,proto3" json:"relative_path,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UploadMetadata) Reset() {
 	*x = UploadMetadata{}
-	mi := &file_proto_sync_proto_msgTypes[7]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -458,7 +463,7 @@ func (x *UploadMetadata) String() string {
 func (*UploadMetadata) ProtoMessage() {}
 
 func (x *UploadMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[7]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -471,7 +476,7 @@ func (x *UploadMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadMetadata.ProtoReflect.Descriptor instead.
 func (*UploadMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{7}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UploadMetadata) GetUserId() string {
@@ -509,6 +514,13 @@ func (x *UploadMetadata) GetSize() int64 {
 	return 0
 }
 
+func (x *UploadMetadata) GetRelativePath() string {
+	if x != nil {
+		return x.RelativePath
+	}
+	return ""
+}
+
 type UploadResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
@@ -521,7 +533,7 @@ type UploadResponse struct {
 
 func (x *UploadResponse) Reset() {
 	*x = UploadResponse{}
-	mi := &file_proto_sync_proto_msgTypes[8]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -533,7 +545,7 @@ func (x *UploadResponse) String() string {
 func (*UploadResponse) ProtoMessage() {}
 
 func (x *UploadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[8]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -546,7 +558,7 @@ func (x *UploadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadResponse.ProtoReflect.Descriptor instead.
 func (*UploadResponse) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{8}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UploadResponse) GetSuccess() bool {
@@ -587,7 +599,7 @@ type DownloadRequest struct {
 
 func (x *DownloadRequest) Reset() {
 	*x = DownloadRequest{}
-	mi := &file_proto_sync_proto_msgTypes[9]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -599,7 +611,7 @@ func (x *DownloadRequest) String() string {
 func (*DownloadRequest) ProtoMessage() {}
 
 func (x *DownloadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[9]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -612,7 +624,7 @@ func (x *DownloadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DownloadRequest.ProtoReflect.Descriptor instead.
 func (*DownloadRequest) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{9}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *DownloadRequest) GetUserId() string {
@@ -642,7 +654,7 @@ type DownloadResponse struct {
 
 func (x *DownloadResponse) Reset() {
 	*x = DownloadResponse{}
-	mi := &file_proto_sync_proto_msgTypes[10]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -654,7 +666,7 @@ func (x *DownloadResponse) String() string {
 func (*DownloadResponse) ProtoMessage() {}
 
 func (x *DownloadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[10]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -667,7 +679,7 @@ func (x *DownloadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DownloadResponse.ProtoReflect.Descriptor instead.
 func (*DownloadResponse) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{10}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DownloadResponse) GetData() isDownloadResponse_Data {
@@ -711,6 +723,150 @@ func (*DownloadResponse_Metadata) isDownloadResponse_Data() {}
 
 func (*DownloadResponse_Chunk) isDownloadResponse_Data() {}
 
+type UpdateFileRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	DeviceId      string                 `protobuf:"bytes,2,opt,name=device_id,json=deviceId,proto3" json:"device_id,omitempty"`
+	FileId        string                 `protobuf:"bytes,3,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	Content       []byte                 `protobuf:"bytes,4,opt,name=content,proto3" json:"content,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateFileRequest) Reset() {
+	*x = UpdateFileRequest{}
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateFileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFileRequest) ProtoMessage() {}
+
+func (x *UpdateFileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFileRequest.ProtoReflect.Descriptor instead.
+func (*UpdateFileRequest) Descriptor() ([]byte, []int) {
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *UpdateFileRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UpdateFileRequest) GetDeviceId() string {
+	if x != nil {
+		return x.DeviceId
+	}
+	return ""
+}
+
+func (x *UpdateFileRequest) GetFileId() string {
+	if x != nil {
+		return x.FileId
+	}
+	return ""
+}
+
+func (x *UpdateFileRequest) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+type UpdateFileResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	FileId        string                 `protobuf:"bytes,3,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	Size          int64                  `protobuf:"varint,4,opt,name=size,proto3" json:"size,omitempty"`
+	Version       int64                  `protobuf:"varint,5,opt,name=version,proto3" json:"version,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateFileResponse) Reset() {
+	*x = UpdateFileResponse{}
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateFileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateFileResponse) ProtoMessage() {}
+
+func (x *UpdateFileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateFileResponse.ProtoReflect.Descriptor instead.
+func (*UpdateFileResponse) Descriptor() ([]byte, []int) {
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *UpdateFileResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *UpdateFileResponse) GetMessage() string {
+	if x != nil {
+		return x.Message
+	}
+	return ""
+}
+
+func (x *UpdateFileResponse) GetFileId() string {
+	if x != nil {
+		return x.FileId
+	}
+	return ""
+}
+
+func (x *UpdateFileResponse) GetSize() int64 {
+	if x != nil {
+		return x.Size
+	}
+	return 0
+}
+
+func (x *UpdateFileResponse) GetVersion() int64 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
 type DeleteFileRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -722,7 +878,7 @@ type DeleteFileRequest struct {
 
 func (x *DeleteFileRequest) Reset() {
 	*x = DeleteFileRequest{}
-	mi := &file_proto_sync_proto_msgTypes[11]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -734,7 +890,7 @@ func (x *DeleteFileRequest) String() string {
 func (*DeleteFileRequest) ProtoMessage() {}
 
 func (x *DeleteFileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[11]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -747,7 +903,7 @@ func (x *DeleteFileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFileRequest.ProtoReflect.Descriptor instead.
 func (*DeleteFileRequest) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{11}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *DeleteFileRequest) GetUserId() string {
@@ -781,7 +937,7 @@ type DeleteFileResponse struct {
 
 func (x *DeleteFileResponse) Reset() {
 	*x = DeleteFileResponse{}
-	mi := &file_proto_sync_proto_msgTypes[12]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -793,7 +949,7 @@ func (x *DeleteFileResponse) String() string {
 func (*DeleteFileResponse) ProtoMessage() {}
 
 func (x *DeleteFileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[12]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -806,7 +962,7 @@ func (x *DeleteFileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteFileResponse.ProtoReflect.Descriptor instead.
 func (*DeleteFileResponse) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{12}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *DeleteFileResponse) GetSuccess() bool {
@@ -833,7 +989,7 @@ type WatchChangesRequest struct {
 
 func (x *WatchChangesRequest) Reset() {
 	*x = WatchChangesRequest{}
-	mi := &file_proto_sync_proto_msgTypes[13]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -845,7 +1001,7 @@ func (x *WatchChangesRequest) String() string {
 func (*WatchChangesRequest) ProtoMessage() {}
 
 func (x *WatchChangesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[13]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -858,7 +1014,7 @@ func (x *WatchChangesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WatchChangesRequest.ProtoReflect.Descriptor instead.
 func (*WatchChangesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{13}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *WatchChangesRequest) GetUserId() string {
@@ -876,19 +1032,28 @@ func (x *WatchChangesRequest) GetDeviceId() string {
 }
 
 type FileChange struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	Type           string                 `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	FileId         string                 `protobuf:"bytes,2,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
-	FileName       string                 `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	OriginDeviceId string                 `protobuf:"bytes,4,opt,name=origin_device_id,json=originDeviceId,proto3" json:"origin_device_id,omitempty"`
-	Timestamp      int64                  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// FILE_CREATED
+	// FILE_CHANGED
+	// FILE_DELETED
+	Type           string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	FileId         string `protobuf:"bytes,2,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	FileName       string `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	OriginDeviceId string `protobuf:"bytes,4,opt,name=origin_device_id,json=originDeviceId,proto3" json:"origin_device_id,omitempty"`
+	Timestamp      int64  `protobuf:"varint,5,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Ruta lógica necesaria para que otro
+	// dispositivo conozca dónde aplicar
+	// el cambio en su árbol local.
+	RelativePath string `protobuf:"bytes,6,opt,name=relative_path,json=relativePath,proto3" json:"relative_path,omitempty"`
+	// Versión lógica del recurso.
+	Version       int64 `protobuf:"varint,7,opt,name=version,proto3" json:"version,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *FileChange) Reset() {
 	*x = FileChange{}
-	mi := &file_proto_sync_proto_msgTypes[14]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -900,7 +1065,7 @@ func (x *FileChange) String() string {
 func (*FileChange) ProtoMessage() {}
 
 func (x *FileChange) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[14]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -913,7 +1078,7 @@ func (x *FileChange) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileChange.ProtoReflect.Descriptor instead.
 func (*FileChange) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{14}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *FileChange) GetType() string {
@@ -951,22 +1116,39 @@ func (x *FileChange) GetTimestamp() int64 {
 	return 0
 }
 
+func (x *FileChange) GetRelativePath() string {
+	if x != nil {
+		return x.RelativePath
+	}
+	return ""
+}
+
+func (x *FileChange) GetVersion() int64 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
 type FileMetadata struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	FileId        string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
-	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	FileName      string                 `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	FileType      string                 `protobuf:"bytes,4,opt,name=file_type,json=fileType,proto3" json:"file_type,omitempty"`
-	Size          int64                  `protobuf:"varint,5,opt,name=size,proto3" json:"size,omitempty"`
-	CreatedAt     int64                  `protobuf:"varint,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt     int64                  `protobuf:"varint,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	state        protoimpl.MessageState `protogen:"open.v1"`
+	FileId       string                 `protobuf:"bytes,1,opt,name=file_id,json=fileId,proto3" json:"file_id,omitempty"`
+	UserId       string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	FileName     string                 `protobuf:"bytes,3,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
+	FileType     string                 `protobuf:"bytes,4,opt,name=file_type,json=fileType,proto3" json:"file_type,omitempty"`
+	Size         int64                  `protobuf:"varint,5,opt,name=size,proto3" json:"size,omitempty"`
+	CreatedAt    int64                  `protobuf:"varint,6,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt    int64                  `protobuf:"varint,7,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	RelativePath string                 `protobuf:"bytes,8,opt,name=relative_path,json=relativePath,proto3" json:"relative_path,omitempty"`
+	// Versión actual administrada por Sync.
+	Version       int64 `protobuf:"varint,9,opt,name=version,proto3" json:"version,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *FileMetadata) Reset() {
 	*x = FileMetadata{}
-	mi := &file_proto_sync_proto_msgTypes[15]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -978,7 +1160,7 @@ func (x *FileMetadata) String() string {
 func (*FileMetadata) ProtoMessage() {}
 
 func (x *FileMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_sync_proto_msgTypes[15]
+	mi := &file_services_sync_service_proto_sync_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -991,7 +1173,7 @@ func (x *FileMetadata) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileMetadata.ProtoReflect.Descriptor instead.
 func (*FileMetadata) Descriptor() ([]byte, []int) {
-	return file_proto_sync_proto_rawDescGZIP(), []int{15}
+	return file_services_sync_service_proto_sync_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *FileMetadata) GetFileId() string {
@@ -1043,11 +1225,25 @@ func (x *FileMetadata) GetUpdatedAt() int64 {
 	return 0
 }
 
-var File_proto_sync_proto protoreflect.FileDescriptor
+func (x *FileMetadata) GetRelativePath() string {
+	if x != nil {
+		return x.RelativePath
+	}
+	return ""
+}
 
-const file_proto_sync_proto_rawDesc = "" +
+func (x *FileMetadata) GetVersion() int64 {
+	if x != nil {
+		return x.Version
+	}
+	return 0
+}
+
+var File_services_sync_service_proto_sync_proto protoreflect.FileDescriptor
+
+const file_services_sync_service_proto_sync_proto_rawDesc = "" +
 	"\n" +
-	"\x10proto/sync.proto\x12\x04sync\"H\n" +
+	"&services/sync-service/proto/sync.proto\x12\x04sync\"H\n" +
 	"\x13AuthenticateRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1b\n" +
 	"\tdevice_id\x18\x02 \x01(\tR\bdeviceId\"c\n" +
@@ -1071,13 +1267,14 @@ const file_proto_sync_proto_rawDesc = "" +
 	"\rUploadRequest\x122\n" +
 	"\bmetadata\x18\x01 \x01(\v2\x14.sync.UploadMetadataH\x00R\bmetadata\x12\x16\n" +
 	"\x05chunk\x18\x02 \x01(\fH\x00R\x05chunkB\x06\n" +
-	"\x04data\"\x94\x01\n" +
+	"\x04data\"\xb9\x01\n" +
 	"\x0eUploadMetadata\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
 	"\tdevice_id\x18\x02 \x01(\tR\bdeviceId\x12\x1b\n" +
 	"\tfile_name\x18\x03 \x01(\tR\bfileName\x12\x1b\n" +
 	"\tfile_type\x18\x04 \x01(\tR\bfileType\x12\x12\n" +
-	"\x04size\x18\x05 \x01(\x03R\x04size\"\x84\x01\n" +
+	"\x04size\x18\x05 \x01(\x03R\x04size\x12#\n" +
+	"\rrelative_path\x18\x06 \x01(\tR\frelativePath\"\x84\x01\n" +
 	"\x0eUploadResponse\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
 	"\amessage\x18\x02 \x01(\tR\amessage\x12\x17\n" +
@@ -1089,7 +1286,18 @@ const file_proto_sync_proto_rawDesc = "" +
 	"\x10DownloadResponse\x120\n" +
 	"\bmetadata\x18\x01 \x01(\v2\x12.sync.FileMetadataH\x00R\bmetadata\x12\x16\n" +
 	"\x05chunk\x18\x02 \x01(\fH\x00R\x05chunkB\x06\n" +
-	"\x04data\"b\n" +
+	"\x04data\"|\n" +
+	"\x11UpdateFileRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
+	"\tdevice_id\x18\x02 \x01(\tR\bdeviceId\x12\x17\n" +
+	"\afile_id\x18\x03 \x01(\tR\x06fileId\x12\x18\n" +
+	"\acontent\x18\x04 \x01(\fR\acontent\"\x8f\x01\n" +
+	"\x12UpdateFileResponse\x12\x18\n" +
+	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\x12\x17\n" +
+	"\afile_id\x18\x03 \x01(\tR\x06fileId\x12\x12\n" +
+	"\x04size\x18\x04 \x01(\x03R\x04size\x12\x18\n" +
+	"\aversion\x18\x05 \x01(\x03R\aversion\"b\n" +
 	"\x11DeleteFileRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
 	"\tdevice_id\x18\x02 \x01(\tR\bdeviceId\x12\x17\n" +
@@ -1099,14 +1307,16 @@ const file_proto_sync_proto_rawDesc = "" +
 	"\amessage\x18\x02 \x01(\tR\amessage\"K\n" +
 	"\x13WatchChangesRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1b\n" +
-	"\tdevice_id\x18\x02 \x01(\tR\bdeviceId\"\x9e\x01\n" +
+	"\tdevice_id\x18\x02 \x01(\tR\bdeviceId\"\xdd\x01\n" +
 	"\n" +
 	"FileChange\x12\x12\n" +
 	"\x04type\x18\x01 \x01(\tR\x04type\x12\x17\n" +
 	"\afile_id\x18\x02 \x01(\tR\x06fileId\x12\x1b\n" +
 	"\tfile_name\x18\x03 \x01(\tR\bfileName\x12(\n" +
 	"\x10origin_device_id\x18\x04 \x01(\tR\x0eoriginDeviceId\x12\x1c\n" +
-	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\"\xcc\x01\n" +
+	"\ttimestamp\x18\x05 \x01(\x03R\ttimestamp\x12#\n" +
+	"\rrelative_path\x18\x06 \x01(\tR\frelativePath\x12\x18\n" +
+	"\aversion\x18\a \x01(\x03R\aversion\"\x8b\x02\n" +
 	"\fFileMetadata\x12\x17\n" +
 	"\afile_id\x18\x01 \x01(\tR\x06fileId\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1b\n" +
@@ -1116,7 +1326,9 @@ const file_proto_sync_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\x06 \x01(\x03R\tcreatedAt\x12\x1d\n" +
 	"\n" +
-	"updated_at\x18\a \x01(\x03R\tupdatedAt2\xb5\x03\n" +
+	"updated_at\x18\a \x01(\x03R\tupdatedAt\x12#\n" +
+	"\rrelative_path\x18\b \x01(\tR\frelativePath\x12\x18\n" +
+	"\aversion\x18\t \x01(\x03R\aversion2\xf6\x03\n" +
 	"\vSyncService\x12E\n" +
 	"\fAuthenticate\x12\x19.sync.AuthenticateRequest\x1a\x1a.sync.AuthenticateResponse\x12-\n" +
 	"\x04Sync\x12\x11.sync.SyncRequest\x1a\x12.sync.SyncResponse\x12<\n" +
@@ -1124,23 +1336,25 @@ const file_proto_sync_proto_rawDesc = "" +
 	"\x06Upload\x12\x13.sync.UploadRequest\x1a\x14.sync.UploadResponse(\x01\x12;\n" +
 	"\bDownload\x12\x15.sync.DownloadRequest\x1a\x16.sync.DownloadResponse0\x01\x12?\n" +
 	"\n" +
+	"UpdateFile\x12\x17.sync.UpdateFileRequest\x1a\x18.sync.UpdateFileResponse\x12?\n" +
+	"\n" +
 	"DeleteFile\x12\x17.sync.DeleteFileRequest\x1a\x18.sync.DeleteFileResponse\x12=\n" +
 	"\fWatchChanges\x12\x19.sync.WatchChangesRequest\x1a\x10.sync.FileChange0\x01BTZRgithub.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/proto;generatedb\x06proto3"
 
 var (
-	file_proto_sync_proto_rawDescOnce sync.Once
-	file_proto_sync_proto_rawDescData []byte
+	file_services_sync_service_proto_sync_proto_rawDescOnce sync.Once
+	file_services_sync_service_proto_sync_proto_rawDescData []byte
 )
 
-func file_proto_sync_proto_rawDescGZIP() []byte {
-	file_proto_sync_proto_rawDescOnce.Do(func() {
-		file_proto_sync_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_sync_proto_rawDesc), len(file_proto_sync_proto_rawDesc)))
+func file_services_sync_service_proto_sync_proto_rawDescGZIP() []byte {
+	file_services_sync_service_proto_sync_proto_rawDescOnce.Do(func() {
+		file_services_sync_service_proto_sync_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_services_sync_service_proto_sync_proto_rawDesc), len(file_services_sync_service_proto_sync_proto_rawDesc)))
 	})
-	return file_proto_sync_proto_rawDescData
+	return file_services_sync_service_proto_sync_proto_rawDescData
 }
 
-var file_proto_sync_proto_msgTypes = make([]protoimpl.MessageInfo, 16)
-var file_proto_sync_proto_goTypes = []any{
+var file_services_sync_service_proto_sync_proto_msgTypes = make([]protoimpl.MessageInfo, 18)
+var file_services_sync_service_proto_sync_proto_goTypes = []any{
 	(*AuthenticateRequest)(nil),  // 0: sync.AuthenticateRequest
 	(*AuthenticateResponse)(nil), // 1: sync.AuthenticateResponse
 	(*SyncRequest)(nil),          // 2: sync.SyncRequest
@@ -1152,48 +1366,52 @@ var file_proto_sync_proto_goTypes = []any{
 	(*UploadResponse)(nil),       // 8: sync.UploadResponse
 	(*DownloadRequest)(nil),      // 9: sync.DownloadRequest
 	(*DownloadResponse)(nil),     // 10: sync.DownloadResponse
-	(*DeleteFileRequest)(nil),    // 11: sync.DeleteFileRequest
-	(*DeleteFileResponse)(nil),   // 12: sync.DeleteFileResponse
-	(*WatchChangesRequest)(nil),  // 13: sync.WatchChangesRequest
-	(*FileChange)(nil),           // 14: sync.FileChange
-	(*FileMetadata)(nil),         // 15: sync.FileMetadata
+	(*UpdateFileRequest)(nil),    // 11: sync.UpdateFileRequest
+	(*UpdateFileResponse)(nil),   // 12: sync.UpdateFileResponse
+	(*DeleteFileRequest)(nil),    // 13: sync.DeleteFileRequest
+	(*DeleteFileResponse)(nil),   // 14: sync.DeleteFileResponse
+	(*WatchChangesRequest)(nil),  // 15: sync.WatchChangesRequest
+	(*FileChange)(nil),           // 16: sync.FileChange
+	(*FileMetadata)(nil),         // 17: sync.FileMetadata
 }
-var file_proto_sync_proto_depIdxs = []int32{
-	14, // 0: sync.SyncResponse.changes:type_name -> sync.FileChange
-	15, // 1: sync.ListFilesResponse.files:type_name -> sync.FileMetadata
+var file_services_sync_service_proto_sync_proto_depIdxs = []int32{
+	16, // 0: sync.SyncResponse.changes:type_name -> sync.FileChange
+	17, // 1: sync.ListFilesResponse.files:type_name -> sync.FileMetadata
 	7,  // 2: sync.UploadRequest.metadata:type_name -> sync.UploadMetadata
-	15, // 3: sync.DownloadResponse.metadata:type_name -> sync.FileMetadata
+	17, // 3: sync.DownloadResponse.metadata:type_name -> sync.FileMetadata
 	0,  // 4: sync.SyncService.Authenticate:input_type -> sync.AuthenticateRequest
 	2,  // 5: sync.SyncService.Sync:input_type -> sync.SyncRequest
 	4,  // 6: sync.SyncService.ListFiles:input_type -> sync.ListFilesRequest
 	6,  // 7: sync.SyncService.Upload:input_type -> sync.UploadRequest
 	9,  // 8: sync.SyncService.Download:input_type -> sync.DownloadRequest
-	11, // 9: sync.SyncService.DeleteFile:input_type -> sync.DeleteFileRequest
-	13, // 10: sync.SyncService.WatchChanges:input_type -> sync.WatchChangesRequest
-	1,  // 11: sync.SyncService.Authenticate:output_type -> sync.AuthenticateResponse
-	3,  // 12: sync.SyncService.Sync:output_type -> sync.SyncResponse
-	5,  // 13: sync.SyncService.ListFiles:output_type -> sync.ListFilesResponse
-	8,  // 14: sync.SyncService.Upload:output_type -> sync.UploadResponse
-	10, // 15: sync.SyncService.Download:output_type -> sync.DownloadResponse
-	12, // 16: sync.SyncService.DeleteFile:output_type -> sync.DeleteFileResponse
-	14, // 17: sync.SyncService.WatchChanges:output_type -> sync.FileChange
-	11, // [11:18] is the sub-list for method output_type
-	4,  // [4:11] is the sub-list for method input_type
+	11, // 9: sync.SyncService.UpdateFile:input_type -> sync.UpdateFileRequest
+	13, // 10: sync.SyncService.DeleteFile:input_type -> sync.DeleteFileRequest
+	15, // 11: sync.SyncService.WatchChanges:input_type -> sync.WatchChangesRequest
+	1,  // 12: sync.SyncService.Authenticate:output_type -> sync.AuthenticateResponse
+	3,  // 13: sync.SyncService.Sync:output_type -> sync.SyncResponse
+	5,  // 14: sync.SyncService.ListFiles:output_type -> sync.ListFilesResponse
+	8,  // 15: sync.SyncService.Upload:output_type -> sync.UploadResponse
+	10, // 16: sync.SyncService.Download:output_type -> sync.DownloadResponse
+	12, // 17: sync.SyncService.UpdateFile:output_type -> sync.UpdateFileResponse
+	14, // 18: sync.SyncService.DeleteFile:output_type -> sync.DeleteFileResponse
+	16, // 19: sync.SyncService.WatchChanges:output_type -> sync.FileChange
+	12, // [12:20] is the sub-list for method output_type
+	4,  // [4:12] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
 	4,  // [4:4] is the sub-list for extension extendee
 	0,  // [0:4] is the sub-list for field type_name
 }
 
-func init() { file_proto_sync_proto_init() }
-func file_proto_sync_proto_init() {
-	if File_proto_sync_proto != nil {
+func init() { file_services_sync_service_proto_sync_proto_init() }
+func file_services_sync_service_proto_sync_proto_init() {
+	if File_services_sync_service_proto_sync_proto != nil {
 		return
 	}
-	file_proto_sync_proto_msgTypes[6].OneofWrappers = []any{
+	file_services_sync_service_proto_sync_proto_msgTypes[6].OneofWrappers = []any{
 		(*UploadRequest_Metadata)(nil),
 		(*UploadRequest_Chunk)(nil),
 	}
-	file_proto_sync_proto_msgTypes[10].OneofWrappers = []any{
+	file_services_sync_service_proto_sync_proto_msgTypes[10].OneofWrappers = []any{
 		(*DownloadResponse_Metadata)(nil),
 		(*DownloadResponse_Chunk)(nil),
 	}
@@ -1201,17 +1419,17 @@ func file_proto_sync_proto_init() {
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_sync_proto_rawDesc), len(file_proto_sync_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_services_sync_service_proto_sync_proto_rawDesc), len(file_services_sync_service_proto_sync_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   16,
+			NumMessages:   18,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_sync_proto_goTypes,
-		DependencyIndexes: file_proto_sync_proto_depIdxs,
-		MessageInfos:      file_proto_sync_proto_msgTypes,
+		GoTypes:           file_services_sync_service_proto_sync_proto_goTypes,
+		DependencyIndexes: file_services_sync_service_proto_sync_proto_depIdxs,
+		MessageInfos:      file_services_sync_service_proto_sync_proto_msgTypes,
 	}.Build()
-	File_proto_sync_proto = out.File
-	file_proto_sync_proto_goTypes = nil
-	file_proto_sync_proto_depIdxs = nil
+	File_services_sync_service_proto_sync_proto = out.File
+	file_services_sync_service_proto_sync_proto_goTypes = nil
+	file_services_sync_service_proto_sync_proto_depIdxs = nil
 }

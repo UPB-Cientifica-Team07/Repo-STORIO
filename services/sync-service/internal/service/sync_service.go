@@ -2,9 +2,8 @@ package service
 
 import (
 	"errors"
+	"strings"
 	"time"
-
-	"github.com/google/uuid"
 
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/internal/repository"
 )
@@ -29,75 +28,121 @@ func NewSyncService(
 }
 
 // =====================================
-// REGISTRAR ARCHIVO
+// REGISTER FILE
 // =====================================
 
 func (s *SyncService) RegisterFile(
+	fileID string,
 	userID string,
 	deviceID string,
 	fileName string,
 	fileType string,
 	size int64,
+	relativePath string,
 ) (*repository.FileMetadata, error) {
 
+	if s == nil ||
+		s.repository == nil {
+
+		return nil,
+			errors.New(
+				"Sync Repository no inicializado",
+			)
+	}
+
+	fileID =
+		strings.TrimSpace(fileID)
+
+	userID =
+		strings.TrimSpace(userID)
+
+	deviceID =
+		strings.TrimSpace(deviceID)
+
+	fileName =
+		strings.TrimSpace(fileName)
+
+	fileType =
+		strings.TrimSpace(fileType)
+
+	relativePath =
+		strings.TrimSpace(relativePath)
+
+	if fileID == "" {
+		return nil, errors.New("el file ID es obligatorio")
+	}
+
 	if userID == "" {
-		return nil, errors.New(
-			"el user ID es obligatorio",
-		)
+		return nil, errors.New("el user ID es obligatorio")
 	}
 
 	if deviceID == "" {
-		return nil, errors.New(
-			"el device ID es obligatorio",
-		)
+		return nil, errors.New("el device ID es obligatorio")
 	}
 
 	if fileName == "" {
-		return nil, errors.New(
-			"el nombre del archivo es obligatorio",
-		)
+		return nil, errors.New("el nombre del archivo es obligatorio")
 	}
 
 	if size < 0 {
-		return nil, errors.New(
-			"el tamaño del archivo no puede ser negativo",
-		)
+		return nil, errors.New("el tamaño del archivo no puede ser negativo")
 	}
 
-	now := time.Now()
+	now :=
+		time.Now()
 
-	file := &repository.FileMetadata{
-		FileID:    uuid.New().String(),
-		UserID:    userID,
-		FileName:  fileName,
-		FileType:  fileType,
-		Size:      size,
-		CreatedAt: now,
-		UpdatedAt: now,
-	}
+	file :=
+		&repository.FileMetadata{
+			FileID:       fileID,
+			UserID:       userID,
+			FileName:     fileName,
+			FileType:     fileType,
+			RelativePath: relativePath,
+			Size:         size,
+			Version:      1,
+			Deleted:      false,
+			CreatedAt:    now,
+			UpdatedAt:    now,
+		}
 
-	err := s.repository.SaveFile(
-		file,
-	)
+	if err :=
+		s.repository.SaveFile(
+			file,
+		); err != nil {
 
-	if err != nil {
 		return nil, err
 	}
 
-	change := &repository.FileChange{
-		Type:           ChangeTypeCreated,
-		FileID:         file.FileID,
-		FileName:       file.FileName,
-		OriginDeviceID: deviceID,
-		Timestamp:      now,
-	}
+	change :=
+		&repository.FileChange{
+			Type:           ChangeTypeCreated,
+			FileID:         file.FileID,
+			FileName:       file.FileName,
+			RelativePath:   file.RelativePath,
+			Version:        file.Version,
+			OriginDeviceID: deviceID,
+			Timestamp:      now,
+		}
 
-	err = s.repository.AddChange(
-		userID,
-		change,
-	)
+	if err :=
+		s.repository.AddChange(
+			userID,
+			change,
+		); err != nil {
 
-	if err != nil {
+		rollbackErr :=
+			s.repository.RemoveFile(
+				file.FileID,
+			)
+
+		if rollbackErr != nil {
+
+			return nil,
+				errors.New(
+					"falló registro del cambio y también rollback de metadata Sync",
+				)
+		}
+
 		return nil, err
 	}
 
@@ -105,17 +150,29 @@ func (s *SyncService) RegisterFile(
 }
 
 // =====================================
-// OBTENER ARCHIVO
+// GET FILE
 // =====================================
 
 func (s *SyncService) GetFile(
 	fileID string,
 ) (*repository.FileMetadata, error) {
 
-	if fileID == "" {
-		return nil, errors.New(
-			"el file ID es obligatorio",
+	if s == nil ||
+		s.repository == nil {
+
+		return nil,
+			errors.New(
+				"Sync Repository no inicializado",
+			)
+	}
+
+	fileID =
+		strings.TrimSpace(
+			fileID,
 		)
+
+	if fileID == "" {
+		return nil, errors.New("el file ID es obligatorio")
 	}
 
 	return s.repository.FindFileByID(
@@ -124,17 +181,29 @@ func (s *SyncService) GetFile(
 }
 
 // =====================================
-// LISTAR ARCHIVOS
+// LIST FILES
 // =====================================
 
 func (s *SyncService) ListFiles(
 	userID string,
 ) ([]*repository.FileMetadata, error) {
 
-	if userID == "" {
-		return nil, errors.New(
-			"el user ID es obligatorio",
+	if s == nil ||
+		s.repository == nil {
+
+		return nil,
+			errors.New(
+				"Sync Repository no inicializado",
+			)
+	}
+
+	userID =
+		strings.TrimSpace(
+			userID,
 		)
+
+	if userID == "" {
+		return nil, errors.New("el user ID es obligatorio")
 	}
 
 	return s.repository.FindFilesByUserID(
@@ -143,7 +212,7 @@ func (s *SyncService) ListFiles(
 }
 
 // =====================================
-// SINCRONIZAR
+// SYNC
 // =====================================
 
 func (s *SyncService) Sync(
@@ -151,32 +220,41 @@ func (s *SyncService) Sync(
 	deviceID string,
 ) ([]*repository.FileChange, error) {
 
-	if userID == "" {
-		return nil, errors.New(
-			"el user ID es obligatorio",
+	if s == nil ||
+		s.repository == nil {
+
+		return nil,
+			errors.New(
+				"Sync Repository no inicializado",
+			)
+	}
+
+	userID =
+		strings.TrimSpace(
+			userID,
 		)
+
+	deviceID =
+		strings.TrimSpace(
+			deviceID,
+		)
+
+	if userID == "" {
+		return nil, errors.New("el user ID es obligatorio")
 	}
 
 	if deviceID == "" {
-		return nil, errors.New(
-			"el device ID es obligatorio",
-		)
+		return nil, errors.New("el device ID es obligatorio")
 	}
 
-	changes, err := s.repository.GetChanges(
+	return s.repository.GetChanges(
 		userID,
 		deviceID,
 	)
-
-	if err != nil {
-		return nil, err
-	}
-
-	return changes, nil
 }
 
 // =====================================
-// ACTUALIZAR ARCHIVO
+// UPDATE FILE
 // =====================================
 
 func (s *SyncService) UpdateFile(
@@ -188,36 +266,62 @@ func (s *SyncService) UpdateFile(
 	size int64,
 ) (*repository.FileMetadata, error) {
 
+	if s == nil ||
+		s.repository == nil {
+
+		return nil,
+			errors.New(
+				"Sync Repository no inicializado",
+			)
+	}
+
+	userID =
+		strings.TrimSpace(userID)
+
+	deviceID =
+		strings.TrimSpace(deviceID)
+
+	fileID =
+		strings.TrimSpace(fileID)
+
+	fileName =
+		strings.TrimSpace(fileName)
+
+	fileType =
+		strings.TrimSpace(fileType)
+
 	if userID == "" {
-		return nil, errors.New(
-			"el user ID es obligatorio",
-		)
+		return nil, errors.New("el user ID es obligatorio")
 	}
 
 	if deviceID == "" {
-		return nil, errors.New(
-			"el device ID es obligatorio",
-		)
+		return nil, errors.New("el device ID es obligatorio")
 	}
 
 	if fileID == "" {
-		return nil, errors.New(
-			"el file ID es obligatorio",
-		)
+		return nil, errors.New("el file ID es obligatorio")
 	}
 
-	file, err := s.repository.FindFileByID(
-		fileID,
-	)
+	if size < 0 {
+		return nil, errors.New("el tamaño del archivo no puede ser negativo")
+	}
+
+	file, err :=
+		s.repository.FindFileByID(
+			fileID,
+		)
 
 	if err != nil {
 		return nil, err
 	}
 
-	if file.UserID != userID {
-		return nil, errors.New(
-			"el archivo no pertenece al usuario",
-		)
+	if file.UserID !=
+		userID {
+
+		return nil,
+			errors.New(
+				"el archivo no pertenece al usuario",
+			)
 	}
 
 	if fileName != "" {
@@ -228,34 +332,39 @@ func (s *SyncService) UpdateFile(
 		file.FileType = fileType
 	}
 
-	if size >= 0 {
-		file.Size = size
-	}
+	file.Size =
+		size
 
-	file.UpdatedAt = time.Now()
+	file.Version++
 
-	err = s.repository.SaveFile(
-		file,
-	)
+	file.UpdatedAt =
+		time.Now()
 
-	if err != nil {
+	if err :=
+		s.repository.SaveFile(
+			file,
+		); err != nil {
+
 		return nil, err
 	}
 
-	change := &repository.FileChange{
-		Type:           ChangeTypeChanged,
-		FileID:         file.FileID,
-		FileName:       file.FileName,
-		OriginDeviceID: deviceID,
-		Timestamp:      file.UpdatedAt,
-	}
+	change :=
+		&repository.FileChange{
+			Type:           ChangeTypeChanged,
+			FileID:         file.FileID,
+			FileName:       file.FileName,
+			RelativePath:   file.RelativePath,
+			Version:        file.Version,
+			OriginDeviceID: deviceID,
+			Timestamp:      file.UpdatedAt,
+		}
 
-	err = s.repository.AddChange(
-		userID,
-		change,
-	)
+	if err :=
+		s.repository.AddChange(
+			userID,
+			change,
+		); err != nil {
 
-	if err != nil {
 		return nil, err
 	}
 
@@ -263,7 +372,7 @@ func (s *SyncService) UpdateFile(
 }
 
 // =====================================
-// ELIMINAR ARCHIVO
+// DELETE FILE
 // =====================================
 
 func (s *SyncService) DeleteFile(
@@ -272,60 +381,78 @@ func (s *SyncService) DeleteFile(
 	fileID string,
 ) error {
 
-	if userID == "" {
+	if s == nil ||
+		s.repository == nil {
+
 		return errors.New(
-			"el user ID es obligatorio",
+			"Sync Repository no inicializado",
 		)
+	}
+
+	userID =
+		strings.TrimSpace(userID)
+
+	deviceID =
+		strings.TrimSpace(deviceID)
+
+	fileID =
+		strings.TrimSpace(fileID)
+
+	if userID == "" {
+		return errors.New("el user ID es obligatorio")
 	}
 
 	if deviceID == "" {
-		return errors.New(
-			"el device ID es obligatorio",
-		)
+		return errors.New("el device ID es obligatorio")
 	}
 
 	if fileID == "" {
-		return errors.New(
-			"el file ID es obligatorio",
-		)
+		return errors.New("el file ID es obligatorio")
 	}
 
-	file, err := s.repository.FindFileByID(
-		fileID,
-	)
+	file, err :=
+		s.repository.FindFileByID(
+			fileID,
+		)
 
 	if err != nil {
 		return err
 	}
 
-	if file.UserID != userID {
+	if file.UserID !=
+		userID {
+
 		return errors.New(
 			"el archivo no pertenece al usuario",
 		)
 	}
 
-	err = s.repository.DeleteFile(
-		fileID,
-	)
+	deletedFile, err :=
+		s.repository.DeleteFile(
+			fileID,
+		)
 
 	if err != nil {
 		return err
 	}
 
-	change := &repository.FileChange{
-		Type:           ChangeTypeDeleted,
-		FileID:         file.FileID,
-		FileName:       file.FileName,
-		OriginDeviceID: deviceID,
-		Timestamp:      time.Now(),
-	}
+	change :=
+		&repository.FileChange{
+			Type:           ChangeTypeDeleted,
+			FileID:         deletedFile.FileID,
+			FileName:       deletedFile.FileName,
+			RelativePath:   deletedFile.RelativePath,
+			Version:        deletedFile.Version,
+			OriginDeviceID: deviceID,
+			Timestamp:      deletedFile.UpdatedAt,
+		}
 
-	err = s.repository.AddChange(
-		userID,
-		change,
-	)
+	if err :=
+		s.repository.AddChange(
+			userID,
+			change,
+		); err != nil {
 
-	if err != nil {
 		return err
 	}
 

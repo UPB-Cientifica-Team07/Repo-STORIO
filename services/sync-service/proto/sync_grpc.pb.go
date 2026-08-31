@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v3.21.12
-// source: proto/sync.proto
+// source: services/sync-service/proto/sync.proto
 
 package generated
 
@@ -24,6 +24,7 @@ const (
 	SyncService_ListFiles_FullMethodName    = "/sync.SyncService/ListFiles"
 	SyncService_Upload_FullMethodName       = "/sync.SyncService/Upload"
 	SyncService_Download_FullMethodName     = "/sync.SyncService/Download"
+	SyncService_UpdateFile_FullMethodName   = "/sync.SyncService/UpdateFile"
 	SyncService_DeleteFile_FullMethodName   = "/sync.SyncService/DeleteFile"
 	SyncService_WatchChanges_FullMethodName = "/sync.SyncService/WatchChanges"
 )
@@ -34,7 +35,7 @@ const (
 type SyncServiceClient interface {
 	// Identifica un dispositivo/usuario.
 	Authenticate(ctx context.Context, in *AuthenticateRequest, opts ...grpc.CallOption) (*AuthenticateResponse, error)
-	// Consulta el estado de sincronización.
+	// Consulta cambios pendientes de sincronización.
 	Sync(ctx context.Context, in *SyncRequest, opts ...grpc.CallOption) (*SyncResponse, error)
 	// Lista archivos asociados al usuario.
 	ListFiles(ctx context.Context, in *ListFilesRequest, opts ...grpc.CallOption) (*ListFilesResponse, error)
@@ -42,6 +43,8 @@ type SyncServiceClient interface {
 	Upload(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UploadRequest, UploadResponse], error)
 	// Descarga mediante server streaming.
 	Download(ctx context.Context, in *DownloadRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[DownloadResponse], error)
+	// Actualiza el contenido de un archivo existente.
+	UpdateFile(ctx context.Context, in *UpdateFileRequest, opts ...grpc.CallOption) (*UpdateFileResponse, error)
 	// Elimina un archivo.
 	DeleteFile(ctx context.Context, in *DeleteFileRequest, opts ...grpc.CallOption) (*DeleteFileResponse, error)
 	// Canal persistente de notificaciones.
@@ -118,6 +121,16 @@ func (c *syncServiceClient) Download(ctx context.Context, in *DownloadRequest, o
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type SyncService_DownloadClient = grpc.ServerStreamingClient[DownloadResponse]
 
+func (c *syncServiceClient) UpdateFile(ctx context.Context, in *UpdateFileRequest, opts ...grpc.CallOption) (*UpdateFileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateFileResponse)
+	err := c.cc.Invoke(ctx, SyncService_UpdateFile_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *syncServiceClient) DeleteFile(ctx context.Context, in *DeleteFileRequest, opts ...grpc.CallOption) (*DeleteFileResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(DeleteFileResponse)
@@ -153,7 +166,7 @@ type SyncService_WatchChangesClient = grpc.ServerStreamingClient[FileChange]
 type SyncServiceServer interface {
 	// Identifica un dispositivo/usuario.
 	Authenticate(context.Context, *AuthenticateRequest) (*AuthenticateResponse, error)
-	// Consulta el estado de sincronización.
+	// Consulta cambios pendientes de sincronización.
 	Sync(context.Context, *SyncRequest) (*SyncResponse, error)
 	// Lista archivos asociados al usuario.
 	ListFiles(context.Context, *ListFilesRequest) (*ListFilesResponse, error)
@@ -161,6 +174,8 @@ type SyncServiceServer interface {
 	Upload(grpc.ClientStreamingServer[UploadRequest, UploadResponse]) error
 	// Descarga mediante server streaming.
 	Download(*DownloadRequest, grpc.ServerStreamingServer[DownloadResponse]) error
+	// Actualiza el contenido de un archivo existente.
+	UpdateFile(context.Context, *UpdateFileRequest) (*UpdateFileResponse, error)
 	// Elimina un archivo.
 	DeleteFile(context.Context, *DeleteFileRequest) (*DeleteFileResponse, error)
 	// Canal persistente de notificaciones.
@@ -189,6 +204,9 @@ func (UnimplementedSyncServiceServer) Upload(grpc.ClientStreamingServer[UploadRe
 }
 func (UnimplementedSyncServiceServer) Download(*DownloadRequest, grpc.ServerStreamingServer[DownloadResponse]) error {
 	return status.Error(codes.Unimplemented, "method Download not implemented")
+}
+func (UnimplementedSyncServiceServer) UpdateFile(context.Context, *UpdateFileRequest) (*UpdateFileResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateFile not implemented")
 }
 func (UnimplementedSyncServiceServer) DeleteFile(context.Context, *DeleteFileRequest) (*DeleteFileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteFile not implemented")
@@ -289,6 +307,24 @@ func _SyncService_Download_Handler(srv interface{}, stream grpc.ServerStream) er
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type SyncService_DownloadServer = grpc.ServerStreamingServer[DownloadResponse]
 
+func _SyncService_UpdateFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateFileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).UpdateFile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_UpdateFile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).UpdateFile(ctx, req.(*UpdateFileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _SyncService_DeleteFile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteFileRequest)
 	if err := dec(in); err != nil {
@@ -338,6 +374,10 @@ var SyncService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _SyncService_ListFiles_Handler,
 		},
 		{
+			MethodName: "UpdateFile",
+			Handler:    _SyncService_UpdateFile_Handler,
+		},
+		{
 			MethodName: "DeleteFile",
 			Handler:    _SyncService_DeleteFile_Handler,
 		},
@@ -359,5 +399,5 @@ var SyncService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "proto/sync.proto",
+	Metadata: "services/sync-service/proto/sync.proto",
 }

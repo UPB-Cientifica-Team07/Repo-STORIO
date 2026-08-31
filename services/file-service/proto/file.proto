@@ -4,22 +4,68 @@ package file;
 
 option go_package = "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/proto;generated";
 
+// =====================================
+// FILE SERVICE
+// =====================================
+
 service FileService {
 
-  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse);
+  rpc UploadFile(UploadFileRequest)
+      returns (UploadFileResponse);
 
-  rpc GetFile(GetFileRequest) returns (GetFileResponse);
+  rpc RestoreFile(RestoreFileRequest)
+      returns (RestoreFileResponse);
 
-  rpc ListFiles(ListFilesRequest) returns (ListFilesResponse);
+  rpc GetFile(GetFileRequest)
+      returns (GetFileResponse);
 
-  rpc DeleteFile(DeleteFileRequest) returns (DeleteFileResponse);
+  // ===================================
+  // UPDATE / ESCRITURA
+  // ===================================
+
+  rpc UpdateFile(UpdateFileRequest)
+      returns (UpdateFileResponse);
+
+  rpc ListFiles(ListFilesRequest)
+      returns (ListFilesResponse);
+
+  rpc DeleteFile(DeleteFileRequest)
+      returns (DeleteFileResponse);
+
+  // ===================================
+  // ACL / COMPARTICIÓN
+  // ===================================
+
+  rpc ShareFile(ShareFileRequest)
+      returns (ShareFileResponse);
+
+  rpc RevokeFileAccess(RevokeFileAccessRequest)
+      returns (RevokeFileAccessResponse);
 }
+
+// =====================================
+// UPLOAD
+// =====================================
 
 message UploadFileRequest {
   string user_id = 1;
   string file_name = 2;
   string file_type = 3;
   bytes content = 4;
+
+  // Directorio lógico relativo dentro del Home.
+  //
+  // Vacío:
+  //   conserva comportamiento Shared File:
+  //   documentos/, imagenes/, videos/
+  //
+  // Con valor:
+  //   preserva árbol utilizado por File Sync.
+  //
+  // Ejemplo:
+  //   proyecto/codigo
+  //
+  string relative_directory = 5;
 }
 
 message UploadFileResponse {
@@ -28,6 +74,28 @@ message UploadFileResponse {
   string file_id = 3;
 }
 
+// =====================================
+// RESTORE
+// =====================================
+
+message RestoreFileRequest {
+  string file_id = 1;
+  string user_id = 2;
+  string file_name = 3;
+  string file_type = 4;
+  bytes content = 5;
+}
+
+message RestoreFileResponse {
+  bool success = 1;
+  string message = 2;
+  string file_id = 3;
+}
+
+// =====================================
+// GET
+// =====================================
+
 message GetFileRequest {
   string file_id = 1;
 }
@@ -35,9 +103,47 @@ message GetFileRequest {
 message GetFileResponse {
   bool success = 1;
   string message = 2;
-
   FileData file = 3;
 }
+
+// =====================================
+// UPDATE
+// =====================================
+//
+// Actualiza únicamente el contenido de
+// un archivo existente.
+//
+// La autorización se evalúa en servidor:
+//
+// OWNER
+// ADMIN
+// can_write = true
+//
+// No se permite modificar mediante este
+// RPC:
+//
+// - propietario
+// - ruta
+// - nombre
+// - MIME type
+// - permisos Unix
+//
+// =====================================
+
+message UpdateFileRequest {
+  string file_id = 1;
+  bytes content = 2;
+}
+
+message UpdateFileResponse {
+  bool success = 1;
+  string message = 2;
+  FileData file = 3;
+}
+
+// =====================================
+// LIST
+// =====================================
 
 message ListFilesRequest {
   string user_id = 1;
@@ -46,9 +152,12 @@ message ListFilesRequest {
 message ListFilesResponse {
   bool success = 1;
   string message = 2;
-
   repeated FileData files = 3;
 }
+
+// =====================================
+// DELETE
+// =====================================
 
 message DeleteFileRequest {
   string file_id = 1;
@@ -58,6 +167,57 @@ message DeleteFileResponse {
   bool success = 1;
   string message = 2;
 }
+
+// =====================================
+// SHARE FILE
+// =====================================
+//
+// Permite conceder o actualizar permisos
+// explícitos sobre un archivo.
+//
+// target_user_id corresponde al
+// directorio_id del usuario.
+//
+// Ejemplo:
+//
+// file_id        = UUID
+// target_user_id = user-002
+// can_read       = true
+// can_write      = false
+// can_share      = false
+//
+// =====================================
+
+message ShareFileRequest {
+  string file_id = 1;
+  string target_user_id = 2;
+  bool can_read = 3;
+  bool can_write = 4;
+  bool can_share = 5;
+}
+
+message ShareFileResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// =====================================
+// REVOKE FILE ACCESS
+// =====================================
+
+message RevokeFileAccessRequest {
+  string file_id = 1;
+  string target_user_id = 2;
+}
+
+message RevokeFileAccessResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// =====================================
+// FILE DATA
+// =====================================
 
 message FileData {
   string file_id = 1;

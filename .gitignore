@@ -1,0 +1,89 @@
+# ============================================================
+# Repo-STORIO - archivos locales / generados
+# ============================================================
+
+# ----------------------------
+# Node.js
+# ----------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# ----------------------------
+# Android / Gradle
+# ----------------------------
+.gradle/
+.idea/
+.kotlin/
+**/build/
+local.properties
+*.iml
+
+# ----------------------------
+# Backups temporales
+# ----------------------------
+*.bak
+*.backup
+*.tmp
+*.swp
+*~
+
+# ----------------------------
+# Java compilado
+# ----------------------------
+*.class
+
+# ----------------------------
+# Binarios compilados locales
+# ----------------------------
+/bin/
+/client
+/watcher
+/network-policy-test
+
+# ----------------------------
+# Runtime storage / archivos de prueba
+# ----------------------------
+services/file-service/data/shared-storage/
+services/sync-service/data/
+
+# ----------------------------
+# Datos runtime de monitoreo
+# ----------------------------
+data/monitoring/alerts.json
+data/monitoring/metrics.json
+data/monitoring/service_status.json
+
+# ----------------------------
+# OS / editores
+# ----------------------------
+.DS_Store
+Thumbs.db
+
+# ----------------------------
+# Logs
+# ----------------------------
+*.log
+logs/
+
+# Backups adicionales
+*.pre-grpc
+
+# Carpeta Android duplicada accidental
+/clients/android/clients/
+
+# Compilados Java previamente versionados
+/services/auth-services/bin/
+
+# Runtime del Monitoring Service
+/services/monitoring-service/data/monitoring/alerts.json
+/services/monitoring-service/data/monitoring/metrics.json
+/services/monitoring-service/data/monitoring/service_status.json
+
+# Ejecutables locales raíz
+/server
+/client
+/watcher
+/network-policy-test
+/bin/

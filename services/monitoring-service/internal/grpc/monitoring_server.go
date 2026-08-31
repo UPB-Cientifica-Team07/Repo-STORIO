@@ -8,25 +8,32 @@ import (
 	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/generated"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/internal/model"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/internal/service"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type MonitoringServer struct {
 	pb.UnimplementedMonitoringServiceServer
 
-	monitoringService *service.MonitoringService
+	service *service.MonitoringService
 }
 
+// =====================================
+// CONSTRUCTOR
+// =====================================
+
 func NewMonitoringServer(
-	monitoringService *service.MonitoringService,
+	service *service.MonitoringService,
 ) *MonitoringServer {
 
 	return &MonitoringServer{
-		monitoringService: monitoringService,
+		service: service,
 	}
 }
 
 // =====================================
-// REGISTRAR MÉTRICAS
+// REPORTAR MÉTRICAS
 // =====================================
 
 func (s *MonitoringServer) ReportMetrics(
@@ -34,36 +41,31 @@ func (s *MonitoringServer) ReportMetrics(
 	req *pb.MetricsRequest,
 ) (*pb.MetricsResponse, error) {
 
-	if req == nil {
+	metric :=
+		model.Metric{
+			ComponentID: req.GetComponentId(),
 
-		return &pb.MetricsResponse{
-			Success: false,
-			Message: "Solicitud de métricas vacía",
-		}, nil
-	}
+			ComponentName: req.GetComponentName(),
 
-	metric := model.Metric{
-		ComponentID:       req.GetComponentId(),
-		ComponentName:     req.GetComponentName(),
-		CPUUsage:          req.GetCpuUsage(),
-		MemoryUsage:       req.GetMemoryUsage(),
-		StorageUsage:      req.GetStorageUsage(),
-		ActiveConnections: req.GetActiveConnections(),
-		TotalRequests:     req.GetTotalRequests(),
-		Timestamp:         time.Unix(req.GetTimestamp(), 0),
-	}
+			CPUUsage: req.GetCpuUsage(),
 
-	err :=
-		s.monitoringService.RegisterMetric(
-			metric,
-		)
+			MemoryUsage: req.GetMemoryUsage(),
 
-	if err != nil {
+			StorageUsage: req.GetStorageUsage(),
 
-		log.Printf(
-			"Error registrando métrica: %v",
-			err,
-		)
+			ActiveConnections: req.GetActiveConnections(),
+
+			TotalRequests: req.GetTotalRequests(),
+
+			Timestamp: time.Unix(
+				req.GetTimestamp(),
+				0,
+			),
+		}
+
+	if err := s.service.RegisterMetric(
+		metric,
+	); err != nil {
 
 		return &pb.MetricsResponse{
 			Success: false,
@@ -75,13 +77,13 @@ func (s *MonitoringServer) ReportMetrics(
 		"=== MÉTRICA REGISTRADA ===",
 	)
 
-	log.Println(
-		"Componente:",
+	log.Printf(
+		"Componente: %s",
 		metric.ComponentName,
 	)
 
-	log.Println(
-		"ID:",
+	log.Printf(
+		"ID: %s",
 		metric.ComponentID,
 	)
 
@@ -100,18 +102,18 @@ func (s *MonitoringServer) ReportMetrics(
 		metric.StorageUsage,
 	)
 
-	log.Println(
-		"Conexiones activas:",
+	log.Printf(
+		"Conexiones activas: %d",
 		metric.ActiveConnections,
 	)
 
-	log.Println(
-		"Total solicitudes:",
+	log.Printf(
+		"Total solicitudes: %d",
 		metric.TotalRequests,
 	)
 
-	log.Println(
-		"Timestamp:",
+	log.Printf(
+		"Timestamp: %v",
 		metric.Timestamp,
 	)
 
@@ -131,16 +133,15 @@ func (s *MonitoringServer) GetMetrics(
 ) (*pb.GetMetricsResponse, error) {
 
 	metrics, err :=
-		s.monitoringService.GetMetrics()
+		s.service.GetMetrics()
 
 	if err != nil {
 
-		log.Printf(
-			"Error consultando métricas: %v",
-			err,
-		)
-
-		return nil, err
+		return nil,
+			status.Error(
+				codes.Internal,
+				err.Error(),
+			)
 	}
 
 	response :=
@@ -158,28 +159,35 @@ func (s *MonitoringServer) GetMetrics(
 			append(
 				response.Metrics,
 				&pb.Metric{
-					ComponentId:       metric.ComponentID,
-					ComponentName:     metric.ComponentName,
-					CpuUsage:          metric.CPUUsage,
-					MemoryUsage:       metric.MemoryUsage,
-					StorageUsage:      metric.StorageUsage,
+					ComponentId: metric.ComponentID,
+
+					ComponentName: metric.ComponentName,
+
+					CpuUsage: metric.CPUUsage,
+
+					MemoryUsage: metric.MemoryUsage,
+
+					StorageUsage: metric.StorageUsage,
+
 					ActiveConnections: metric.ActiveConnections,
-					TotalRequests:     metric.TotalRequests,
-					Timestamp:         metric.Timestamp.Unix(),
+
+					TotalRequests: metric.TotalRequests,
+
+					Timestamp: metric.Timestamp.Unix(),
 				},
 			)
 	}
 
 	log.Printf(
 		"Consulta de métricas realizada. Total: %d",
-		len(response.Metrics),
+		len(metrics),
 	)
 
 	return response, nil
 }
 
 // =====================================
-// REGISTRAR ESTADO DE SERVICIO
+// REPORTAR ESTADO
 // =====================================
 
 func (s *MonitoringServer) ReportStatus(
@@ -187,37 +195,25 @@ func (s *MonitoringServer) ReportStatus(
 	req *pb.StatusRequest,
 ) (*pb.StatusResponse, error) {
 
-	if req == nil {
-
-		return &pb.StatusResponse{
-			Success: false,
-			Message: "Solicitud de estado vacía",
-		}, nil
-	}
-
 	serviceStatus :=
 		model.ServiceStatus{
-			ComponentID:   req.GetComponentId(),
+			ComponentID: req.GetComponentId(),
+
 			ComponentName: req.GetComponentName(),
-			Status:        req.GetStatus(),
-			Message:       req.GetMessage(),
+
+			Status: req.GetStatus(),
+
+			Message: req.GetMessage(),
+
 			LastUpdated: time.Unix(
 				req.GetTimestamp(),
 				0,
 			),
 		}
 
-	err :=
-		s.monitoringService.RegisterServiceStatus(
-			serviceStatus,
-		)
-
-	if err != nil {
-
-		log.Printf(
-			"Error registrando estado del servicio: %v",
-			err,
-		)
+	if err := s.service.RegisterServiceStatus(
+		serviceStatus,
+	); err != nil {
 
 		return &pb.StatusResponse{
 			Success: false,
@@ -229,39 +225,39 @@ func (s *MonitoringServer) ReportStatus(
 		"=== ESTADO DE SERVICIO REGISTRADO ===",
 	)
 
-	log.Println(
-		"Componente:",
+	log.Printf(
+		"Componente: %s",
 		serviceStatus.ComponentName,
 	)
 
-	log.Println(
-		"ID:",
+	log.Printf(
+		"ID: %s",
 		serviceStatus.ComponentID,
 	)
 
-	log.Println(
-		"Estado:",
+	log.Printf(
+		"Estado: %s",
 		serviceStatus.Status,
 	)
 
-	log.Println(
-		"Mensaje:",
+	log.Printf(
+		"Mensaje: %s",
 		serviceStatus.Message,
 	)
 
-	log.Println(
-		"Última actualización:",
+	log.Printf(
+		"Última actualización: %v",
 		serviceStatus.LastUpdated,
 	)
 
 	return &pb.StatusResponse{
 		Success: true,
-		Message: "Estado del servicio registrado correctamente",
+		Message: "Estado registrado correctamente",
 	}, nil
 }
 
 // =====================================
-// CONSULTAR ESTADO DE SERVICIO
+// CONSULTAR ESTADO
 // =====================================
 
 func (s *MonitoringServer) GetServiceStatus(
@@ -269,35 +265,28 @@ func (s *MonitoringServer) GetServiceStatus(
 	req *pb.ServiceRequest,
 ) (*pb.ServiceResponse, error) {
 
-	if req == nil {
-
-		return &pb.ServiceResponse{
-			Status:  "INVALID_REQUEST",
-			Message: "Solicitud vacía",
-		}, nil
-	}
-
 	serviceStatus, err :=
-		s.monitoringService.GetServiceStatus(
+		s.service.GetServiceStatus(
 			req.GetComponentName(),
 		)
 
 	if err != nil {
 
-		log.Printf(
-			"Error consultando estado del servicio: %v",
-			err,
-		)
-
-		return nil, err
+		return nil,
+			status.Error(
+				codes.Internal,
+				err.Error(),
+			)
 	}
 
 	if serviceStatus == nil {
 
 		return &pb.ServiceResponse{
 			ComponentName: req.GetComponentName(),
-			Status:        "NOT_FOUND",
-			Message:       "No existe información para este servicio",
+
+			Status: "NOT_FOUND",
+
+			Message: "No existe información para este servicio",
 		}, nil
 	}
 
@@ -307,10 +296,397 @@ func (s *MonitoringServer) GetServiceStatus(
 	)
 
 	return &pb.ServiceResponse{
-		ComponentId:   serviceStatus.ComponentID,
+		ComponentId: serviceStatus.ComponentID,
+
 		ComponentName: serviceStatus.ComponentName,
-		Status:        serviceStatus.Status,
-		Message:       serviceStatus.Message,
-		LastUpdated:   serviceStatus.LastUpdated.Unix(),
+
+		Status: serviceStatus.Status,
+
+		Message: serviceStatus.Message,
+
+		LastUpdated: serviceStatus.LastUpdated.Unix(),
 	}, nil
+}
+
+// =====================================
+// CONSULTAR NODO HPC
+// =====================================
+
+func (s *MonitoringServer) GetNodeStatus(
+	ctx context.Context,
+	req *pb.NodeRequest,
+) (*pb.NodeResponse, error) {
+
+	return &pb.NodeResponse{
+		NodeId: req.GetNodeId(),
+
+		Status: "NOT_IMPLEMENTED",
+	}, nil
+}
+
+// =====================================
+// CREAR REGLA DE ALERTA
+// =====================================
+
+func (s *MonitoringServer) CreateAlertRule(
+	ctx context.Context,
+	req *pb.CreateAlertRuleRequest,
+) (*pb.CreateAlertRuleResponse, error) {
+
+	rule :=
+		model.AlertRule{
+			ID: req.GetId(),
+
+			Name: req.GetName(),
+
+			Metric: req.GetMetric(),
+
+			Operator: req.GetOperator(),
+
+			Threshold: req.GetThreshold(),
+
+			ComponentName: req.GetComponentName(),
+
+			Enabled: req.GetEnabled(),
+		}
+
+	createdRule, err :=
+		s.service.CreateAlertRule(
+			rule,
+		)
+
+	if err != nil {
+
+		return &pb.CreateAlertRuleResponse{
+			Success: false,
+			Message: err.Error(),
+			RuleId:  rule.ID,
+		}, nil
+	}
+
+	log.Println(
+		"=== REGLA DE ALERTA CREADA ===",
+	)
+
+	log.Printf(
+		"ID: %s",
+		createdRule.ID,
+	)
+
+	log.Printf(
+		"Nombre: %s",
+		createdRule.Name,
+	)
+
+	log.Printf(
+		"Métrica: %s",
+		createdRule.Metric,
+	)
+
+	log.Printf(
+		"Operador: %s",
+		createdRule.Operator,
+	)
+
+	log.Printf(
+		"Umbral: %.2f",
+		createdRule.Threshold,
+	)
+
+	log.Printf(
+		"Componente: %s",
+		createdRule.ComponentName,
+	)
+
+	log.Printf(
+		"Habilitada: %t",
+		createdRule.Enabled,
+	)
+
+	return &pb.CreateAlertRuleResponse{
+		Success: true,
+		Message: "Regla de alerta creada correctamente",
+		RuleId:  createdRule.ID,
+	}, nil
+}
+
+// =====================================
+// ACTUALIZAR REGLA DE ALERTA
+// =====================================
+
+func (s *MonitoringServer) UpdateAlertRule(
+	ctx context.Context,
+	req *pb.UpdateAlertRuleRequest,
+) (*pb.UpdateAlertRuleResponse, error) {
+
+	rule :=
+		model.AlertRule{
+			ID: req.GetId(),
+
+			Name: req.GetName(),
+
+			Metric: req.GetMetric(),
+
+			Operator: req.GetOperator(),
+
+			Threshold: req.GetThreshold(),
+
+			ComponentName: req.GetComponentName(),
+
+			Enabled: req.GetEnabled(),
+		}
+
+	updatedRule, err :=
+		s.service.UpdateAlertRule(
+			rule,
+		)
+
+	if err != nil {
+
+		return &pb.UpdateAlertRuleResponse{
+			Success: false,
+			Message: err.Error(),
+			Rule:    nil,
+		}, nil
+	}
+
+	log.Println(
+		"=== REGLA DE ALERTA ACTUALIZADA ===",
+	)
+
+	log.Printf(
+		"ID: %s",
+		updatedRule.ID,
+	)
+
+	log.Printf(
+		"Nombre: %s",
+		updatedRule.Name,
+	)
+
+	log.Printf(
+		"Métrica: %s",
+		updatedRule.Metric,
+	)
+
+	log.Printf(
+		"Operador: %s",
+		updatedRule.Operator,
+	)
+
+	log.Printf(
+		"Umbral: %.2f",
+		updatedRule.Threshold,
+	)
+
+	log.Printf(
+		"Componente: %s",
+		updatedRule.ComponentName,
+	)
+
+	log.Printf(
+		"Habilitada: %t",
+		updatedRule.Enabled,
+	)
+
+	return &pb.UpdateAlertRuleResponse{
+		Success: true,
+
+		Message: "Regla de alerta actualizada correctamente",
+
+		Rule: &pb.AlertRule{
+			Id: updatedRule.ID,
+
+			Name: updatedRule.Name,
+
+			Metric: updatedRule.Metric,
+
+			Operator: updatedRule.Operator,
+
+			Threshold: updatedRule.Threshold,
+
+			ComponentName: updatedRule.ComponentName,
+
+			Enabled: updatedRule.Enabled,
+		},
+	}, nil
+}
+
+// =====================================
+// ELIMINAR REGLA DE ALERTA
+// =====================================
+
+func (s *MonitoringServer) DeleteAlertRule(
+	ctx context.Context,
+	req *pb.DeleteAlertRuleRequest,
+) (*pb.DeleteAlertRuleResponse, error) {
+
+	ruleID :=
+		req.GetId()
+
+	if err := s.service.DeleteAlertRule(
+		ruleID,
+	); err != nil {
+
+		return &pb.DeleteAlertRuleResponse{
+			Success: false,
+			Message: err.Error(),
+			RuleId:  ruleID,
+		}, nil
+	}
+
+	log.Println(
+		"=== REGLA DE ALERTA ELIMINADA ===",
+	)
+
+	log.Printf(
+		"ID: %s",
+		ruleID,
+	)
+
+	return &pb.DeleteAlertRuleResponse{
+		Success: true,
+		Message: "Regla de alerta eliminada correctamente",
+		RuleId:  ruleID,
+	}, nil
+}
+
+// =====================================
+// CONSULTAR REGLAS
+// =====================================
+
+func (s *MonitoringServer) GetAlertRules(
+	ctx context.Context,
+	req *pb.GetAlertRulesRequest,
+) (*pb.GetAlertRulesResponse, error) {
+
+	rules, err :=
+		s.service.GetAlertRules()
+
+	if err != nil {
+
+		return nil,
+			status.Error(
+				codes.Internal,
+				err.Error(),
+			)
+	}
+
+	response :=
+		&pb.GetAlertRulesResponse{
+			Rules: make(
+				[]*pb.AlertRule,
+				0,
+				len(rules),
+			),
+		}
+
+	for _, rule := range rules {
+
+		response.Rules =
+			append(
+				response.Rules,
+				&pb.AlertRule{
+					Id: rule.ID,
+
+					Name: rule.Name,
+
+					Metric: rule.Metric,
+
+					Operator: rule.Operator,
+
+					Threshold: rule.Threshold,
+
+					ComponentName: rule.ComponentName,
+
+					Enabled: rule.Enabled,
+				},
+			)
+	}
+
+	log.Printf(
+		"Consulta de reglas realizada. Total: %d",
+		len(rules),
+	)
+
+	return response, nil
+}
+
+// =====================================
+// CONSULTAR ALERTAS
+// =====================================
+
+func (s *MonitoringServer) GetAlerts(
+	ctx context.Context,
+	req *pb.GetAlertsRequest,
+) (*pb.GetAlertsResponse, error) {
+
+	alerts, err :=
+		s.service.GetAlerts()
+
+	if err != nil {
+
+		return nil,
+			status.Error(
+				codes.Internal,
+				err.Error(),
+			)
+	}
+
+	response :=
+		&pb.GetAlertsResponse{
+			Alerts: make(
+				[]*pb.Alert,
+				0,
+				len(alerts),
+			),
+		}
+
+	for _, alert := range alerts {
+
+		var resolvedAt int64
+
+		if alert.ResolvedAt != nil {
+
+			resolvedAt =
+				alert.ResolvedAt.Unix()
+		}
+
+		response.Alerts =
+			append(
+				response.Alerts,
+				&pb.Alert{
+					Id: alert.ID,
+
+					RuleId: alert.RuleID,
+
+					RuleName: alert.RuleName,
+
+					ComponentId: alert.ComponentID,
+
+					ComponentName: alert.ComponentName,
+
+					Metric: alert.Metric,
+
+					CurrentValue: alert.CurrentValue,
+
+					Threshold: alert.Threshold,
+
+					Message: alert.Message,
+
+					CreatedAt: alert.CreatedAt.Unix(),
+
+					Active: alert.Active,
+
+					ResolvedAt: resolvedAt,
+				},
+			)
+	}
+
+	log.Printf(
+		"Consulta de alertas realizada. Total: %d",
+		len(alerts),
+	)
+
+	return response, nil
 }

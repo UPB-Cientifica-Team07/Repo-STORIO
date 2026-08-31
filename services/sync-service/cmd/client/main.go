@@ -32,12 +32,16 @@ func main() {
 		)
 
 	// =====================================
-	// LOGIN
+	// ENCABEZADO
 	// =====================================
 
 	fmt.Println("===================================")
 	fmt.Println(" CLIENTE SYNC SERVICE")
 	fmt.Println("===================================")
+
+	// =====================================
+	// 0. LOGIN
+	// =====================================
 
 	fmt.Println()
 	fmt.Println("0. LOGIN")
@@ -110,13 +114,13 @@ func main() {
 	ctx, cancel :=
 		context.WithTimeout(
 			context.Background(),
-			30*time.Second,
+			40*time.Second,
 		)
 
 	defer cancel()
 
 	// =====================================
-	// AUTHENTICATE
+	// 1. AUTHENTICATE
 	// =====================================
 
 	fmt.Println()
@@ -164,7 +168,7 @@ func main() {
 		"desktop-001"
 
 	// =====================================
-	// UPLOAD
+	// 2. UPLOAD
 	// =====================================
 
 	fmt.Println()
@@ -187,21 +191,22 @@ func main() {
 		)
 	}
 
-	err = uploadStream.Send(
-		&pb.UploadRequest{
-			Data: &pb.UploadRequest_Metadata{
-				Metadata: &pb.UploadMetadata{
-					UserId:   userID,
-					DeviceId: deviceID,
-					FileName: "prueba-sync.txt",
-					FileType: "DOCUMENTO",
-					Size: int64(
-						len(content),
-					),
+	err =
+		uploadStream.Send(
+			&pb.UploadRequest{
+				Data: &pb.UploadRequest_Metadata{
+					Metadata: &pb.UploadMetadata{
+						UserId:   userID,
+						DeviceId: deviceID,
+						FileName: "prueba-sync.txt",
+						FileType: "DOCUMENTO",
+						Size: int64(
+							len(content),
+						),
+					},
 				},
 			},
-		},
-	)
+		)
 
 	if err != nil {
 		log.Fatalf(
@@ -210,13 +215,14 @@ func main() {
 		)
 	}
 
-	err = uploadStream.Send(
-		&pb.UploadRequest{
-			Data: &pb.UploadRequest_Chunk{
-				Chunk: content,
+	err =
+		uploadStream.Send(
+			&pb.UploadRequest{
+				Data: &pb.UploadRequest_Chunk{
+					Chunk: content,
+				},
 			},
-		},
-	)
+		)
 
 	if err != nil {
 		log.Fatalf(
@@ -255,11 +261,15 @@ func main() {
 		uploadResponse.BytesReceived,
 	)
 
+	if !uploadResponse.Success {
+		return
+	}
+
 	fileID :=
 		uploadResponse.FileId
 
 	// =====================================
-	// LIST FILES
+	// 3. LIST FILES
 	// =====================================
 
 	fmt.Println()
@@ -301,7 +311,7 @@ func main() {
 	}
 
 	// =====================================
-	// DOWNLOAD
+	// 4. DOWNLOAD
 	// =====================================
 
 	fmt.Println()
@@ -376,7 +386,7 @@ func main() {
 	)
 
 	// =====================================
-	// SYNC DESDE OTRO DISPOSITIVO
+	// 5. SYNC DESDE OTRO DISPOSITIVO
 	// =====================================
 
 	fmt.Println()
@@ -421,7 +431,24 @@ func main() {
 	}
 
 	// =====================================
-	// DELETE
+	// PAUSA PARA MONITOREO DE STORAGE
+	// =====================================
+
+	fmt.Println()
+	fmt.Println(
+		"Esperando 10 segundos antes de eliminar...",
+	)
+
+	fmt.Println(
+		"Durante este tiempo Monitoring debería detectar 53 bytes.",
+	)
+
+	time.Sleep(
+		10 * time.Second,
+	)
+
+	// =====================================
+	// 6. DELETE
 	// =====================================
 
 	fmt.Println()
@@ -455,7 +482,24 @@ func main() {
 	)
 
 	// =====================================
-	// LIST FINAL
+	// PAUSA DESPUÉS DEL DELETE
+	// =====================================
+
+	fmt.Println()
+	fmt.Println(
+		"Esperando 6 segundos después del DELETE...",
+	)
+
+	fmt.Println(
+		"Monitoring debería volver a detectar 0 bytes.",
+	)
+
+	time.Sleep(
+		6 * time.Second,
+	)
+
+	// =====================================
+	// 7. LIST FILES FINAL
 	// =====================================
 
 	fmt.Println()

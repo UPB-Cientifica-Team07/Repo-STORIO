@@ -28,3 +28,39 @@ type ServiceStatus struct {
 	Message       string
 	LastUpdated   time.Time
 }
+
+// =====================================
+// REGLA DE ALERTA
+// =====================================
+
+type AlertRule struct {
+	ID            string
+	Name          string
+	Metric        string
+	Operator      string
+	Threshold     float64
+	ComponentName string
+	Enabled       bool
+}
+
+// =====================================
+// ALERTA
+// =====================================
+
+type Alert struct {
+	ID            string
+	RuleID        string
+	RuleName      string
+	ComponentID   string
+	ComponentName string
+	Metric        string
+	CurrentValue  float64
+	Threshold     float64
+	Message       string
+
+	CreatedAt time.Time
+
+	Active bool
+
+	ResolvedAt *time.Time
+}

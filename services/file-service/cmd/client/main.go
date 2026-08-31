@@ -3,15 +3,29 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	grpcClient "google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 
 	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/proto"
 )
 
 func main() {
+
+	// =====================================
+	// TOKEN
+	// =====================================
+
+	token := os.Getenv("TOKEN")
+
+	if token == "" {
+		log.Fatal(
+			"La variable de entorno TOKEN es obligatoria",
+		)
+	}
 
 	// =====================================
 	// CONECTAR CON FILE SERVICE
@@ -37,30 +51,50 @@ func main() {
 		connection,
 	)
 
+	// =====================================
+	// CONTEXTO + AUTH METADATA
+	// =====================================
+
 	ctx, cancel := context.WithTimeout(
 		context.Background(),
-		10*time.Second,
+		15*time.Second,
 	)
 
 	defer cancel()
+
+	ctx = metadata.NewOutgoingContext(
+		ctx,
+		metadata.Pairs(
+			"authorization",
+			"Bearer "+token,
+		),
+	)
 
 	// =====================================
 	// 1. SUBIR ARCHIVO
 	// =====================================
 
 	log.Println("===================================")
-	log.Println(" SUBIENDO ARCHIVO")
+	log.Println(" SUBIENDO ARCHIVO AL HOME")
 	log.Println("===================================")
+
+	content := []byte(
+		"Archivo almacenado dentro del Home de user-001.",
+	)
 
 	uploadResponse, err := client.UploadFile(
 		ctx,
 		&pb.UploadFileRequest{
-			UserId:   "user-001",
-			FileName: "documento.txt",
+			// Aunque enviemos otro valor aquí,
+			// el servidor debe usar la identidad
+			// obtenida del token.
+			UserId: "user-001",
+
+			FileName: "home-test.txt",
+
 			FileType: "text/plain",
-			Content: []byte(
-				"Este es el contenido del archivo de prueba.",
-			),
+
+			Content: content,
 		},
 	)
 
@@ -87,6 +121,12 @@ func main() {
 	)
 
 	fileID := uploadResponse.FileId
+
+	if fileID == "" {
+		log.Fatal(
+			"UploadFile no devolvió un File ID",
+		)
+	}
 
 	// =====================================
 	// 2. OBTENER ARCHIVO
@@ -134,7 +174,9 @@ func main() {
 
 		log.Printf(
 			"Contenido: %s",
-			string(getResponse.File.Content),
+			string(
+				getResponse.File.Content,
+			),
 		)
 
 		log.Printf(
@@ -144,11 +186,11 @@ func main() {
 	}
 
 	// =====================================
-	// 3. LISTAR ARCHIVOS DEL USUARIO
+	// 3. LISTAR ARCHIVOS
 	// =====================================
 
 	log.Println("===================================")
-	log.Println(" LISTANDO ARCHIVOS")
+	log.Println(" LISTANDO ARCHIVOS DE USER-001")
 	log.Println("===================================")
 
 	listResponse, err := client.ListFiles(
@@ -177,7 +219,9 @@ func main() {
 
 	log.Printf(
 		"Cantidad de archivos: %d",
-		len(listResponse.Files),
+		len(
+			listResponse.Files,
+		),
 	)
 
 	for _, file := range listResponse.Files {
@@ -191,70 +235,19 @@ func main() {
 	}
 
 	// =====================================
-	// 4. ELIMINAR ARCHIVO
+	// NO ELIMINAR TODAVÍA
 	// =====================================
 	//
-	//log.Println("===================================")
-	//log.Println(" ELIMINANDO ARCHIVO")
-	//log.Println("===================================")
-
-	//deleteResponse, err := client.DeleteFile(
-	//	ctx,
-	//	&pb.DeleteFileRequest{
-	//		FileId: fileID,
-	//	},
-	//)
-
-	//if err != nil {
-	//	log.Fatalf(
-	//		"Error eliminando archivo: %v",
-	//		err,
-	//	)
-	//}
-
-	//log.Printf(
-	//	"Success: %t",
-	//	deleteResponse.Success,
-	//)
-
-	//log.Printf(
-	//	"Mensaje: %s",
-	//	deleteResponse.Message,
-	//)
-
-	// =====================================
-	// 5. VERIFICAR QUE FUE ELIMINADO
+	// Queremos inspeccionar físicamente:
+	//
+	// homes/user-001/documentos/
+	//
+	// y comprobar Monitoring.
+	//
 	// =====================================
 
 	log.Println("===================================")
-	log.Println(" VERIFICANDO ELIMINACIÓN")
-	log.Println("===================================")
-
-	verifyResponse, err := client.GetFile(
-		ctx,
-		&pb.GetFileRequest{
-			FileId: fileID,
-		},
-	)
-
-	if err != nil {
-		log.Fatalf(
-			"Error verificando archivo: %v",
-			err,
-		)
-	}
-
-	log.Printf(
-		"Success: %t",
-		verifyResponse.Success,
-	)
-
-	log.Printf(
-		"Mensaje: %s",
-		verifyResponse.Message,
-	)
-
-	log.Println("===================================")
-	log.Println(" PRUEBA COMPLETADA")
+	log.Println(" PRUEBA DE HOME COMPLETADA")
+	log.Println(" Archivo conservado para inspección")
 	log.Println("===================================")
 }

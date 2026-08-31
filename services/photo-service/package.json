@@ -1,0 +1,30 @@
+{
+  "name": "photo-service",
+  "version": "1.0.0",
+  "description": "Photo Album Service for UPB-CIENTIFICA",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "photo",
+    "album",
+    "distributed-systems",
+    "upb"
+  ],
+  "author": "UPB-Cientifica-Team07",
+  "license": "ISC",
+  "dependencies": {
+    "@grpc/grpc-js": "^1.14.4",
+    "@grpc/proto-loader": "^0.8.1",
+    "axios": "^1.19.0",
+    "express": "^5.2.1",
+    "multer": "^2.2.0",
+    "pg": "^8.23.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14"
+  }
+}
