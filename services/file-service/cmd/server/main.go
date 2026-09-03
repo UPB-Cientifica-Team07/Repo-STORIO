@@ -24,6 +24,7 @@ import (
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/monitoring"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/repository"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/service"
+	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/internal/streaming"
 
 	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/file-service/proto"
 )
@@ -118,6 +119,25 @@ func main() {
 	log.Printf(
 		"Shared Storage: %s",
 		storageDir,
+	)
+
+	// =====================================
+	// STREAMING SERVICE
+	// =====================================
+
+	streamingURL :=
+		os.Getenv(
+			"STREAMING_SERVICE_URL",
+		)
+
+	if streamingURL == "" {
+		streamingURL =
+			"http://127.0.0.1:50054"
+	}
+
+	log.Printf(
+		"Streaming Service: %s",
+		streamingURL,
 	)
 
 	// =====================================
@@ -255,6 +275,49 @@ func main() {
 			homeRepository,
 			metadataRepository,
 		)
+
+	// =====================================
+	// STREAMING CLIENT
+	// =====================================
+
+	streamingClient :=
+		streaming.NewClient(
+			streamingURL,
+		)
+
+	fileService.SetStreamingNotifier(
+		func(
+			fileID string,
+		) error {
+
+			result,
+				err :=
+				streamingClient.RegisterVideo(
+					fileID,
+				)
+
+			if err != nil {
+				log.Printf(
+					"Streaming registerVideo falló para file=%s: %v",
+					fileID,
+					err,
+				)
+
+				return err
+			}
+
+			log.Printf(
+				"Streaming registrado: file=%s video=%s duracion=%ds calidad=%s formato=%s",
+				result.FileID,
+				result.VideoID,
+				result.DurationSeconds,
+				result.Quality,
+				result.Format,
+			)
+
+			return nil
+		},
+	)
 
 	// =====================================
 	// AUTH CLIENT

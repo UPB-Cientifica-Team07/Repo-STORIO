@@ -20,6 +20,10 @@ const PHOTO_SERVICE =
   process.env.PHOTO_SERVICE ||
   "http://127.0.0.1:50052";
 
+const STREAMING_SERVICE =
+  process.env.STREAMING_SERVICE ||
+  "http://127.0.0.1:50054";
+
 const upload =
   multer({
     storage:
@@ -100,6 +104,20 @@ app.post(
           });
       }
 
+      res.cookie(
+        "upb_token",
+        parts[3],
+        {
+          httpOnly: true,
+          sameSite: "strict",
+          secure:
+            process.env.NODE_ENV ===
+            "production",
+
+          path: "/"
+        }
+      );
+
       return res.json({
         success: true,
 
@@ -137,6 +155,35 @@ app.post(
 );
 
 // =====================================
+// LOGOUT
+// =====================================
+
+app.post(
+  "/api/auth/logout",
+  (req, res) => {
+
+    res.clearCookie(
+      "upb_token",
+      {
+        httpOnly: true,
+        sameSite: "strict",
+        secure:
+          process.env.NODE_ENV ===
+          "production",
+
+        path: "/"
+      }
+    );
+
+    return res.json({
+      success: true,
+      message:
+        "Sesión cerrada"
+    });
+  }
+);
+
+// =====================================
 // HEALTH
 // =====================================
 
@@ -162,6 +209,9 @@ app.get(
 
       photoService:
         PHOTO_SERVICE,
+
+      streamingService:
+        STREAMING_SERVICE,
 
       timestamp:
         new Date().toISOString()
@@ -1480,8 +1530,461 @@ app.delete(
 );
 
 // =====================================
+// STREAMING CATALOG API
+// =====================================
+
+function xmlDecode(
+  value
+) {
+
+  return String(
+    value || ""
+  )
+    .replaceAll(
+      "&lt;",
+      "<"
+    )
+    .replaceAll(
+      "&gt;",
+      ">"
+    )
+    .replaceAll(
+      "&quot;",
+      '"'
+    )
+    .replaceAll(
+      "&apos;",
+      "'"
+    )
+    .replaceAll(
+      "&amp;",
+      "&"
+    );
+}
+
+function soapTagValue(
+  xml,
+  tag
+) {
+
+  const expression =
+    new RegExp(
+      `<(?:[A-Za-z0-9_]+:)?${tag}>([\\s\\S]*?)<\\/(?:[A-Za-z0-9_]+:)?${tag}>`
+    );
+
+  const match =
+    String(xml)
+      .match(
+        expression
+      );
+
+  return match
+    ? xmlDecode(
+        match[1]
+      )
+    : "";
+}
+
+function parseVideoListSoap(
+  xml
+) {
+
+  const videos = [];
+
+  const expression =
+    /<(?:[A-Za-z0-9_]+:)?video>([\s\S]*?)<\/(?:[A-Za-z0-9_]+:)?video>/g;
+
+  let match;
+
+  while (
+    (
+      match =
+        expression.exec(
+          String(xml)
+        )
+    ) !== null
+  ) {
+
+    const block =
+      match[1];
+
+    videos.push({
+      idVideo:
+        soapTagValue(
+          block,
+          "idVideo"
+        ),
+
+      idArchivo:
+        soapTagValue(
+          block,
+          "idArchivo"
+        ),
+
+      nombre:
+        soapTagValue(
+          block,
+          "nombre"
+        ),
+
+      mimeType:
+        soapTagValue(
+          block,
+          "mimeType"
+        ),
+
+      tamano:
+        Number(
+          soapTagValue(
+            block,
+            "tamano"
+          ) ||
+          0
+        ),
+
+      duracionSegundos:
+        Number(
+          soapTagValue(
+            block,
+            "duracionSegundos"
+          ) ||
+          0
+        ),
+
+      calidad:
+        soapTagValue(
+          block,
+          "calidad"
+        ),
+
+      formato:
+        soapTagValue(
+          block,
+          "formato"
+        )
+    });
+  }
+
+  return videos;
+}
+
+app.get(
+  "/api/videos",
+  async (req, res) => {
+
+    const token =
+      tokenOnly(
+        req
+      ) ||
+      cookieValue(
+        req,
+        "upb_token"
+      );
+
+    if (!token) {
+
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message:
+            "Token requerido"
+        });
+    }
+
+    const escapedToken =
+      String(token)
+        .replaceAll(
+          "&",
+          "&amp;"
+        )
+        .replaceAll(
+          "<",
+          "&lt;"
+        )
+        .replaceAll(
+          ">",
+          "&gt;"
+        )
+        .replaceAll(
+          '"',
+          "&quot;"
+        )
+        .replaceAll(
+          "'",
+          "&apos;"
+        );
+
+    const payload =
+      `<?xml version="1.0" encoding="UTF-8"?>
+<soap:Envelope
+  xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+  xmlns:tns="urn:UPBCientificaStreaming">
+  <soap:Body>
+    <tns:listVideosRequest>
+      <tns:token>${escapedToken}</tns:token>
+    </tns:listVideosRequest>
+  </soap:Body>
+</soap:Envelope>`;
+
+    try {
+
+      const response =
+        await axios.post(
+          `${STREAMING_SERVICE}/`,
+          payload,
+          {
+            headers: {
+              "Content-Type":
+                "text/xml; charset=utf-8",
+
+              SOAPAction:
+                '"urn:UPBCientificaStreaming#listVideos"'
+            },
+
+            timeout:
+              10000,
+
+            validateStatus:
+              () => true
+          }
+        );
+
+      const xml =
+        String(
+          response.data ||
+          ""
+        );
+
+      if (
+        response.status !== 200
+      ) {
+
+        return res
+          .status(
+            response.status
+          )
+          .json({
+            success: false,
+            message:
+              soapTagValue(
+                xml,
+                "faultstring"
+              ) ||
+              "Streaming Service rechazó la solicitud"
+          });
+      }
+
+      return res.json({
+        success: true,
+
+        message:
+          soapTagValue(
+            xml,
+            "message"
+          ) ||
+          "Videos encontrados",
+
+        videos:
+          parseVideoListSoap(
+            xml
+          )
+      });
+
+    } catch (error) {
+
+      console.error(
+        "STREAMING CATALOG ERROR:",
+        error.message
+      );
+
+      return res
+        .status(502)
+        .json({
+          success: false,
+          message:
+            "No fue posible consultar Streaming Service"
+        });
+    }
+  }
+);
+
+// =====================================
+// STREAMING API PROXY
+// =====================================
+
+app.get(
+  "/api/stream/:idVideo",
+  async (req, res) => {
+
+    const token =
+      cookieValue(
+        req,
+        "upb_token"
+      );
+
+    if (!token) {
+
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message:
+            "Sesión requerida para reproducir video"
+        });
+    }
+
+    try {
+
+      const headers = {
+        Authorization:
+          `Bearer ${token}`
+      };
+
+      if (req.headers.range) {
+
+        headers.Range =
+          req.headers.range;
+      }
+
+      const response =
+        await axios.get(
+          `${STREAMING_SERVICE}/stream/${encodeURIComponent(
+            req.params.idVideo
+          )}`,
+          {
+            headers,
+
+            responseType:
+              "stream",
+
+            timeout:
+              15000,
+
+            validateStatus:
+              () => true
+          }
+        );
+
+      const forwardedHeaders = [
+        "content-type",
+        "content-length",
+        "content-range",
+        "accept-ranges",
+        "cache-control"
+      ];
+
+      for (
+        const headerName
+        of forwardedHeaders
+      ) {
+
+        const value =
+          response.headers[
+            headerName
+          ];
+
+        if (value !== undefined) {
+
+          res.setHeader(
+            headerName,
+            value
+          );
+        }
+      }
+
+      res.status(
+        response.status
+      );
+
+      response.data.on(
+        "error",
+        error => {
+
+          console.error(
+            "STREAM PROXY BODY ERROR:",
+            error.message
+          );
+
+          if (!res.headersSent) {
+
+            res
+              .status(502)
+              .end();
+          } else {
+
+            res.destroy(
+              error
+            );
+          }
+        }
+      );
+
+      return response.data.pipe(
+        res
+      );
+
+    } catch (error) {
+
+      console.error(
+        "STREAM PROXY ERROR:",
+        error.message
+      );
+
+      if (res.headersSent) {
+
+        return res.end();
+      }
+
+      return res
+        .status(502)
+        .json({
+          success: false,
+          message:
+            "No fue posible comunicarse con Streaming Service"
+        });
+    }
+  }
+);
+
+// =====================================
 // FILE API - HTTP -> gRPC
 // =====================================
+
+function cookieValue(
+  req,
+  name
+) {
+
+  const raw =
+    req.headers.cookie ||
+    "";
+
+  const cookies =
+    raw.split(";");
+
+  for (
+    const cookie of cookies
+  ) {
+
+    const [
+      key,
+      ...valueParts
+    ] =
+      cookie
+        .trim()
+        .split("=");
+
+    if (key === name) {
+
+      return decodeURIComponent(
+        valueParts.join("=")
+      );
+    }
+  }
+
+  return null;
+}
 
 function tokenOnly(
   req

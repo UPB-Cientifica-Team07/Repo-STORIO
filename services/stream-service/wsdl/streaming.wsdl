@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<definitions
+    xmlns="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:tns="urn:UPBCientificaStreaming"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    targetNamespace="urn:UPBCientificaStreaming"
+    name="StreamingService">
+
+    <types>
+        <xsd:schema
+            targetNamespace="urn:UPBCientificaStreaming"
+            elementFormDefault="qualified">
+
+            <xsd:complexType name="Video">
+                <xsd:sequence>
+                    <xsd:element name="idVideo" type="xsd:string"/>
+                    <xsd:element name="idArchivo" type="xsd:string"/>
+                    <xsd:element name="nombre" type="xsd:string"/>
+                    <xsd:element name="mimeType" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="tamano" type="xsd:long"/>
+                    <xsd:element name="duracionSegundos" type="xsd:int" minOccurs="0"/>
+                    <xsd:element name="calidad" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="formato" type="xsd:string" minOccurs="0"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="VideoList">
+                <xsd:sequence>
+                    <xsd:element
+                        name="video"
+                        type="tns:Video"
+                        minOccurs="0"
+                        maxOccurs="unbounded"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:complexType name="StreamingInfo">
+                <xsd:sequence>
+                    <xsd:element name="idVideo" type="xsd:string"/>
+                    <xsd:element name="idArchivo" type="xsd:string"/>
+                    <xsd:element name="nombre" type="xsd:string"/>
+                    <xsd:element name="mimeType" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="formato" type="xsd:string" minOccurs="0"/>
+                    <xsd:element name="tamano" type="xsd:long"/>
+                    <xsd:element name="modo" type="xsd:string"/>
+                    <xsd:element name="reproduccionDisponible" type="xsd:boolean"/>
+                </xsd:sequence>
+            </xsd:complexType>
+
+            <xsd:element name="registerVideoRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="idArchivo" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="registerVideoResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="success" type="xsd:boolean"/>
+                        <xsd:element name="message" type="xsd:string"/>
+                        <xsd:element name="idVideo" type="xsd:string"/>
+                        <xsd:element name="idArchivo" type="xsd:string"/>
+                        <xsd:element name="duracionSegundos" type="xsd:int"/>
+                        <xsd:element name="calidad" type="xsd:string"/>
+                        <xsd:element name="formato" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+
+            <xsd:element name="listVideosRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="token" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="listVideosResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="success" type="xsd:boolean"/>
+                        <xsd:element name="message" type="xsd:string"/>
+                        <xsd:element name="videos" type="tns:VideoList"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="getVideoRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="idVideo" type="xsd:string"/>
+                        <xsd:element name="token" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="getVideoResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="success" type="xsd:boolean"/>
+                        <xsd:element name="message" type="xsd:string"/>
+                        <xsd:element name="video" type="tns:Video"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="getStreamingInfoRequest">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="idVideo" type="xsd:string"/>
+                        <xsd:element name="token" type="xsd:string"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+            <xsd:element name="getStreamingInfoResponse">
+                <xsd:complexType>
+                    <xsd:sequence>
+                        <xsd:element name="success" type="xsd:boolean"/>
+                        <xsd:element name="message" type="xsd:string"/>
+                        <xsd:element name="streaming" type="tns:StreamingInfo"/>
+                    </xsd:sequence>
+                </xsd:complexType>
+            </xsd:element>
+
+        </xsd:schema>
+    </types>
+
+    <message name="registerVideoInput">
+        <part name="parameters" element="tns:registerVideoRequest"/>
+    </message>
+
+    <message name="registerVideoOutput">
+        <part name="parameters" element="tns:registerVideoResponse"/>
+    </message>
+
+
+    <message name="listVideosInput">
+        <part name="parameters" element="tns:listVideosRequest"/>
+    </message>
+
+    <message name="listVideosOutput">
+        <part name="parameters" element="tns:listVideosResponse"/>
+    </message>
+
+    <message name="getVideoInput">
+        <part name="parameters" element="tns:getVideoRequest"/>
+    </message>
+
+    <message name="getVideoOutput">
+        <part name="parameters" element="tns:getVideoResponse"/>
+    </message>
+
+    <message name="getStreamingInfoInput">
+        <part name="parameters" element="tns:getStreamingInfoRequest"/>
+    </message>
+
+    <message name="getStreamingInfoOutput">
+        <part name="parameters" element="tns:getStreamingInfoResponse"/>
+    </message>
+
+    <portType name="StreamingServicePortType">
+
+        <operation name="registerVideo">
+            <input message="tns:registerVideoInput"/>
+            <output message="tns:registerVideoOutput"/>
+        </operation>
+
+
+        <operation name="listVideos">
+            <input message="tns:listVideosInput"/>
+            <output message="tns:listVideosOutput"/>
+        </operation>
+
+        <operation name="getVideo">
+            <input message="tns:getVideoInput"/>
+            <output message="tns:getVideoOutput"/>
+        </operation>
+
+        <operation name="getStreamingInfo">
+            <input message="tns:getStreamingInfoInput"/>
+            <output message="tns:getStreamingInfoOutput"/>
+        </operation>
+
+    </portType>
+
+    <binding
+        name="StreamingServiceBinding"
+        type="tns:StreamingServicePortType">
+
+        <soap:binding
+            style="document"
+            transport="http://schemas.xmlsoap.org/soap/http"/>
+
+        <operation name="registerVideo">
+            <soap:operation soapAction="urn:UPBCientificaStreaming#registerVideo"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+
+
+        <operation name="listVideos">
+            <soap:operation soapAction="urn:UPBCientificaStreaming#listVideos"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+
+        <operation name="getVideo">
+            <soap:operation soapAction="urn:UPBCientificaStreaming#getVideo"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+
+        <operation name="getStreamingInfo">
+            <soap:operation soapAction="urn:UPBCientificaStreaming#getStreamingInfo"/>
+            <input>
+                <soap:body use="literal"/>
+            </input>
+            <output>
+                <soap:body use="literal"/>
+            </output>
+        </operation>
+
+    </binding>
+
+    <service name="StreamingService">
+        <port
+            name="StreamingServicePort"
+            binding="tns:StreamingServiceBinding">
+
+            <soap:address
+                location="http://127.0.0.1:50054/"/>
+
+        </port>
+    </service>
+
+</definitions>

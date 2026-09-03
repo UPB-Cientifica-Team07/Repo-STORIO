@@ -18,6 +18,10 @@ type FileService struct {
 	repository         *repository.FileRepository
 	homeRepository     *repository.HomeRepository
 	metadataRepository *repository.FileMetadataRepository
+
+	streamingNotifier func(
+		fileID string,
+	) error
 }
 
 // =====================================
@@ -35,6 +39,18 @@ func NewFileService(
 		homeRepository:     homeRepository,
 		metadataRepository: metadataRepository,
 	}
+}
+
+// =====================================
+// STREAMING NOTIFIER
+// =====================================
+
+func (s *FileService) SetStreamingNotifier(
+	notifier func(
+		fileID string,
+	) error,
+) {
+	s.streamingNotifier = notifier
 }
 
 // =====================================
@@ -350,6 +366,43 @@ func (s *FileService) UploadFile(
 				"falló registro PostgreSQL; operación revertida: %w",
 				err,
 			)
+	}
+
+	// =====================================
+	// STREAMING
+	// =====================================
+	//
+	// El archivo ya quedó confirmado en:
+	//
+	// - Shared Storage
+	// - PostgreSQL
+	//
+	// Para archivos video/* se solicita
+	// de manera asíncrona el registro de
+	// metadata en Streaming Service.
+	//
+	// Una caída de Streaming NO revierte
+	// una carga válida del File Service.
+	//
+	// registerVideo es idempotente.
+	//
+	// =====================================
+
+	if strings.HasPrefix(
+		strings.ToLower(
+			file.Type,
+		),
+		"video/",
+	) &&
+		s.streamingNotifier != nil {
+
+		fileID := file.ID
+
+		go func() {
+			_ = s.streamingNotifier(
+				fileID,
+			)
+		}()
 	}
 
 	return file, nil

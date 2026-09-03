@@ -169,7 +169,25 @@ loginForm.addEventListener(
 
 logoutButton.addEventListener(
   "click",
-  () => {
+  async () => {
+
+    try {
+
+      await fetch(
+        "/api/auth/logout",
+        {
+          method:
+            "POST"
+        }
+      );
+
+    } catch (error) {
+
+      console.error(
+        "LOGOUT ERROR:",
+        error.message
+      );
+    }
 
     sessionStorage.removeItem(
       "upbSession"
@@ -1658,6 +1676,187 @@ async function shareSharedFile(
 }
 
 // =====================================
+// STREAMING
+// =====================================
+
+async function loadVideos() {
+
+  contentView.innerHTML = `
+    <div class="section-header">
+
+      <div>
+        <h3>
+          Streaming
+        </h3>
+
+        <p>
+          Videos del Home disponibles según tus permisos.
+        </p>
+      </div>
+
+      <button
+        id="refreshVideos"
+      >
+        Actualizar
+      </button>
+
+    </div>
+
+    <p
+      id="videosMessage"
+    >
+      Cargando videos...
+    </p>
+
+    <div
+      id="videoGrid"
+      class="photo-grid"
+    ></div>
+  `;
+
+  document
+    .getElementById(
+      "refreshVideos"
+    )
+    .addEventListener(
+      "click",
+      loadVideos
+    );
+
+  const message =
+    document.getElementById(
+      "videosMessage"
+    );
+
+  const grid =
+    document.getElementById(
+      "videoGrid"
+    );
+
+  try {
+
+    const response =
+      await apiFetch(
+        "/api/videos"
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
+      throw new Error(
+        data.message ||
+        "No fue posible cargar los videos"
+      );
+    }
+
+    const videos =
+      data.videos ||
+      [];
+
+    if (
+      videos.length === 0
+    ) {
+
+      message.textContent =
+        "No hay videos autorizados.";
+
+      return;
+    }
+
+    message.textContent =
+      `${videos.length} video(s) disponible(s).`;
+
+    for (
+      const video of videos
+    ) {
+
+      const card =
+        document.createElement(
+          "article"
+        );
+
+      card.className =
+        "photo-card";
+
+      card.innerHTML = `
+        <div
+          class="photo-preview"
+        >
+          <video
+            controls
+            preload="metadata"
+            playsinline
+            style="width:100%;max-height:320px;background:#000"
+            src="/api/stream/${encodeURIComponent(
+              video.idVideo
+            )}"
+          ></video>
+        </div>
+
+        <div
+          class="photo-info"
+        >
+          <strong>
+            ${escapeHtml(
+              video.nombre ||
+              "Video"
+            )}
+          </strong>
+
+          <p>
+            Duración:
+            ${Number(
+              video.duracionSegundos ||
+              0
+            )} s
+          </p>
+
+          <p>
+            Calidad:
+            ${escapeHtml(
+              video.calidad ||
+              "N/D"
+            )}
+          </p>
+
+          <p>
+            Formato:
+            ${escapeHtml(
+              video.formato ||
+              "N/D"
+            )}
+          </p>
+
+          <p>
+            Tamaño:
+            ${formatBytes(
+              Number(
+                video.tamano ||
+                0
+              )
+            )}
+          </p>
+        </div>
+      `;
+
+      grid.appendChild(
+        card
+      );
+    }
+
+  } catch (error) {
+
+    message.textContent =
+      error.message;
+  }
+}
+
+// =====================================
 // ALBUMS
 // =====================================
 
@@ -2486,6 +2685,16 @@ document
           ) {
 
             loadAlbums();
+
+            return;
+          }
+
+          if (
+            module ===
+            "streaming"
+          ) {
+
+            loadVideos();
 
             return;
           }
