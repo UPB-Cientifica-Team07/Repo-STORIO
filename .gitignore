@@ -87,3 +87,8 @@ logs/
 /watcher
 /network-policy-test
 /bin/
+
+# HPC Service build artifacts
+services/hpc-service/bin/
+services/hpc-service/mpi/hello_mpi
+services/hpc-service/mpi/sleep_mpi
