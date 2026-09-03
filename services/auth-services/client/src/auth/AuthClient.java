@@ -5,11 +5,64 @@ import java.rmi.registry.Registry;
 
 public class AuthClient {
 
-    private static final String HOST = "localhost";
-    private static final int PORT = 1099;
-    private static final String SERVICE_NAME = "AuthService";
+    private static final String HOST =
+            System.getenv()
+                    .getOrDefault(
+                            "AUTH_RMI_HOST",
+                            "localhost"
+                    );
 
-    public static void main(String[] args) {
+    private static final int PORT =
+            Integer.parseInt(
+                    System.getenv()
+                            .getOrDefault(
+                                    "AUTH_RMI_PORT",
+                                    "1099"
+                            )
+            );
+
+    private static final String SERVICE_NAME =
+            "AuthService";
+
+    public static void main(
+            String[] args
+    ) {
+
+        String username =
+                args.length > 0
+                        ? args[0]
+                        : System.getenv(
+                                "AUTH_TEST_USER"
+                        );
+
+        String password =
+                args.length > 1
+                        ? args[1]
+                        : System.getenv(
+                                "AUTH_TEST_PASSWORD"
+                        );
+
+        if (
+                username == null ||
+                username.isBlank() ||
+                password == null ||
+                password.isBlank()
+        ) {
+
+            System.err.println(
+                    "Uso:"
+            );
+
+            System.err.println(
+                    "java auth.AuthClient <usuario> <password>"
+            );
+
+            System.err.println(
+                    "o variables AUTH_TEST_USER / AUTH_TEST_PASSWORD"
+            );
+
+            System.exit(1);
+        }
 
         try {
 
@@ -27,19 +80,17 @@ public class AuthClient {
             System.out.println(
                     "==================================="
             );
-
             System.out.println(
-                    " 1. LOGIN"
+                    " 1. LOGIN RMI -> DIRECTORY SERVICE"
             );
-
             System.out.println(
                     "==================================="
             );
 
             AuthResult loginResult =
                     authService.login(
-                            "samuel",
-                            "123456"
+                            username,
+                            password
                     );
 
             System.out.println(
@@ -52,7 +103,9 @@ public class AuthClient {
                             + loginResult.getMessage()
             );
 
-            if (!loginResult.isSuccess()) {
+            if (
+                    !loginResult.isSuccess()
+            ) {
                 return;
             }
 
@@ -71,11 +124,6 @@ public class AuthClient {
                             + loginResult.getRole()
             );
 
-            System.out.println(
-                    "Token: "
-                            + loginResult.getToken()
-            );
-
             String token =
                     loginResult.getToken();
 
@@ -83,13 +131,19 @@ public class AuthClient {
                     loginResult.getUserId();
 
             System.out.println(
-                    "==================================="
+                    "Token generado: "
+                            + (
+                                    token != null &&
+                                    !token.isBlank()
+                            )
             );
 
             System.out.println(
+                    "==================================="
+            );
+            System.out.println(
                     " 2. VALIDAR TOKEN"
             );
-
             System.out.println(
                     "==================================="
             );
@@ -122,11 +176,9 @@ public class AuthClient {
             System.out.println(
                     "==================================="
             );
-
             System.out.println(
                     " 3. CONSULTAR USUARIO"
             );
-
             System.out.println(
                     "==================================="
             );
@@ -159,22 +211,22 @@ public class AuthClient {
             System.out.println(
                     "==================================="
             );
-
             System.out.println(
                     " PRUEBA RMI COMPLETADA"
             );
-
             System.out.println(
                     "==================================="
             );
 
-        } catch (Exception e) {
+        } catch (
+                Exception error
+        ) {
 
             System.err.println(
                     "Error en Auth Client:"
             );
 
-            e.printStackTrace();
+            error.printStackTrace();
         }
     }
 }

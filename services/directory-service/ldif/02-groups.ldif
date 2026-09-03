@@ -1,0 +1,20 @@
+dn: cn=ADMIN,ou=groups,dc=upb-cientifica,dc=local
+objectClass: top
+objectClass: groupOfNames
+cn: ADMIN
+member: cn=admin,dc=upb-cientifica,dc=local
+description: Administradores de UPB-CIENTIFICA
+
+dn: cn=INVESTIGADOR,ou=groups,dc=upb-cientifica,dc=local
+objectClass: top
+objectClass: groupOfNames
+cn: INVESTIGADOR
+member: cn=admin,dc=upb-cientifica,dc=local
+description: Investigadores de UPB-CIENTIFICA
+
+dn: cn=USUARIO,ou=groups,dc=upb-cientifica,dc=local
+objectClass: top
+objectClass: groupOfNames
+cn: USUARIO
+member: cn=admin,dc=upb-cientifica,dc=local
+description: Usuarios estándar de UPB-CIENTIFICA

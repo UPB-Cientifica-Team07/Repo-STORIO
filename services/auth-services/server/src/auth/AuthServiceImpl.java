@@ -6,120 +6,60 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.naming.NamingException;
+
 public class AuthServiceImpl
         extends UnicastRemoteObject
         implements IAuthService {
 
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID =
+            1L;
 
-    private final Map<String, User> usersByUsername;
-    private final Map<String, User> usersById;
-    private final Map<String, String> tokens;
+    /*
+     * Tokens permanecen gestionados por
+     * Auth Service.
+     *
+     * token -> usuario autenticado
+     */
+    private final Map<String, User>
+            sessions;
 
-    public AuthServiceImpl() throws RemoteException {
+    private final LdapDirectoryClient
+            directoryClient;
+
+    public AuthServiceImpl()
+            throws RemoteException {
+
         super();
 
-        usersByUsername = new HashMap<>();
-        usersById = new HashMap<>();
-        tokens = new HashMap<>();
+        sessions =
+                new HashMap<>();
 
-        loadDefaultUsers();
+        directoryClient =
+                new LdapDirectoryClient();
+
+        System.out.println(
+                "Auth Service configurado con OpenLDAP"
+        );
+
+        System.out.println(
+                " LDAP: "
+                        + System.getenv()
+                                .getOrDefault(
+                                        "LDAP_URL",
+                                        "ldap://127.0.0.1:389"
+                                )
+        );
+
+        System.out.println(
+                " Base DN: "
+                        + System.getenv()
+                                .getOrDefault(
+                                        "LDAP_BASE_DN",
+                                        "dc=upb-cientifica,dc=local"
+                                )
+        );
     }
-
-    // =====================================
-    // USUARIOS POR DEFECTO
-    // =====================================
-
-// =====================================
-// USUARIOS POR DEFECTO
-// =====================================
-
-private void loadDefaultUsers() {
-
-    // =====================================
-    // ADMINISTRADOR
-    // =====================================
-
-    User admin = new User(
-            "user-001",
-            "samuel",
-            "123456",
-            "ADMIN"
-    );
-
-    usersByUsername.put(
-            admin.username,
-            admin
-    );
-
-    usersById.put(
-            admin.id,
-            admin
-    );
-
-    // =====================================
-    // USUARIO NORMAL 1
-    // =====================================
-
-    User normalUser = new User(
-            "user-002",
-            "prueba",
-            "123456",
-            "USUARIO"
-    );
-
-    usersByUsername.put(
-            normalUser.username,
-            normalUser
-    );
-
-    usersById.put(
-            normalUser.id,
-            normalUser
-    );
-
-    // =====================================
-    // USUARIO NORMAL 2
-    // =====================================
-
-    User thirdUser = new User(
-            "user-003",
-            "tercero",
-            "123456",
-            "USUARIO"
-    );
-
-    usersByUsername.put(
-            thirdUser.username,
-            thirdUser
-    );
-
-    usersById.put(
-            thirdUser.id,
-            thirdUser
-    );
-
-    // =====================================
-    // LOG DE USUARIOS
-    // =====================================
-
-    System.out.println(
-            "Usuarios por defecto cargados:"
-    );
-
-    System.out.println(
-            " - samuel | user-001 | ADMIN"
-    );
-
-    System.out.println(
-            " - prueba | user-002 | USUARIO"
-    );
-
-    System.out.println(
-            " - tercero | user-003 | USUARIO"
-    );
-}
-
 
     // =====================================
     // LOGIN
@@ -161,66 +101,83 @@ private void loadDefaultUsers() {
             );
         }
 
-        User user =
-                usersByUsername.get(
-                        username
-                );
+        try {
 
-        if (user == null) {
+            LdapDirectoryClient.DirectoryUser
+                    directoryUser =
+                    directoryClient
+                            .authenticate(
+                                    username.trim(),
+                                    password
+                            );
+
+            if (
+                    directoryUser == null
+            ) {
+
+                return new AuthResult(
+                        false,
+                        "Credenciales inválidas",
+                        "",
+                        "",
+                        "",
+                        ""
+                );
+            }
+
+            User user =
+                    new User(
+                            directoryUser.id(),
+                            directoryUser.username(),
+                            directoryUser.role()
+                    );
+
+            String token =
+                    UUID.randomUUID()
+                            .toString();
+
+            sessions.put(
+                    token,
+                    user
+            );
+
+            System.out.println(
+                    "Login LDAP correcto"
+                            + " | Usuario: "
+                            + user.username
+                            + " | ID: "
+                            + user.id
+                            + " | Rol: "
+                            + user.role
+            );
 
             return new AuthResult(
-                    false,
-                    "Usuario no encontrado",
-                    "",
-                    "",
-                    "",
-                    ""
+                    true,
+                    "Login correcto",
+                    user.id,
+                    user.username,
+                    user.role,
+                    token
             );
-        }
 
-        if (
-                !user.password.equals(
-                        password
-                )
+        } catch (
+                NamingException error
         ) {
 
+            System.err.println(
+                    "Error consultando OpenLDAP: "
+                            + error.getMessage()
+            );
+
             return new AuthResult(
                     false,
-                    "Credenciales inválidas",
+                    "Directory Service no disponible",
                     "",
                     "",
                     "",
                     ""
             );
         }
-
-        String token =
-                UUID.randomUUID()
-                        .toString();
-
-        tokens.put(
-                token,
-                user.id
-        );
-
-        System.out.println(
-                "Login correcto"
-                        + " | Usuario: "
-                        + user.username
-                        + " | ID: "
-                        + user.id
-                        + " | Rol: "
-                        + user.role
-        );
-
-        return new AuthResult(
-                true,
-                "Login correcto",
-                user.id,
-                user.username,
-                user.role,
-                token
-        );
     }
 
     // =====================================
@@ -228,7 +185,8 @@ private void loadDefaultUsers() {
     // =====================================
 
     @Override
-    public synchronized TokenResult validateToken(
+    public synchronized TokenResult
+    validateToken(
             String token
     ) throws RemoteException {
 
@@ -245,31 +203,18 @@ private void loadDefaultUsers() {
             );
         }
 
-        String userId =
-                tokens.get(
+        User user =
+                sessions.get(
                         token
                 );
 
-        if (userId == null) {
+        if (
+                user == null
+        ) {
 
             return new TokenResult(
                     false,
                     "Token inválido",
-                    "",
-                    ""
-            );
-        }
-
-        User user =
-                usersById.get(
-                        userId
-                );
-
-        if (user == null) {
-
-            return new TokenResult(
-                    false,
-                    "Usuario asociado al token no encontrado",
                     "",
                     ""
             );
@@ -307,22 +252,81 @@ private void loadDefaultUsers() {
             );
         }
 
-        User user =
-                usersById.get(
-                        userId
-                );
+        /*
+         * Primero buscamos entre sesiones
+         * ya autenticadas.
+         */
+        for (
+                User user
+                        : sessions.values()
+        ) {
 
-        if (user == null) {
+            if (
+                    user.id.equals(
+                            userId
+                    )
+            ) {
+
+                return userResult(
+                        user
+                );
+            }
+        }
+
+        /*
+         * Si el usuario todavía no ha iniciado
+         * sesión, se consulta el directorio.
+         */
+        try {
+
+            LdapDirectoryClient.DirectoryUser
+                    directoryUser =
+                    directoryClient
+                            .findByDirectoryId(
+                                    userId
+                            );
+
+            if (
+                    directoryUser == null
+            ) {
+
+                return new AuthResult(
+                        false,
+                        "Usuario no encontrado",
+                        "",
+                        "",
+                        "",
+                        ""
+                );
+            }
+
+            return new AuthResult(
+                    true,
+                    "Usuario encontrado",
+                    directoryUser.id(),
+                    directoryUser.username(),
+                    directoryUser.role(),
+                    ""
+            );
+
+        } catch (
+                NamingException error
+        ) {
 
             return new AuthResult(
                     false,
-                    "Usuario no encontrado",
+                    "Directory Service no disponible",
                     "",
                     "",
                     "",
                     ""
             );
         }
+    }
+
+    private AuthResult userResult(
+            User user
+    ) {
 
         return new AuthResult(
                 true,
@@ -335,20 +339,18 @@ private void loadDefaultUsers() {
     }
 
     // =====================================
-    // MODELO INTERNO DE USUARIO
+    // SESIÓN AUTENTICADA
     // =====================================
 
     private static class User {
 
         private final String id;
         private final String username;
-        private final String password;
         private final String role;
 
         private User(
                 String id,
                 String username,
-                String password,
                 String role
         ) {
 
@@ -357,9 +359,6 @@ private void loadDefaultUsers() {
 
             this.username =
                     username;
-
-            this.password =
-                    password;
 
             this.role =
                     role;

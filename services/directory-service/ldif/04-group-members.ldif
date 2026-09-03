@@ -1,0 +1,16 @@
+dn: cn=ADMIN,ou=groups,dc=upb-cientifica,dc=local
+changetype: modify
+add: member
+member: uid=samuel,ou=people,dc=upb-cientifica,dc=local
+-
+delete: member
+member: cn=admin,dc=upb-cientifica,dc=local
+
+dn: cn=USUARIO,ou=groups,dc=upb-cientifica,dc=local
+changetype: modify
+add: member
+member: uid=prueba,ou=people,dc=upb-cientifica,dc=local
+member: uid=tercero,ou=people,dc=upb-cientifica,dc=local
+-
+delete: member
+member: cn=admin,dc=upb-cientifica,dc=local

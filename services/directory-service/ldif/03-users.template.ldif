@@ -1,0 +1,17 @@
+# Este archivo documenta la estructura de usuarios.
+# No contiene passwords ni hashes.
+#
+# Los usuarios reales se aprovisionan localmente
+# mediante scripts/provision-users.sh.
+
+dn: uid=<USERNAME>,ou=people,dc=upb-cientifica,dc=local
+objectClass: top
+objectClass: person
+objectClass: organizationalPerson
+objectClass: inetOrgPerson
+uid: <USERNAME>
+cn: <COMMON_NAME>
+sn: <SURNAME>
+displayName: <DISPLAY_NAME>
+employeeNumber: <DIRECTORY_ID>
+description: Usuario de UPB-CIENTIFICA

@@ -1,0 +1,19 @@
+dn: ou=people,dc=upb-cientifica,dc=local
+objectClass: organizationalUnit
+ou: people
+description: Usuarios de UPB-CIENTIFICA
+
+dn: ou=groups,dc=upb-cientifica,dc=local
+objectClass: organizationalUnit
+ou: groups
+description: Roles y grupos de UPB-CIENTIFICA
+
+dn: ou=services,dc=upb-cientifica,dc=local
+objectClass: organizationalUnit
+ou: services
+description: Servicios distribuidos de UPB-CIENTIFICA
+
+dn: ou=resources,dc=upb-cientifica,dc=local
+objectClass: organizationalUnit
+ou: resources
+description: Recursos y estructuras del repositorio distribuido
