@@ -460,6 +460,85 @@ func (s *Server) Sync(
 }
 
 // =====================================
+// ACKNOWLEDGE CHANGES
+// =====================================
+
+func (s *Server) AcknowledgeChanges(
+	ctx context.Context,
+	request *pb.AcknowledgeChangesRequest,
+) (*pb.AcknowledgeChangesResponse, error) {
+
+	identity, err :=
+		authenticatedIdentity(
+			ctx,
+		)
+
+	if err != nil {
+		return nil, err
+	}
+
+	if s == nil ||
+		s.syncService == nil {
+
+		return nil,
+			status.Error(
+				codes.Internal,
+				"Sync Service no inicializado",
+			)
+	}
+
+	if request == nil {
+		return nil,
+			status.Error(
+				codes.InvalidArgument,
+				"la solicitud es obligatoria",
+			)
+	}
+
+	deviceID :=
+		strings.TrimSpace(
+			request.DeviceId,
+		)
+
+	if deviceID == "" {
+		return nil,
+			status.Error(
+				codes.InvalidArgument,
+				"el device ID es obligatorio",
+			)
+	}
+
+	if request.ChangeId <= 0 {
+		return nil,
+			status.Error(
+				codes.InvalidArgument,
+				"el change ID debe ser mayor que cero",
+			)
+	}
+
+	err =
+		s.syncService.AcknowledgeChanges(
+			identity.UserID,
+			deviceID,
+			request.ChangeId,
+		)
+
+	if err != nil {
+		return nil,
+			status.Errorf(
+				codes.Internal,
+				"no se pudo confirmar cambio: %v",
+				err,
+			)
+	}
+
+	return &pb.AcknowledgeChangesResponse{
+		Success: true,
+		Message: "Cambio confirmado correctamente",
+	}, nil
+}
+
+// =====================================
 // LIST FILES
 // =====================================
 
@@ -1637,6 +1716,8 @@ func toProtoChange(
 	}
 
 	return &pb.FileChange{
+		ChangeId: change.ChangeID,
+
 		Type: change.Type,
 
 		FileId: change.FileID,

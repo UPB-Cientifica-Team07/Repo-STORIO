@@ -909,22 +909,252 @@ func (r *SyncRepository) AddChange(
 //
 //	id_cambio > last_change_id
 //
-// Los cambios creados por el mismo dispositivo
-// no se devuelven, pero SÍ hacen avanzar su
-// cursor.
+// Se devuelve únicamente el cambio pendiente
+// más reciente de cada archivo.
 //
-// De esta forma no son revisados infinitamente.
+// Los cambios creados por el mismo dispositivo
+// también se devuelven. El cliente no los reaplica,
+// pero sí los confirma mediante AcknowledgeChanges.
+//
+// GetChanges NO avanza el cursor.
 //
 // =====================================
+
+// =====================================
+// CONFIRMAR CAMBIO APLICADO
+// =====================================
+//
+// El cursor solo avanza cuando el cliente
+// confirma explícitamente un change_id.
+//
+// GREATEST hace el ACK idempotente:
+// - repetir el mismo ACK es seguro
+// - un ACK antiguo nunca retrocede el cursor
+//
+// =====================================
+
+func (r *SyncRepository) AcknowledgeChanges(
+	userID string,
+	deviceID string,
+	changeID int64,
+) error {
+
+	if err := r.validateDB(); err != nil {
+		return err
+	}
+
+	userID =
+		strings.TrimSpace(
+			userID,
+		)
+
+	deviceID =
+		strings.TrimSpace(
+			deviceID,
+		)
+
+	if userID == "" {
+		return errors.New(
+			"el user ID es obligatorio",
+		)
+	}
+
+	if deviceID == "" {
+		return errors.New(
+			"el device ID es obligatorio",
+		)
+	}
+
+	if changeID <= 0 {
+		return errors.New(
+			"el change ID debe ser mayor que cero",
+		)
+	}
+
+	ctx, cancel :=
+		context.WithTimeout(
+			context.Background(),
+			5*time.Second,
+		)
+
+	defer cancel()
+
+	tx, err :=
+		r.db.BeginTx(
+			ctx,
+			&sql.TxOptions{
+				Isolation: sql.LevelReadCommitted,
+			},
+		)
+
+	if err != nil {
+		return fmt.Errorf(
+			"no se pudo iniciar transacción ACK Sync: %w",
+			err,
+		)
+	}
+
+	defer func() {
+		_ = tx.Rollback()
+	}()
+
+	var internalUserID string
+
+	err =
+		tx.QueryRowContext(
+			ctx,
+			`
+			SELECT
+				id_usuario::text
+			FROM usuario
+			WHERE directorio_id = $1
+			`,
+			userID,
+		).Scan(
+			&internalUserID,
+		)
+
+	if errors.Is(
+		err,
+		sql.ErrNoRows,
+	) {
+		return errors.New(
+			"usuario no encontrado",
+		)
+	}
+
+	if err != nil {
+		return fmt.Errorf(
+			"error resolviendo usuario para ACK Sync: %w",
+			err,
+		)
+	}
+
+	var changeExists bool
+
+	err =
+		tx.QueryRowContext(
+			ctx,
+			`
+			SELECT EXISTS (
+				SELECT 1
+				FROM sync_change
+				WHERE
+					id_usuario = $1::uuid
+					AND id_cambio = $2
+			)
+			`,
+			internalUserID,
+			changeID,
+		).Scan(
+			&changeExists,
+		)
+
+	if err != nil {
+		return fmt.Errorf(
+			"error validando change ID: %w",
+			err,
+		)
+	}
+
+	if !changeExists {
+		return errors.New(
+			"el change ID no pertenece al usuario",
+		)
+	}
+
+	_, err =
+		tx.ExecContext(
+			ctx,
+			`
+			INSERT INTO sync_device_cursor (
+				id_usuario,
+				device_id,
+				last_change_id
+			)
+			VALUES (
+				$1::uuid,
+				$2,
+				0
+			)
+			ON CONFLICT (
+				id_usuario,
+				device_id
+			)
+			DO NOTHING
+			`,
+			internalUserID,
+			deviceID,
+		)
+
+	if err != nil {
+		return fmt.Errorf(
+			"error inicializando cursor ACK Sync: %w",
+			err,
+		)
+	}
+
+	result, err :=
+		tx.ExecContext(
+			ctx,
+			`
+			UPDATE sync_device_cursor
+			SET
+				last_change_id =
+					GREATEST(
+						last_change_id,
+						$1
+					),
+				fecha_actualizacion =
+					CURRENT_TIMESTAMP
+			WHERE
+				id_usuario = $2::uuid
+				AND device_id = $3
+			`,
+			changeID,
+			internalUserID,
+			deviceID,
+		)
+
+	if err != nil {
+		return fmt.Errorf(
+			"error actualizando cursor ACK Sync: %w",
+			err,
+		)
+	}
+
+	rowsAffected, err :=
+		result.RowsAffected()
+
+	if err != nil {
+		return fmt.Errorf(
+			"error verificando ACK Sync: %w",
+			err,
+		)
+	}
+
+	if rowsAffected != 1 {
+		return errors.New(
+			"no se pudo actualizar cursor ACK Sync",
+		)
+	}
+
+	if err := tx.Commit(); err != nil {
+		return fmt.Errorf(
+			"error confirmando transacción ACK Sync: %w",
+			err,
+		)
+	}
+
+	return nil
+}
 
 func (r *SyncRepository) GetChanges(
 	userID string,
 	deviceID string,
 ) ([]*FileChange, error) {
 
-	if err :=
-		r.validateDB(); err != nil {
-
+	if err := r.validateDB(); err != nil {
 		return nil, err
 	}
 
@@ -939,7 +1169,6 @@ func (r *SyncRepository) GetChanges(
 		)
 
 	if userID == "" {
-
 		return nil,
 			errors.New(
 				"el user ID es obligatorio",
@@ -947,7 +1176,6 @@ func (r *SyncRepository) GetChanges(
 	}
 
 	if deviceID == "" {
-
 		return nil,
 			errors.New(
 				"el device ID es obligatorio",
@@ -971,7 +1199,6 @@ func (r *SyncRepository) GetChanges(
 		)
 
 	if err != nil {
-
 		return nil,
 			fmt.Errorf(
 				"no se pudo iniciar transacción Sync: %w",
@@ -1006,7 +1233,6 @@ func (r *SyncRepository) GetChanges(
 		err,
 		sql.ErrNoRows,
 	) {
-
 		return nil,
 			errors.New(
 				"usuario no encontrado",
@@ -1014,7 +1240,6 @@ func (r *SyncRepository) GetChanges(
 	}
 
 	if err != nil {
-
 		return nil,
 			fmt.Errorf(
 				"error resolviendo usuario Sync: %w",
@@ -1022,8 +1247,14 @@ func (r *SyncRepository) GetChanges(
 			)
 	}
 
-	// Crear cursor en cero si el dispositivo
-	// todavía nunca ha sincronizado.
+	// El cursor se crea en cero la primera vez.
+	//
+	// IMPORTANTE:
+	// GetChanges NO lo avanza.
+	// El avance ocurre exclusivamente mediante
+	// AcknowledgeChanges después de que el cliente
+	// confirma el procesamiento.
+
 	_, err =
 		tx.ExecContext(
 			ctx,
@@ -1049,7 +1280,6 @@ func (r *SyncRepository) GetChanges(
 		)
 
 	if err != nil {
-
 		return nil,
 			fmt.Errorf(
 				"error inicializando cursor Sync: %w",
@@ -1076,7 +1306,6 @@ func (r *SyncRepository) GetChanges(
 		)
 
 	if err != nil {
-
 		return nil,
 			fmt.Errorf(
 				"error consultando cursor Sync: %w",
@@ -1088,27 +1317,43 @@ func (r *SyncRepository) GetChanges(
 		tx.QueryContext(
 			ctx,
 			`
-			SELECT
-				id_cambio,
-				tipo,
-				id_archivo::text,
-				nombre,
-				relative_path,
-				version,
-				origin_device_id,
-				fecha_cambio
-			FROM sync_change
-			WHERE
-				id_usuario = $1::uuid
-				AND id_cambio > $2
-			ORDER BY id_cambio ASC
+			WITH pending AS (
+                                SELECT DISTINCT ON (
+                                        id_archivo
+                                )
+                                        id_cambio,
+                                        tipo,
+                                        id_archivo,
+                                        nombre,
+                                        relative_path,
+                                        version,
+                                        origin_device_id,
+                                        fecha_cambio
+                                FROM sync_change
+                                WHERE
+                                        id_usuario = $1::uuid
+                                        AND id_cambio > $2
+                                ORDER BY
+                                        id_archivo,
+                                        id_cambio DESC
+                        )
+                        SELECT
+                                id_cambio,
+                                tipo,
+                                id_archivo::text,
+                                nombre,
+                                relative_path,
+                                version,
+                                origin_device_id,
+                                fecha_cambio
+                        FROM pending
+                        ORDER BY id_cambio ASC
 			`,
 			internalUserID,
 			lastChangeID,
 		)
 
 	if err != nil {
-
 		return nil,
 			fmt.Errorf(
 				"error consultando cambios Sync: %w",
@@ -1123,9 +1368,6 @@ func (r *SyncRepository) GetChanges(
 			[]*FileChange,
 			0,
 		)
-
-	maxChangeID :=
-		lastChangeID
 
 	for rows.Next() {
 
@@ -1147,7 +1389,6 @@ func (r *SyncRepository) GetChanges(
 			)
 
 		if err != nil {
-
 			return nil,
 				fmt.Errorf(
 					"error leyendo cambio Sync: %w",
@@ -1156,25 +1397,20 @@ func (r *SyncRepository) GetChanges(
 		}
 
 		if relativePath.Valid {
-
 			change.RelativePath =
 				relativePath.String
 		}
 
-		if change.ChangeID >
-			maxChangeID {
-
-			maxChangeID =
-				change.ChangeID
-		}
-
-		// El dispositivo que originó el cambio
-		// no necesita recibir su propio evento.
-		if change.OriginDeviceID ==
-			deviceID {
-
-			continue
-		}
+		// Todos los cambios se devuelven.
+		//
+		// El cliente decidirá:
+		//
+		// - cambio propio -> ACK sin aplicar
+		// - cambio remoto -> aplicar y después ACK
+		//
+		// Esto evita dejar el cursor bloqueado
+		// detrás de un cambio originado por el
+		// propio dispositivo.
 
 		changes =
 			append(
@@ -1183,9 +1419,7 @@ func (r *SyncRepository) GetChanges(
 			)
 	}
 
-	if err :=
-		rows.Err(); err != nil {
-
+	if err := rows.Err(); err != nil {
 		return nil,
 			fmt.Errorf(
 				"error recorriendo cambios Sync: %w",
@@ -1193,42 +1427,10 @@ func (r *SyncRepository) GetChanges(
 			)
 	}
 
-	if maxChangeID >
-		lastChangeID {
-
-		_, err =
-			tx.ExecContext(
-				ctx,
-				`
-				UPDATE sync_device_cursor
-				SET
-					last_change_id = $1,
-					fecha_actualizacion = CURRENT_TIMESTAMP
-				WHERE
-					id_usuario = $2::uuid
-					AND device_id = $3
-				`,
-				maxChangeID,
-				internalUserID,
-				deviceID,
-			)
-
-		if err != nil {
-
-			return nil,
-				fmt.Errorf(
-					"error actualizando cursor Sync: %w",
-					err,
-				)
-		}
-	}
-
-	if err :=
-		tx.Commit(); err != nil {
-
+	if err := tx.Commit(); err != nil {
 		return nil,
 			fmt.Errorf(
-				"error confirmando cursor Sync: %w",
+				"error confirmando lectura Sync: %w",
 				err,
 			)
 	}

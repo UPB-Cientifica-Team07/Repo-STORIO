@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v3.21.12
-// source: services/sync-service/proto/sync.proto
+// source: proto/sync.proto
 
 package generated
 
@@ -19,14 +19,15 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	SyncService_Authenticate_FullMethodName = "/sync.SyncService/Authenticate"
-	SyncService_Sync_FullMethodName         = "/sync.SyncService/Sync"
-	SyncService_ListFiles_FullMethodName    = "/sync.SyncService/ListFiles"
-	SyncService_Upload_FullMethodName       = "/sync.SyncService/Upload"
-	SyncService_Download_FullMethodName     = "/sync.SyncService/Download"
-	SyncService_UpdateFile_FullMethodName   = "/sync.SyncService/UpdateFile"
-	SyncService_DeleteFile_FullMethodName   = "/sync.SyncService/DeleteFile"
-	SyncService_WatchChanges_FullMethodName = "/sync.SyncService/WatchChanges"
+	SyncService_Authenticate_FullMethodName       = "/sync.SyncService/Authenticate"
+	SyncService_Sync_FullMethodName               = "/sync.SyncService/Sync"
+	SyncService_ListFiles_FullMethodName          = "/sync.SyncService/ListFiles"
+	SyncService_Upload_FullMethodName             = "/sync.SyncService/Upload"
+	SyncService_Download_FullMethodName           = "/sync.SyncService/Download"
+	SyncService_UpdateFile_FullMethodName         = "/sync.SyncService/UpdateFile"
+	SyncService_DeleteFile_FullMethodName         = "/sync.SyncService/DeleteFile"
+	SyncService_WatchChanges_FullMethodName       = "/sync.SyncService/WatchChanges"
+	SyncService_AcknowledgeChanges_FullMethodName = "/sync.SyncService/AcknowledgeChanges"
 )
 
 // SyncServiceClient is the client API for SyncService service.
@@ -49,6 +50,9 @@ type SyncServiceClient interface {
 	DeleteFile(ctx context.Context, in *DeleteFileRequest, opts ...grpc.CallOption) (*DeleteFileResponse, error)
 	// Canal persistente de notificaciones.
 	WatchChanges(ctx context.Context, in *WatchChangesRequest, opts ...grpc.CallOption) (grpc.ServerStreamingClient[FileChange], error)
+	// Confirma que un dispositivo aplicó correctamente
+	// los cambios hasta un change_id determinado.
+	AcknowledgeChanges(ctx context.Context, in *AcknowledgeChangesRequest, opts ...grpc.CallOption) (*AcknowledgeChangesResponse, error)
 }
 
 type syncServiceClient struct {
@@ -160,6 +164,16 @@ func (c *syncServiceClient) WatchChanges(ctx context.Context, in *WatchChangesRe
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type SyncService_WatchChangesClient = grpc.ServerStreamingClient[FileChange]
 
+func (c *syncServiceClient) AcknowledgeChanges(ctx context.Context, in *AcknowledgeChangesRequest, opts ...grpc.CallOption) (*AcknowledgeChangesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AcknowledgeChangesResponse)
+	err := c.cc.Invoke(ctx, SyncService_AcknowledgeChanges_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SyncServiceServer is the server API for SyncService service.
 // All implementations must embed UnimplementedSyncServiceServer
 // for forward compatibility.
@@ -180,6 +194,9 @@ type SyncServiceServer interface {
 	DeleteFile(context.Context, *DeleteFileRequest) (*DeleteFileResponse, error)
 	// Canal persistente de notificaciones.
 	WatchChanges(*WatchChangesRequest, grpc.ServerStreamingServer[FileChange]) error
+	// Confirma que un dispositivo aplicó correctamente
+	// los cambios hasta un change_id determinado.
+	AcknowledgeChanges(context.Context, *AcknowledgeChangesRequest) (*AcknowledgeChangesResponse, error)
 	mustEmbedUnimplementedSyncServiceServer()
 }
 
@@ -213,6 +230,9 @@ func (UnimplementedSyncServiceServer) DeleteFile(context.Context, *DeleteFileReq
 }
 func (UnimplementedSyncServiceServer) WatchChanges(*WatchChangesRequest, grpc.ServerStreamingServer[FileChange]) error {
 	return status.Error(codes.Unimplemented, "method WatchChanges not implemented")
+}
+func (UnimplementedSyncServiceServer) AcknowledgeChanges(context.Context, *AcknowledgeChangesRequest) (*AcknowledgeChangesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AcknowledgeChanges not implemented")
 }
 func (UnimplementedSyncServiceServer) mustEmbedUnimplementedSyncServiceServer() {}
 func (UnimplementedSyncServiceServer) testEmbeddedByValue()                     {}
@@ -354,6 +374,24 @@ func _SyncService_WatchChanges_Handler(srv interface{}, stream grpc.ServerStream
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type SyncService_WatchChangesServer = grpc.ServerStreamingServer[FileChange]
 
+func _SyncService_AcknowledgeChanges_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AcknowledgeChangesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SyncServiceServer).AcknowledgeChanges(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SyncService_AcknowledgeChanges_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SyncServiceServer).AcknowledgeChanges(ctx, req.(*AcknowledgeChangesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SyncService_ServiceDesc is the grpc.ServiceDesc for SyncService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -381,6 +419,10 @@ var SyncService_ServiceDesc = grpc.ServiceDesc{
 			MethodName: "DeleteFile",
 			Handler:    _SyncService_DeleteFile_Handler,
 		},
+		{
+			MethodName: "AcknowledgeChanges",
+			Handler:    _SyncService_AcknowledgeChanges_Handler,
+		},
 	},
 	Streams: []grpc.StreamDesc{
 		{
@@ -399,5 +441,5 @@ var SyncService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "services/sync-service/proto/sync.proto",
+	Metadata: "proto/sync.proto",
 }

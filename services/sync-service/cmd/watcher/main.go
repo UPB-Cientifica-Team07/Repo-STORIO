@@ -31,9 +31,6 @@ const (
 	defaultServerAddress = "localhost:50055"
 	defaultAuthURL       = "http://localhost:8081"
 
-	defaultUsername = "tercero"
-	defaultPassword = "123456"
-
 	defaultDeviceID = "linux-client-001"
 
 	defaultSyncDirectory = "./sync-home"
@@ -457,14 +454,16 @@ func loadConfig() (
 				defaultAuthURL,
 			),
 
-			Username: getenv(
-				"SYNC_USERNAME",
-				defaultUsername,
+			Username: strings.TrimSpace(
+				os.Getenv(
+					"SYNC_USERNAME",
+				),
 			),
 
-			Password: getenv(
-				"SYNC_PASSWORD",
-				defaultPassword,
+			Password: strings.TrimSpace(
+				os.Getenv(
+					"SYNC_PASSWORD",
+				),
 			),
 
 			DeviceID: getenv(
@@ -496,6 +495,26 @@ func loadConfig() (
 		filepath.Clean(
 			absolutePath,
 		)
+
+	if strings.TrimSpace(
+		config.Username,
+	) == "" {
+
+		return Config{},
+			fmt.Errorf(
+				"SYNC_USERNAME es obligatorio",
+			)
+	}
+
+	if strings.TrimSpace(
+		config.Password,
+	) == "" {
+
+		return Config{},
+			fmt.Errorf(
+				"SYNC_PASSWORD es obligatorio",
+			)
+	}
 
 	if strings.TrimSpace(
 		config.DeviceID,
@@ -1702,6 +1721,51 @@ func (c *Client) applyRemoteChange(
 }
 
 // =====================================
+// CONFIRMAR CAMBIO REMOTO
+// =====================================
+
+func (c *Client) acknowledgeChange(
+	changeID int64,
+) error {
+
+	if changeID <= 0 {
+		return fmt.Errorf(
+			"change_id inválido: %d",
+			changeID,
+		)
+	}
+
+	ctx, cancel :=
+		c.authenticatedContext(
+			10 * time.Second,
+		)
+
+	defer cancel()
+
+	response, err :=
+		c.client.AcknowledgeChanges(
+			ctx,
+			&pb.AcknowledgeChangesRequest{
+				DeviceId: c.config.DeviceID,
+				ChangeId: changeID,
+			},
+		)
+
+	if err != nil {
+		return err
+	}
+
+	if !response.Success {
+		return fmt.Errorf(
+			"%s",
+			response.Message,
+		)
+	}
+
+	return nil
+}
+
+// =====================================
 // CONSUMIR CAMBIOS PENDIENTES
 // =====================================
 
@@ -1729,7 +1793,6 @@ func (c *Client) consumePendingChanges() error {
 	}
 
 	if !response.Success {
-
 		return fmt.Errorf(
 			"%s",
 			response.Message,
@@ -1738,6 +1801,35 @@ func (c *Client) consumePendingChanges() error {
 
 	for _, change := range response.Changes {
 
+		if change == nil {
+			continue
+		}
+
+		// Un cambio originado por este dispositivo
+		// ya está reflejado localmente.
+		//
+		// No se reaplica, pero debe confirmarse
+		// para permitir que avance el cursor.
+
+		if change.OriginDeviceId ==
+			c.config.DeviceID {
+
+			err =
+				c.acknowledgeChange(
+					change.ChangeId,
+				)
+
+			if err != nil {
+				return fmt.Errorf(
+					"ACK de cambio propio %d falló: %w",
+					change.ChangeId,
+					err,
+				)
+			}
+
+			continue
+		}
+
 		err =
 			c.applyRemoteChange(
 				change,
@@ -1745,9 +1837,29 @@ func (c *Client) consumePendingChanges() error {
 
 		if err != nil {
 
-			log.Printf(
-				"Advertencia aplicando cambio %s: %v",
+			// NO se confirma.
+			//
+			// El cursor permanece antes de este
+			// cambio y será entregado nuevamente.
+
+			return fmt.Errorf(
+				"no se pudo aplicar cambio %d (%s/%s): %w",
+				change.ChangeId,
+				change.Type,
 				change.FileId,
+				err,
+			)
+		}
+
+		err =
+			c.acknowledgeChange(
+				change.ChangeId,
+			)
+
+		if err != nil {
+			return fmt.Errorf(
+				"cambio %d aplicado pero ACK falló: %w",
+				change.ChangeId,
 				err,
 			)
 		}
@@ -2539,8 +2651,24 @@ func (c *Client) runRemoteWatch() error {
 			continue
 		}
 
+		// Evento originado localmente:
+		// no reaplicar, solamente ACK.
+
 		if change.OriginDeviceId ==
 			c.config.DeviceID {
+
+			err =
+				c.acknowledgeChange(
+					change.ChangeId,
+				)
+
+			if err != nil {
+				return fmt.Errorf(
+					"ACK de cambio propio %d falló: %w",
+					change.ChangeId,
+					err,
+				)
+			}
 
 			continue
 		}
@@ -2552,10 +2680,29 @@ func (c *Client) runRemoteWatch() error {
 
 		if err != nil {
 
-			log.Printf(
-				"No se pudo aplicar cambio remoto %s/%s: %v",
+			// Al devolver error se cierra este stream.
+			// El cliente reconectará y, al no existir
+			// ACK, el servidor volverá a entregar
+			// este cambio.
+
+			return fmt.Errorf(
+				"no se pudo aplicar cambio remoto %d (%s/%s): %w",
+				change.ChangeId,
 				change.Type,
 				change.FileId,
+				err,
+			)
+		}
+
+		err =
+			c.acknowledgeChange(
+				change.ChangeId,
+			)
+
+		if err != nil {
+			return fmt.Errorf(
+				"cambio remoto %d aplicado pero ACK falló: %w",
+				change.ChangeId,
 				err,
 			)
 		}

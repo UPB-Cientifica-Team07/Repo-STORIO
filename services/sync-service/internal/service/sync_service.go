@@ -254,6 +254,59 @@ func (s *SyncService) Sync(
 }
 
 // =====================================
+// ACKNOWLEDGE CHANGES
+// =====================================
+
+func (s *SyncService) AcknowledgeChanges(
+	userID string,
+	deviceID string,
+	changeID int64,
+) error {
+
+	if s == nil ||
+		s.repository == nil {
+
+		return errors.New(
+			"Sync Repository no inicializado",
+		)
+	}
+
+	userID =
+		strings.TrimSpace(
+			userID,
+		)
+
+	deviceID =
+		strings.TrimSpace(
+			deviceID,
+		)
+
+	if userID == "" {
+		return errors.New(
+			"el user ID es obligatorio",
+		)
+	}
+
+	if deviceID == "" {
+		return errors.New(
+			"el device ID es obligatorio",
+		)
+	}
+
+	if changeID <= 0 {
+		return errors.New(
+			"el change ID debe ser mayor que cero",
+		)
+	}
+
+	return s.repository.AcknowledgeChanges(
+		userID,
+		deviceID,
+		changeID,
+	)
+}
+
+// =====================================
 // UPDATE FILE
 // =====================================
 
