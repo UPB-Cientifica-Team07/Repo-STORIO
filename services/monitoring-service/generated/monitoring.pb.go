@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: proto/monitoring.proto
+// source: monitoring.proto
 
 package generated
 
@@ -37,7 +37,7 @@ type MetricsRequest struct {
 
 func (x *MetricsRequest) Reset() {
 	*x = MetricsRequest{}
-	mi := &file_proto_monitoring_proto_msgTypes[0]
+	mi := &file_monitoring_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -49,7 +49,7 @@ func (x *MetricsRequest) String() string {
 func (*MetricsRequest) ProtoMessage() {}
 
 func (x *MetricsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[0]
+	mi := &file_monitoring_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -62,7 +62,7 @@ func (x *MetricsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricsRequest.ProtoReflect.Descriptor instead.
 func (*MetricsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{0}
+	return file_monitoring_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *MetricsRequest) GetComponentId() string {
@@ -131,7 +131,7 @@ type MetricsResponse struct {
 
 func (x *MetricsResponse) Reset() {
 	*x = MetricsResponse{}
-	mi := &file_proto_monitoring_proto_msgTypes[1]
+	mi := &file_monitoring_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -143,7 +143,7 @@ func (x *MetricsResponse) String() string {
 func (*MetricsResponse) ProtoMessage() {}
 
 func (x *MetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[1]
+	mi := &file_monitoring_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -156,7 +156,7 @@ func (x *MetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MetricsResponse.ProtoReflect.Descriptor instead.
 func (*MetricsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{1}
+	return file_monitoring_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *MetricsResponse) GetSuccess() bool {
@@ -181,7 +181,7 @@ type GetMetricsRequest struct {
 
 func (x *GetMetricsRequest) Reset() {
 	*x = GetMetricsRequest{}
-	mi := &file_proto_monitoring_proto_msgTypes[2]
+	mi := &file_monitoring_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -193,7 +193,7 @@ func (x *GetMetricsRequest) String() string {
 func (*GetMetricsRequest) ProtoMessage() {}
 
 func (x *GetMetricsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[2]
+	mi := &file_monitoring_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -206,7 +206,7 @@ func (x *GetMetricsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMetricsRequest.ProtoReflect.Descriptor instead.
 func (*GetMetricsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{2}
+	return file_monitoring_proto_rawDescGZIP(), []int{2}
 }
 
 type Metric struct {
@@ -225,7 +225,7 @@ type Metric struct {
 
 func (x *Metric) Reset() {
 	*x = Metric{}
-	mi := &file_proto_monitoring_proto_msgTypes[3]
+	mi := &file_monitoring_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -237,7 +237,7 @@ func (x *Metric) String() string {
 func (*Metric) ProtoMessage() {}
 
 func (x *Metric) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[3]
+	mi := &file_monitoring_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -250,7 +250,7 @@ func (x *Metric) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Metric.ProtoReflect.Descriptor instead.
 func (*Metric) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{3}
+	return file_monitoring_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *Metric) GetComponentId() string {
@@ -318,7 +318,7 @@ type GetMetricsResponse struct {
 
 func (x *GetMetricsResponse) Reset() {
 	*x = GetMetricsResponse{}
-	mi := &file_proto_monitoring_proto_msgTypes[4]
+	mi := &file_monitoring_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -330,7 +330,7 @@ func (x *GetMetricsResponse) String() string {
 func (*GetMetricsResponse) ProtoMessage() {}
 
 func (x *GetMetricsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[4]
+	mi := &file_monitoring_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -343,7 +343,7 @@ func (x *GetMetricsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMetricsResponse.ProtoReflect.Descriptor instead.
 func (*GetMetricsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{4}
+	return file_monitoring_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetMetricsResponse) GetMetrics() []*Metric {
@@ -366,7 +366,7 @@ type StatusRequest struct {
 
 func (x *StatusRequest) Reset() {
 	*x = StatusRequest{}
-	mi := &file_proto_monitoring_proto_msgTypes[5]
+	mi := &file_monitoring_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -378,7 +378,7 @@ func (x *StatusRequest) String() string {
 func (*StatusRequest) ProtoMessage() {}
 
 func (x *StatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[5]
+	mi := &file_monitoring_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -391,7 +391,7 @@ func (x *StatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
 func (*StatusRequest) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{5}
+	return file_monitoring_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *StatusRequest) GetComponentId() string {
@@ -439,7 +439,7 @@ type StatusResponse struct {
 
 func (x *StatusResponse) Reset() {
 	*x = StatusResponse{}
-	mi := &file_proto_monitoring_proto_msgTypes[6]
+	mi := &file_monitoring_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -451,7 +451,7 @@ func (x *StatusResponse) String() string {
 func (*StatusResponse) ProtoMessage() {}
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[6]
+	mi := &file_monitoring_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -464,7 +464,7 @@ func (x *StatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
 func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{6}
+	return file_monitoring_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *StatusResponse) GetSuccess() bool {
@@ -490,7 +490,7 @@ type ServiceRequest struct {
 
 func (x *ServiceRequest) Reset() {
 	*x = ServiceRequest{}
-	mi := &file_proto_monitoring_proto_msgTypes[7]
+	mi := &file_monitoring_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -502,7 +502,7 @@ func (x *ServiceRequest) String() string {
 func (*ServiceRequest) ProtoMessage() {}
 
 func (x *ServiceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[7]
+	mi := &file_monitoring_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -515,7 +515,7 @@ func (x *ServiceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServiceRequest.ProtoReflect.Descriptor instead.
 func (*ServiceRequest) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{7}
+	return file_monitoring_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ServiceRequest) GetComponentName() string {
@@ -538,7 +538,7 @@ type ServiceResponse struct {
 
 func (x *ServiceResponse) Reset() {
 	*x = ServiceResponse{}
-	mi := &file_proto_monitoring_proto_msgTypes[8]
+	mi := &file_monitoring_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -550,7 +550,7 @@ func (x *ServiceResponse) String() string {
 func (*ServiceResponse) ProtoMessage() {}
 
 func (x *ServiceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[8]
+	mi := &file_monitoring_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -563,7 +563,7 @@ func (x *ServiceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ServiceResponse.ProtoReflect.Descriptor instead.
 func (*ServiceResponse) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{8}
+	return file_monitoring_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ServiceResponse) GetComponentId() string {
@@ -610,7 +610,7 @@ type NodeRequest struct {
 
 func (x *NodeRequest) Reset() {
 	*x = NodeRequest{}
-	mi := &file_proto_monitoring_proto_msgTypes[9]
+	mi := &file_monitoring_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -622,7 +622,7 @@ func (x *NodeRequest) String() string {
 func (*NodeRequest) ProtoMessage() {}
 
 func (x *NodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[9]
+	mi := &file_monitoring_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -635,7 +635,7 @@ func (x *NodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeRequest.ProtoReflect.Descriptor instead.
 func (*NodeRequest) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{9}
+	return file_monitoring_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *NodeRequest) GetNodeId() string {
@@ -655,13 +655,15 @@ type NodeResponse struct {
 	CpuUsage      float64                `protobuf:"fixed64,6,opt,name=cpu_usage,json=cpuUsage,proto3" json:"cpu_usage,omitempty"`
 	MemoryUsage   float64                `protobuf:"fixed64,7,opt,name=memory_usage,json=memoryUsage,proto3" json:"memory_usage,omitempty"`
 	LastUpdated   int64                  `protobuf:"varint,8,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
+	Ip            string                 `protobuf:"bytes,9,opt,name=ip,proto3" json:"ip,omitempty"`
+	Location      string                 `protobuf:"bytes,10,opt,name=location,proto3" json:"location,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *NodeResponse) Reset() {
 	*x = NodeResponse{}
-	mi := &file_proto_monitoring_proto_msgTypes[10]
+	mi := &file_monitoring_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -673,7 +675,7 @@ func (x *NodeResponse) String() string {
 func (*NodeResponse) ProtoMessage() {}
 
 func (x *NodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[10]
+	mi := &file_monitoring_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -686,7 +688,7 @@ func (x *NodeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NodeResponse.ProtoReflect.Descriptor instead.
 func (*NodeResponse) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{10}
+	return file_monitoring_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *NodeResponse) GetNodeId() string {
@@ -745,6 +747,20 @@ func (x *NodeResponse) GetLastUpdated() int64 {
 	return 0
 }
 
+func (x *NodeResponse) GetIp() string {
+	if x != nil {
+		return x.Ip
+	}
+	return ""
+}
+
+func (x *NodeResponse) GetLocation() string {
+	if x != nil {
+		return x.Location
+	}
+	return ""
+}
+
 type AlertRule struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -760,7 +776,7 @@ type AlertRule struct {
 
 func (x *AlertRule) Reset() {
 	*x = AlertRule{}
-	mi := &file_proto_monitoring_proto_msgTypes[11]
+	mi := &file_monitoring_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -772,7 +788,7 @@ func (x *AlertRule) String() string {
 func (*AlertRule) ProtoMessage() {}
 
 func (x *AlertRule) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[11]
+	mi := &file_monitoring_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -785,7 +801,7 @@ func (x *AlertRule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AlertRule.ProtoReflect.Descriptor instead.
 func (*AlertRule) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{11}
+	return file_monitoring_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *AlertRule) GetId() string {
@@ -854,7 +870,7 @@ type CreateAlertRuleRequest struct {
 
 func (x *CreateAlertRuleRequest) Reset() {
 	*x = CreateAlertRuleRequest{}
-	mi := &file_proto_monitoring_proto_msgTypes[12]
+	mi := &file_monitoring_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -866,7 +882,7 @@ func (x *CreateAlertRuleRequest) String() string {
 func (*CreateAlertRuleRequest) ProtoMessage() {}
 
 func (x *CreateAlertRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[12]
+	mi := &file_monitoring_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -879,7 +895,7 @@ func (x *CreateAlertRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAlertRuleRequest.ProtoReflect.Descriptor instead.
 func (*CreateAlertRuleRequest) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{12}
+	return file_monitoring_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *CreateAlertRuleRequest) GetId() string {
@@ -945,7 +961,7 @@ type CreateAlertRuleResponse struct {
 
 func (x *CreateAlertRuleResponse) Reset() {
 	*x = CreateAlertRuleResponse{}
-	mi := &file_proto_monitoring_proto_msgTypes[13]
+	mi := &file_monitoring_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -957,7 +973,7 @@ func (x *CreateAlertRuleResponse) String() string {
 func (*CreateAlertRuleResponse) ProtoMessage() {}
 
 func (x *CreateAlertRuleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[13]
+	mi := &file_monitoring_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -970,7 +986,7 @@ func (x *CreateAlertRuleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAlertRuleResponse.ProtoReflect.Descriptor instead.
 func (*CreateAlertRuleResponse) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{13}
+	return file_monitoring_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *CreateAlertRuleResponse) GetSuccess() bool {
@@ -1011,7 +1027,7 @@ type UpdateAlertRuleRequest struct {
 
 func (x *UpdateAlertRuleRequest) Reset() {
 	*x = UpdateAlertRuleRequest{}
-	mi := &file_proto_monitoring_proto_msgTypes[14]
+	mi := &file_monitoring_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1023,7 +1039,7 @@ func (x *UpdateAlertRuleRequest) String() string {
 func (*UpdateAlertRuleRequest) ProtoMessage() {}
 
 func (x *UpdateAlertRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[14]
+	mi := &file_monitoring_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1036,7 +1052,7 @@ func (x *UpdateAlertRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAlertRuleRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAlertRuleRequest) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{14}
+	return file_monitoring_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *UpdateAlertRuleRequest) GetId() string {
@@ -1100,7 +1116,7 @@ type UpdateAlertRuleResponse struct {
 
 func (x *UpdateAlertRuleResponse) Reset() {
 	*x = UpdateAlertRuleResponse{}
-	mi := &file_proto_monitoring_proto_msgTypes[15]
+	mi := &file_monitoring_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1112,7 +1128,7 @@ func (x *UpdateAlertRuleResponse) String() string {
 func (*UpdateAlertRuleResponse) ProtoMessage() {}
 
 func (x *UpdateAlertRuleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[15]
+	mi := &file_monitoring_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1125,7 +1141,7 @@ func (x *UpdateAlertRuleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAlertRuleResponse.ProtoReflect.Descriptor instead.
 func (*UpdateAlertRuleResponse) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{15}
+	return file_monitoring_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *UpdateAlertRuleResponse) GetSuccess() bool {
@@ -1160,7 +1176,7 @@ type DeleteAlertRuleRequest struct {
 
 func (x *DeleteAlertRuleRequest) Reset() {
 	*x = DeleteAlertRuleRequest{}
-	mi := &file_proto_monitoring_proto_msgTypes[16]
+	mi := &file_monitoring_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1172,7 +1188,7 @@ func (x *DeleteAlertRuleRequest) String() string {
 func (*DeleteAlertRuleRequest) ProtoMessage() {}
 
 func (x *DeleteAlertRuleRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[16]
+	mi := &file_monitoring_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1185,7 +1201,7 @@ func (x *DeleteAlertRuleRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAlertRuleRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAlertRuleRequest) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{16}
+	return file_monitoring_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *DeleteAlertRuleRequest) GetId() string {
@@ -1207,7 +1223,7 @@ type DeleteAlertRuleResponse struct {
 
 func (x *DeleteAlertRuleResponse) Reset() {
 	*x = DeleteAlertRuleResponse{}
-	mi := &file_proto_monitoring_proto_msgTypes[17]
+	mi := &file_monitoring_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1219,7 +1235,7 @@ func (x *DeleteAlertRuleResponse) String() string {
 func (*DeleteAlertRuleResponse) ProtoMessage() {}
 
 func (x *DeleteAlertRuleResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[17]
+	mi := &file_monitoring_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1232,7 +1248,7 @@ func (x *DeleteAlertRuleResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAlertRuleResponse.ProtoReflect.Descriptor instead.
 func (*DeleteAlertRuleResponse) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{17}
+	return file_monitoring_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *DeleteAlertRuleResponse) GetSuccess() bool {
@@ -1264,7 +1280,7 @@ type GetAlertRulesRequest struct {
 
 func (x *GetAlertRulesRequest) Reset() {
 	*x = GetAlertRulesRequest{}
-	mi := &file_proto_monitoring_proto_msgTypes[18]
+	mi := &file_monitoring_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1276,7 +1292,7 @@ func (x *GetAlertRulesRequest) String() string {
 func (*GetAlertRulesRequest) ProtoMessage() {}
 
 func (x *GetAlertRulesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[18]
+	mi := &file_monitoring_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1289,7 +1305,7 @@ func (x *GetAlertRulesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAlertRulesRequest.ProtoReflect.Descriptor instead.
 func (*GetAlertRulesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{18}
+	return file_monitoring_proto_rawDescGZIP(), []int{18}
 }
 
 type GetAlertRulesResponse struct {
@@ -1301,7 +1317,7 @@ type GetAlertRulesResponse struct {
 
 func (x *GetAlertRulesResponse) Reset() {
 	*x = GetAlertRulesResponse{}
-	mi := &file_proto_monitoring_proto_msgTypes[19]
+	mi := &file_monitoring_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1313,7 +1329,7 @@ func (x *GetAlertRulesResponse) String() string {
 func (*GetAlertRulesResponse) ProtoMessage() {}
 
 func (x *GetAlertRulesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[19]
+	mi := &file_monitoring_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1326,7 +1342,7 @@ func (x *GetAlertRulesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAlertRulesResponse.ProtoReflect.Descriptor instead.
 func (*GetAlertRulesResponse) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{19}
+	return file_monitoring_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GetAlertRulesResponse) GetRules() []*AlertRule {
@@ -1358,7 +1374,7 @@ type Alert struct {
 
 func (x *Alert) Reset() {
 	*x = Alert{}
-	mi := &file_proto_monitoring_proto_msgTypes[20]
+	mi := &file_monitoring_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1370,7 +1386,7 @@ func (x *Alert) String() string {
 func (*Alert) ProtoMessage() {}
 
 func (x *Alert) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[20]
+	mi := &file_monitoring_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1383,7 +1399,7 @@ func (x *Alert) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Alert.ProtoReflect.Descriptor instead.
 func (*Alert) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{20}
+	return file_monitoring_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *Alert) GetId() string {
@@ -1478,7 +1494,7 @@ type GetAlertsRequest struct {
 
 func (x *GetAlertsRequest) Reset() {
 	*x = GetAlertsRequest{}
-	mi := &file_proto_monitoring_proto_msgTypes[21]
+	mi := &file_monitoring_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1490,7 +1506,7 @@ func (x *GetAlertsRequest) String() string {
 func (*GetAlertsRequest) ProtoMessage() {}
 
 func (x *GetAlertsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[21]
+	mi := &file_monitoring_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1503,7 +1519,7 @@ func (x *GetAlertsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAlertsRequest.ProtoReflect.Descriptor instead.
 func (*GetAlertsRequest) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{21}
+	return file_monitoring_proto_rawDescGZIP(), []int{21}
 }
 
 type GetAlertsResponse struct {
@@ -1515,7 +1531,7 @@ type GetAlertsResponse struct {
 
 func (x *GetAlertsResponse) Reset() {
 	*x = GetAlertsResponse{}
-	mi := &file_proto_monitoring_proto_msgTypes[22]
+	mi := &file_monitoring_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1527,7 +1543,7 @@ func (x *GetAlertsResponse) String() string {
 func (*GetAlertsResponse) ProtoMessage() {}
 
 func (x *GetAlertsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_monitoring_proto_msgTypes[22]
+	mi := &file_monitoring_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1540,7 +1556,7 @@ func (x *GetAlertsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAlertsResponse.ProtoReflect.Descriptor instead.
 func (*GetAlertsResponse) Descriptor() ([]byte, []int) {
-	return file_proto_monitoring_proto_rawDescGZIP(), []int{22}
+	return file_monitoring_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GetAlertsResponse) GetAlerts() []*Alert {
@@ -1550,11 +1566,179 @@ func (x *GetAlertsResponse) GetAlerts() []*Alert {
 	return nil
 }
 
-var File_proto_monitoring_proto protoreflect.FileDescriptor
+type GetHpcSummaryRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
 
-const file_proto_monitoring_proto_rawDesc = "" +
+func (x *GetHpcSummaryRequest) Reset() {
+	*x = GetHpcSummaryRequest{}
+	mi := &file_monitoring_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetHpcSummaryRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetHpcSummaryRequest) ProtoMessage() {}
+
+func (x *GetHpcSummaryRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_monitoring_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetHpcSummaryRequest.ProtoReflect.Descriptor instead.
+func (*GetHpcSummaryRequest) Descriptor() ([]byte, []int) {
+	return file_monitoring_proto_rawDescGZIP(), []int{23}
+}
+
+type HpcSummaryResponse struct {
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	TotalJobs          int64                  `protobuf:"varint,1,opt,name=total_jobs,json=totalJobs,proto3" json:"total_jobs,omitempty"`
+	PendingJobs        int64                  `protobuf:"varint,2,opt,name=pending_jobs,json=pendingJobs,proto3" json:"pending_jobs,omitempty"`
+	RunningJobs        int64                  `protobuf:"varint,3,opt,name=running_jobs,json=runningJobs,proto3" json:"running_jobs,omitempty"`
+	CompletedJobs      int64                  `protobuf:"varint,4,opt,name=completed_jobs,json=completedJobs,proto3" json:"completed_jobs,omitempty"`
+	FailedJobs         int64                  `protobuf:"varint,5,opt,name=failed_jobs,json=failedJobs,proto3" json:"failed_jobs,omitempty"`
+	CancelledJobs      int64                  `protobuf:"varint,6,opt,name=cancelled_jobs,json=cancelledJobs,proto3" json:"cancelled_jobs,omitempty"`
+	AverageExecutionMs float64                `protobuf:"fixed64,7,opt,name=average_execution_ms,json=averageExecutionMs,proto3" json:"average_execution_ms,omitempty"`
+	TotalNodes         int64                  `protobuf:"varint,8,opt,name=total_nodes,json=totalNodes,proto3" json:"total_nodes,omitempty"`
+	AvailableNodes     int64                  `protobuf:"varint,9,opt,name=available_nodes,json=availableNodes,proto3" json:"available_nodes,omitempty"`
+	BusyNodes          int64                  `protobuf:"varint,10,opt,name=busy_nodes,json=busyNodes,proto3" json:"busy_nodes,omitempty"`
+	InactiveNodes      int64                  `protobuf:"varint,11,opt,name=inactive_nodes,json=inactiveNodes,proto3" json:"inactive_nodes,omitempty"`
+	Timestamp          int64                  `protobuf:"varint,12,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
+}
+
+func (x *HpcSummaryResponse) Reset() {
+	*x = HpcSummaryResponse{}
+	mi := &file_monitoring_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *HpcSummaryResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*HpcSummaryResponse) ProtoMessage() {}
+
+func (x *HpcSummaryResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_monitoring_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use HpcSummaryResponse.ProtoReflect.Descriptor instead.
+func (*HpcSummaryResponse) Descriptor() ([]byte, []int) {
+	return file_monitoring_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *HpcSummaryResponse) GetTotalJobs() int64 {
+	if x != nil {
+		return x.TotalJobs
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetPendingJobs() int64 {
+	if x != nil {
+		return x.PendingJobs
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetRunningJobs() int64 {
+	if x != nil {
+		return x.RunningJobs
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetCompletedJobs() int64 {
+	if x != nil {
+		return x.CompletedJobs
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetFailedJobs() int64 {
+	if x != nil {
+		return x.FailedJobs
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetCancelledJobs() int64 {
+	if x != nil {
+		return x.CancelledJobs
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetAverageExecutionMs() float64 {
+	if x != nil {
+		return x.AverageExecutionMs
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetTotalNodes() int64 {
+	if x != nil {
+		return x.TotalNodes
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetAvailableNodes() int64 {
+	if x != nil {
+		return x.AvailableNodes
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetBusyNodes() int64 {
+	if x != nil {
+		return x.BusyNodes
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetInactiveNodes() int64 {
+	if x != nil {
+		return x.InactiveNodes
+	}
+	return 0
+}
+
+func (x *HpcSummaryResponse) GetTimestamp() int64 {
+	if x != nil {
+		return x.Timestamp
+	}
+	return 0
+}
+
+var File_monitoring_proto protoreflect.FileDescriptor
+
+const file_monitoring_proto_rawDesc = "" +
 	"\n" +
-	"\x16proto/monitoring.proto\x12\n" +
+	"\x10monitoring.proto\x12\n" +
 	"monitoring\"\xb3\x02\n" +
 	"\x0eMetricsRequest\x12!\n" +
 	"\fcomponent_id\x18\x01 \x01(\tR\vcomponentId\x12%\n" +
@@ -1598,7 +1782,7 @@ const file_proto_monitoring_proto_rawDesc = "" +
 	"\amessage\x18\x04 \x01(\tR\amessage\x12!\n" +
 	"\flast_updated\x18\x05 \x01(\x03R\vlastUpdated\"&\n" +
 	"\vNodeRequest\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\"\xf3\x01\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\"\x9f\x02\n" +
 	"\fNodeResponse\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x1a\n" +
 	"\bhostname\x18\x02 \x01(\tR\bhostname\x12\x16\n" +
@@ -1607,7 +1791,10 @@ const file_proto_monitoring_proto_rawDesc = "" +
 	"\x06memory\x18\x05 \x01(\x03R\x06memory\x12\x1b\n" +
 	"\tcpu_usage\x18\x06 \x01(\x01R\bcpuUsage\x12!\n" +
 	"\fmemory_usage\x18\a \x01(\x01R\vmemoryUsage\x12!\n" +
-	"\flast_updated\x18\b \x01(\x03R\vlastUpdated\"\xc2\x01\n" +
+	"\flast_updated\x18\b \x01(\x03R\vlastUpdated\x12\x0e\n" +
+	"\x02ip\x18\t \x01(\tR\x02ip\x12\x1a\n" +
+	"\blocation\x18\n" +
+	" \x01(\tR\blocation\"\xc2\x01\n" +
 	"\tAlertRule\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +
@@ -1667,14 +1854,34 @@ const file_proto_monitoring_proto_rawDesc = "" +
 	"resolvedAt\"\x12\n" +
 	"\x10GetAlertsRequest\">\n" +
 	"\x11GetAlertsResponse\x12)\n" +
-	"\x06alerts\x18\x01 \x03(\v2\x11.monitoring.AlertR\x06alerts2\xb6\x06\n" +
+	"\x06alerts\x18\x01 \x03(\v2\x11.monitoring.AlertR\x06alerts\"\x16\n" +
+	"\x14GetHpcSummaryRequest\"\xc8\x03\n" +
+	"\x12HpcSummaryResponse\x12\x1d\n" +
+	"\n" +
+	"total_jobs\x18\x01 \x01(\x03R\ttotalJobs\x12!\n" +
+	"\fpending_jobs\x18\x02 \x01(\x03R\vpendingJobs\x12!\n" +
+	"\frunning_jobs\x18\x03 \x01(\x03R\vrunningJobs\x12%\n" +
+	"\x0ecompleted_jobs\x18\x04 \x01(\x03R\rcompletedJobs\x12\x1f\n" +
+	"\vfailed_jobs\x18\x05 \x01(\x03R\n" +
+	"failedJobs\x12%\n" +
+	"\x0ecancelled_jobs\x18\x06 \x01(\x03R\rcancelledJobs\x120\n" +
+	"\x14average_execution_ms\x18\a \x01(\x01R\x12averageExecutionMs\x12\x1f\n" +
+	"\vtotal_nodes\x18\b \x01(\x03R\n" +
+	"totalNodes\x12'\n" +
+	"\x0favailable_nodes\x18\t \x01(\x03R\x0eavailableNodes\x12\x1d\n" +
+	"\n" +
+	"busy_nodes\x18\n" +
+	" \x01(\x03R\tbusyNodes\x12%\n" +
+	"\x0einactive_nodes\x18\v \x01(\x03R\rinactiveNodes\x12\x1c\n" +
+	"\ttimestamp\x18\f \x01(\x03R\ttimestamp2\x89\a\n" +
 	"\x11MonitoringService\x12H\n" +
 	"\rReportMetrics\x12\x1a.monitoring.MetricsRequest\x1a\x1b.monitoring.MetricsResponse\x12K\n" +
 	"\n" +
 	"GetMetrics\x12\x1d.monitoring.GetMetricsRequest\x1a\x1e.monitoring.GetMetricsResponse\x12E\n" +
 	"\fReportStatus\x12\x19.monitoring.StatusRequest\x1a\x1a.monitoring.StatusResponse\x12K\n" +
 	"\x10GetServiceStatus\x12\x1a.monitoring.ServiceRequest\x1a\x1b.monitoring.ServiceResponse\x12B\n" +
-	"\rGetNodeStatus\x12\x17.monitoring.NodeRequest\x1a\x18.monitoring.NodeResponse\x12Z\n" +
+	"\rGetNodeStatus\x12\x17.monitoring.NodeRequest\x1a\x18.monitoring.NodeResponse\x12Q\n" +
+	"\rGetHpcSummary\x12 .monitoring.GetHpcSummaryRequest\x1a\x1e.monitoring.HpcSummaryResponse\x12Z\n" +
 	"\x0fCreateAlertRule\x12\".monitoring.CreateAlertRuleRequest\x1a#.monitoring.CreateAlertRuleResponse\x12Z\n" +
 	"\x0fUpdateAlertRule\x12\".monitoring.UpdateAlertRuleRequest\x1a#.monitoring.UpdateAlertRuleResponse\x12Z\n" +
 	"\x0fDeleteAlertRule\x12\".monitoring.DeleteAlertRuleRequest\x1a#.monitoring.DeleteAlertRuleResponse\x12T\n" +
@@ -1682,19 +1889,19 @@ const file_proto_monitoring_proto_rawDesc = "" +
 	"\tGetAlerts\x12\x1c.monitoring.GetAlertsRequest\x1a\x1d.monitoring.GetAlertsResponseB^Z\\github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/generated;generatedb\x06proto3"
 
 var (
-	file_proto_monitoring_proto_rawDescOnce sync.Once
-	file_proto_monitoring_proto_rawDescData []byte
+	file_monitoring_proto_rawDescOnce sync.Once
+	file_monitoring_proto_rawDescData []byte
 )
 
-func file_proto_monitoring_proto_rawDescGZIP() []byte {
-	file_proto_monitoring_proto_rawDescOnce.Do(func() {
-		file_proto_monitoring_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_monitoring_proto_rawDesc), len(file_proto_monitoring_proto_rawDesc)))
+func file_monitoring_proto_rawDescGZIP() []byte {
+	file_monitoring_proto_rawDescOnce.Do(func() {
+		file_monitoring_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_monitoring_proto_rawDesc), len(file_monitoring_proto_rawDesc)))
 	})
-	return file_proto_monitoring_proto_rawDescData
+	return file_monitoring_proto_rawDescData
 }
 
-var file_proto_monitoring_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
-var file_proto_monitoring_proto_goTypes = []any{
+var file_monitoring_proto_msgTypes = make([]protoimpl.MessageInfo, 25)
+var file_monitoring_proto_goTypes = []any{
 	(*MetricsRequest)(nil),          // 0: monitoring.MetricsRequest
 	(*MetricsResponse)(nil),         // 1: monitoring.MetricsResponse
 	(*GetMetricsRequest)(nil),       // 2: monitoring.GetMetricsRequest
@@ -1718,8 +1925,10 @@ var file_proto_monitoring_proto_goTypes = []any{
 	(*Alert)(nil),                   // 20: monitoring.Alert
 	(*GetAlertsRequest)(nil),        // 21: monitoring.GetAlertsRequest
 	(*GetAlertsResponse)(nil),       // 22: monitoring.GetAlertsResponse
+	(*GetHpcSummaryRequest)(nil),    // 23: monitoring.GetHpcSummaryRequest
+	(*HpcSummaryResponse)(nil),      // 24: monitoring.HpcSummaryResponse
 }
-var file_proto_monitoring_proto_depIdxs = []int32{
+var file_monitoring_proto_depIdxs = []int32{
 	3,  // 0: monitoring.GetMetricsResponse.metrics:type_name -> monitoring.Metric
 	11, // 1: monitoring.UpdateAlertRuleResponse.rule:type_name -> monitoring.AlertRule
 	11, // 2: monitoring.GetAlertRulesResponse.rules:type_name -> monitoring.AlertRule
@@ -1729,48 +1938,50 @@ var file_proto_monitoring_proto_depIdxs = []int32{
 	5,  // 6: monitoring.MonitoringService.ReportStatus:input_type -> monitoring.StatusRequest
 	7,  // 7: monitoring.MonitoringService.GetServiceStatus:input_type -> monitoring.ServiceRequest
 	9,  // 8: monitoring.MonitoringService.GetNodeStatus:input_type -> monitoring.NodeRequest
-	12, // 9: monitoring.MonitoringService.CreateAlertRule:input_type -> monitoring.CreateAlertRuleRequest
-	14, // 10: monitoring.MonitoringService.UpdateAlertRule:input_type -> monitoring.UpdateAlertRuleRequest
-	16, // 11: monitoring.MonitoringService.DeleteAlertRule:input_type -> monitoring.DeleteAlertRuleRequest
-	18, // 12: monitoring.MonitoringService.GetAlertRules:input_type -> monitoring.GetAlertRulesRequest
-	21, // 13: monitoring.MonitoringService.GetAlerts:input_type -> monitoring.GetAlertsRequest
-	1,  // 14: monitoring.MonitoringService.ReportMetrics:output_type -> monitoring.MetricsResponse
-	4,  // 15: monitoring.MonitoringService.GetMetrics:output_type -> monitoring.GetMetricsResponse
-	6,  // 16: monitoring.MonitoringService.ReportStatus:output_type -> monitoring.StatusResponse
-	8,  // 17: monitoring.MonitoringService.GetServiceStatus:output_type -> monitoring.ServiceResponse
-	10, // 18: monitoring.MonitoringService.GetNodeStatus:output_type -> monitoring.NodeResponse
-	13, // 19: monitoring.MonitoringService.CreateAlertRule:output_type -> monitoring.CreateAlertRuleResponse
-	15, // 20: monitoring.MonitoringService.UpdateAlertRule:output_type -> monitoring.UpdateAlertRuleResponse
-	17, // 21: monitoring.MonitoringService.DeleteAlertRule:output_type -> monitoring.DeleteAlertRuleResponse
-	19, // 22: monitoring.MonitoringService.GetAlertRules:output_type -> monitoring.GetAlertRulesResponse
-	22, // 23: monitoring.MonitoringService.GetAlerts:output_type -> monitoring.GetAlertsResponse
-	14, // [14:24] is the sub-list for method output_type
-	4,  // [4:14] is the sub-list for method input_type
+	23, // 9: monitoring.MonitoringService.GetHpcSummary:input_type -> monitoring.GetHpcSummaryRequest
+	12, // 10: monitoring.MonitoringService.CreateAlertRule:input_type -> monitoring.CreateAlertRuleRequest
+	14, // 11: monitoring.MonitoringService.UpdateAlertRule:input_type -> monitoring.UpdateAlertRuleRequest
+	16, // 12: monitoring.MonitoringService.DeleteAlertRule:input_type -> monitoring.DeleteAlertRuleRequest
+	18, // 13: monitoring.MonitoringService.GetAlertRules:input_type -> monitoring.GetAlertRulesRequest
+	21, // 14: monitoring.MonitoringService.GetAlerts:input_type -> monitoring.GetAlertsRequest
+	1,  // 15: monitoring.MonitoringService.ReportMetrics:output_type -> monitoring.MetricsResponse
+	4,  // 16: monitoring.MonitoringService.GetMetrics:output_type -> monitoring.GetMetricsResponse
+	6,  // 17: monitoring.MonitoringService.ReportStatus:output_type -> monitoring.StatusResponse
+	8,  // 18: monitoring.MonitoringService.GetServiceStatus:output_type -> monitoring.ServiceResponse
+	10, // 19: monitoring.MonitoringService.GetNodeStatus:output_type -> monitoring.NodeResponse
+	24, // 20: monitoring.MonitoringService.GetHpcSummary:output_type -> monitoring.HpcSummaryResponse
+	13, // 21: monitoring.MonitoringService.CreateAlertRule:output_type -> monitoring.CreateAlertRuleResponse
+	15, // 22: monitoring.MonitoringService.UpdateAlertRule:output_type -> monitoring.UpdateAlertRuleResponse
+	17, // 23: monitoring.MonitoringService.DeleteAlertRule:output_type -> monitoring.DeleteAlertRuleResponse
+	19, // 24: monitoring.MonitoringService.GetAlertRules:output_type -> monitoring.GetAlertRulesResponse
+	22, // 25: monitoring.MonitoringService.GetAlerts:output_type -> monitoring.GetAlertsResponse
+	15, // [15:26] is the sub-list for method output_type
+	4,  // [4:15] is the sub-list for method input_type
 	4,  // [4:4] is the sub-list for extension type_name
 	4,  // [4:4] is the sub-list for extension extendee
 	0,  // [0:4] is the sub-list for field type_name
 }
 
-func init() { file_proto_monitoring_proto_init() }
-func file_proto_monitoring_proto_init() {
-	if File_proto_monitoring_proto != nil {
+func init() { file_monitoring_proto_init() }
+func file_monitoring_proto_init() {
+	if File_monitoring_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_monitoring_proto_rawDesc), len(file_proto_monitoring_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_monitoring_proto_rawDesc), len(file_monitoring_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   23,
+			NumMessages:   25,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_monitoring_proto_goTypes,
-		DependencyIndexes: file_proto_monitoring_proto_depIdxs,
-		MessageInfos:      file_proto_monitoring_proto_msgTypes,
+		GoTypes:           file_monitoring_proto_goTypes,
+		DependencyIndexes: file_monitoring_proto_depIdxs,
+		MessageInfos:      file_monitoring_proto_msgTypes,
 	}.Build()
-	File_proto_monitoring_proto = out.File
-	file_proto_monitoring_proto_goTypes = nil
-	file_proto_monitoring_proto_depIdxs = nil
+	File_monitoring_proto = out.File
+	file_monitoring_proto_goTypes = nil
+	file_monitoring_proto_depIdxs = nil
 }

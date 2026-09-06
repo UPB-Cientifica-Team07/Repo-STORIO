@@ -43,12 +43,39 @@ func main() {
 		repository.NewMonitoringRepository()
 
 	// =====================================
+	// HPC POSTGRESQL REPOSITORY
+	// =====================================
+
+	hpcRepository, err :=
+		repository.NewHpcRepository()
+
+	if err != nil {
+
+		log.Fatalf(
+			"No fue posible conectar Monitoring con PostgreSQL HPC: %v",
+			err,
+		)
+	}
+
+	defer func() {
+
+		if err := hpcRepository.Close(); err != nil {
+
+			log.Printf(
+				"Error cerrando PostgreSQL HPC: %v",
+				err,
+			)
+		}
+	}()
+
+	// =====================================
 	// SERVICE
 	// =====================================
 
 	monitoringService :=
 		service.NewMonitoringService(
 			monitoringRepository,
+			hpcRepository,
 		)
 
 	// =====================================

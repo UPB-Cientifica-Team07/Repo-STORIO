@@ -64,3 +64,41 @@ type Alert struct {
 
 	ResolvedAt *time.Time
 }
+
+// =====================================
+// NODO HPC
+// =====================================
+
+type HpcNode struct {
+	NodeID      string
+	Hostname    string
+	Status      string
+	CPUCores    int32
+	MemoryMB    int64
+	IP          string
+	Location    string
+	CPUUsage    float64
+	MemoryUsage float64
+	LastUpdated time.Time
+}
+
+// =====================================
+// RESUMEN HPC
+// =====================================
+
+type HpcSummary struct {
+	TotalJobs          int64
+	PendingJobs        int64
+	RunningJobs        int64
+	CompletedJobs      int64
+	FailedJobs         int64
+	CancelledJobs      int64
+	AverageExecutionMs float64
+
+	TotalNodes     int64
+	AvailableNodes int64
+	BusyNodes      int64
+	InactiveNodes  int64
+
+	Timestamp time.Time
+}

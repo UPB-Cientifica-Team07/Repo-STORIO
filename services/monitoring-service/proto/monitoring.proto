@@ -37,6 +37,9 @@ service MonitoringService {
     rpc GetNodeStatus(NodeRequest)
         returns (NodeResponse);
 
+    rpc GetHpcSummary(GetHpcSummaryRequest)
+        returns (HpcSummaryResponse);
+
     // =====================================
     // REGLAS DE ALERTA
     // =====================================
@@ -169,6 +172,9 @@ message NodeResponse {
     double memory_usage = 7;
 
     int64 last_updated = 8;
+
+    string ip = 9;
+    string location = 10;
 }
 
 // =====================================
@@ -323,4 +329,29 @@ message GetAlertsRequest {
 
 message GetAlertsResponse {
     repeated Alert alerts = 1;
+}
+
+// =====================================
+// RESUMEN HPC
+// =====================================
+
+message GetHpcSummaryRequest {
+}
+
+message HpcSummaryResponse {
+    int64 total_jobs = 1;
+    int64 pending_jobs = 2;
+    int64 running_jobs = 3;
+    int64 completed_jobs = 4;
+    int64 failed_jobs = 5;
+    int64 cancelled_jobs = 6;
+
+    double average_execution_ms = 7;
+
+    int64 total_nodes = 8;
+    int64 available_nodes = 9;
+    int64 busy_nodes = 10;
+    int64 inactive_nodes = 11;
+
+    int64 timestamp = 12;
 }

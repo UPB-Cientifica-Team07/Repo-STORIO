@@ -18,7 +18,8 @@ const (
 )
 
 type MonitoringService struct {
-	repository *repository.MonitoringRepository
+	repository    *repository.MonitoringRepository
+	hpcRepository *repository.HpcRepository
 }
 
 // =====================================
@@ -26,12 +27,55 @@ type MonitoringService struct {
 // =====================================
 
 func NewMonitoringService(
-	repository *repository.MonitoringRepository,
+	monitoringRepository *repository.MonitoringRepository,
+	hpcRepository *repository.HpcRepository,
 ) *MonitoringService {
 
 	return &MonitoringService{
-		repository: repository,
+		repository:    monitoringRepository,
+		hpcRepository: hpcRepository,
 	}
+}
+
+// =====================================
+// CONSULTAR NODO HPC
+// =====================================
+
+func (s *MonitoringService) GetHpcNode(
+	nodeID string,
+) (*model.HpcNode, error) {
+
+	if s.hpcRepository == nil {
+
+		return nil,
+			errors.New(
+				"repositorio HPC no configurado",
+			)
+	}
+
+	return s.hpcRepository.GetNode(
+		nodeID,
+	)
+}
+
+// =====================================
+// CONSULTAR RESUMEN HPC
+// =====================================
+
+func (s *MonitoringService) GetHpcSummary() (
+	model.HpcSummary,
+	error,
+) {
+
+	if s.hpcRepository == nil {
+
+		return model.HpcSummary{},
+			errors.New(
+				"repositorio HPC no configurado",
+			)
+	}
+
+	return s.hpcRepository.GetSummary()
 }
 
 // =====================================

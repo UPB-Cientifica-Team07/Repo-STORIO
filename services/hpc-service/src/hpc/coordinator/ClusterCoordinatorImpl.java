@@ -323,53 +323,9 @@ public class ClusterCoordinatorImpl
             );
         }
 
-        String selectedNode =
-            scheduler
-                .selectAndReserveNode(
-                    processes
-                );
-
-        if (
-            selectedNode == null
-        ) {
-
-            throw new RemoteException(
-                "No hay nodo HPC disponible con capacidad para " +
-                processes +
-                " procesos"
-            );
-        }
-
-        HpcWorker worker =
-            workers.get(
-                selectedNode
-            );
-
-        if (
-            worker == null
-        ) {
-
-            scheduler.releaseNode(
-                selectedNode
-            );
-
-            throw new RemoteException(
-                "Worker RMI no disponible: " +
-                selectedNode
-            );
-        }
-
-        UUID databaseNodeId =
-            databaseNodeIds.get(
-                selectedNode
-            );
-
-        if (databaseNodeId == null) {
-
-            throw new RemoteException(
-                "El nodo seleccionado no está persistido"
-            );
-        }
+        // =====================================
+        // AUTENTICAR ANTES DE RESERVAR RECURSOS
+        // =====================================
 
         final UUID userId;
 
@@ -422,7 +378,57 @@ public class ClusterCoordinatorImpl
             );
         }
 
+        // =====================================
+        // RESERVAR NODO DESPUÉS DE AUTH
+        // =====================================
+
+        String selectedNode =
+            scheduler
+                .selectAndReserveNode(
+                    processes
+                );
+
+        if (
+            selectedNode == null
+        ) {
+
+            throw new RemoteException(
+                "No hay nodo HPC disponible con capacidad para " +
+                processes +
+                " procesos"
+            );
+        }
+
         try {
+
+            HpcWorker worker =
+                workers.get(
+                    selectedNode
+                );
+
+            if (
+                worker == null
+            ) {
+
+                throw new RemoteException(
+                    "Worker RMI no disponible: " +
+                    selectedNode
+                );
+            }
+
+            UUID databaseNodeId =
+                databaseNodeIds.get(
+                    selectedNode
+                );
+
+            if (
+                databaseNodeId == null
+            ) {
+
+                throw new RemoteException(
+                    "El nodo seleccionado no está persistido"
+                );
+            }
 
             jobRepository
                 .createJob(
@@ -476,15 +482,6 @@ public class ClusterCoordinatorImpl
                     "DISPONIBLE"
                 );
 
-            scheduler.releaseNode(
-                selectedNode
-            );
-
-            System.out.println(
-                "[SCHEDULER] Nodo liberado: " +
-                selectedNode
-            );
-
             System.out.println(
                 "[DB] Job actualizado: " +
                 (
@@ -496,7 +493,16 @@ public class ClusterCoordinatorImpl
 
             return result;
 
+        } catch (RemoteException error) {
+
+            throw error;
+
         } catch (Exception error) {
+
+            UUID databaseNodeId =
+                databaseNodeIds.get(
+                    selectedNode
+                );
 
             try {
 
@@ -506,22 +512,34 @@ public class ClusterCoordinatorImpl
                         false
                     );
 
-                nodeRepository
-                    .updateStatus(
-                        databaseNodeId,
-                        "DISPONIBLE"
-                    );
+                if (
+                    databaseNodeId != null
+                ) {
+
+                    nodeRepository
+                        .updateStatus(
+                            databaseNodeId,
+                            "DISPONIBLE"
+                        );
+                }
 
             } catch (Exception ignored) {
             }
+
+            throw new RemoteException(
+                "Error ejecutando job HPC",
+                error
+            );
+
+        } finally {
 
             scheduler.releaseNode(
                 selectedNode
             );
 
-            throw new RemoteException(
-                "Error ejecutando job HPC",
-                error
+            System.out.println(
+                "[SCHEDULER] Nodo liberado: " +
+                selectedNode
             );
         }
     }

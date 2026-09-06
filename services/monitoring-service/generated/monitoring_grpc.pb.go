@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v3.21.12
-// source: proto/monitoring.proto
+// source: monitoring.proto
 
 package generated
 
@@ -24,6 +24,7 @@ const (
 	MonitoringService_ReportStatus_FullMethodName     = "/monitoring.MonitoringService/ReportStatus"
 	MonitoringService_GetServiceStatus_FullMethodName = "/monitoring.MonitoringService/GetServiceStatus"
 	MonitoringService_GetNodeStatus_FullMethodName    = "/monitoring.MonitoringService/GetNodeStatus"
+	MonitoringService_GetHpcSummary_FullMethodName    = "/monitoring.MonitoringService/GetHpcSummary"
 	MonitoringService_CreateAlertRule_FullMethodName  = "/monitoring.MonitoringService/CreateAlertRule"
 	MonitoringService_UpdateAlertRule_FullMethodName  = "/monitoring.MonitoringService/UpdateAlertRule"
 	MonitoringService_DeleteAlertRule_FullMethodName  = "/monitoring.MonitoringService/DeleteAlertRule"
@@ -40,6 +41,7 @@ type MonitoringServiceClient interface {
 	ReportStatus(ctx context.Context, in *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	GetServiceStatus(ctx context.Context, in *ServiceRequest, opts ...grpc.CallOption) (*ServiceResponse, error)
 	GetNodeStatus(ctx context.Context, in *NodeRequest, opts ...grpc.CallOption) (*NodeResponse, error)
+	GetHpcSummary(ctx context.Context, in *GetHpcSummaryRequest, opts ...grpc.CallOption) (*HpcSummaryResponse, error)
 	CreateAlertRule(ctx context.Context, in *CreateAlertRuleRequest, opts ...grpc.CallOption) (*CreateAlertRuleResponse, error)
 	UpdateAlertRule(ctx context.Context, in *UpdateAlertRuleRequest, opts ...grpc.CallOption) (*UpdateAlertRuleResponse, error)
 	DeleteAlertRule(ctx context.Context, in *DeleteAlertRuleRequest, opts ...grpc.CallOption) (*DeleteAlertRuleResponse, error)
@@ -105,6 +107,16 @@ func (c *monitoringServiceClient) GetNodeStatus(ctx context.Context, in *NodeReq
 	return out, nil
 }
 
+func (c *monitoringServiceClient) GetHpcSummary(ctx context.Context, in *GetHpcSummaryRequest, opts ...grpc.CallOption) (*HpcSummaryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(HpcSummaryResponse)
+	err := c.cc.Invoke(ctx, MonitoringService_GetHpcSummary_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *monitoringServiceClient) CreateAlertRule(ctx context.Context, in *CreateAlertRuleRequest, opts ...grpc.CallOption) (*CreateAlertRuleResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateAlertRuleResponse)
@@ -164,6 +176,7 @@ type MonitoringServiceServer interface {
 	ReportStatus(context.Context, *StatusRequest) (*StatusResponse, error)
 	GetServiceStatus(context.Context, *ServiceRequest) (*ServiceResponse, error)
 	GetNodeStatus(context.Context, *NodeRequest) (*NodeResponse, error)
+	GetHpcSummary(context.Context, *GetHpcSummaryRequest) (*HpcSummaryResponse, error)
 	CreateAlertRule(context.Context, *CreateAlertRuleRequest) (*CreateAlertRuleResponse, error)
 	UpdateAlertRule(context.Context, *UpdateAlertRuleRequest) (*UpdateAlertRuleResponse, error)
 	DeleteAlertRule(context.Context, *DeleteAlertRuleRequest) (*DeleteAlertRuleResponse, error)
@@ -193,6 +206,9 @@ func (UnimplementedMonitoringServiceServer) GetServiceStatus(context.Context, *S
 }
 func (UnimplementedMonitoringServiceServer) GetNodeStatus(context.Context, *NodeRequest) (*NodeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetNodeStatus not implemented")
+}
+func (UnimplementedMonitoringServiceServer) GetHpcSummary(context.Context, *GetHpcSummaryRequest) (*HpcSummaryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetHpcSummary not implemented")
 }
 func (UnimplementedMonitoringServiceServer) CreateAlertRule(context.Context, *CreateAlertRuleRequest) (*CreateAlertRuleResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateAlertRule not implemented")
@@ -320,6 +336,24 @@ func _MonitoringService_GetNodeStatus_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _MonitoringService_GetHpcSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetHpcSummaryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MonitoringServiceServer).GetHpcSummary(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MonitoringService_GetHpcSummary_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MonitoringServiceServer).GetHpcSummary(ctx, req.(*GetHpcSummaryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _MonitoringService_CreateAlertRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateAlertRuleRequest)
 	if err := dec(in); err != nil {
@@ -438,6 +472,10 @@ var MonitoringService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _MonitoringService_GetNodeStatus_Handler,
 		},
 		{
+			MethodName: "GetHpcSummary",
+			Handler:    _MonitoringService_GetHpcSummary_Handler,
+		},
+		{
 			MethodName: "CreateAlertRule",
 			Handler:    _MonitoringService_CreateAlertRule_Handler,
 		},
@@ -459,5 +497,5 @@ var MonitoringService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/monitoring.proto",
+	Metadata: "monitoring.proto",
 }

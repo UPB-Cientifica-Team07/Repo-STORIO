@@ -317,10 +317,104 @@ func (s *MonitoringServer) GetNodeStatus(
 	req *pb.NodeRequest,
 ) (*pb.NodeResponse, error) {
 
-	return &pb.NodeResponse{
-		NodeId: req.GetNodeId(),
+	node, err :=
+		s.service.GetHpcNode(
+			req.GetNodeId(),
+		)
 
-		Status: "NOT_IMPLEMENTED",
+	if err != nil {
+
+		return nil,
+			status.Error(
+				codes.Internal,
+				err.Error(),
+			)
+	}
+
+	if node == nil {
+
+		return &pb.NodeResponse{
+			NodeId: req.GetNodeId(),
+			Status: "NOT_FOUND",
+		}, nil
+	}
+
+	var lastUpdated int64
+
+	if !node.LastUpdated.IsZero() {
+
+		lastUpdated =
+			node.LastUpdated.Unix()
+	}
+
+	return &pb.NodeResponse{
+		NodeId: node.NodeID,
+
+		Hostname: node.Hostname,
+
+		Status: node.Status,
+
+		CpuCores: node.CPUCores,
+
+		Memory: node.MemoryMB,
+
+		CpuUsage: node.CPUUsage,
+
+		MemoryUsage: node.MemoryUsage,
+
+		LastUpdated: lastUpdated,
+
+		Ip: node.IP,
+
+		Location: node.Location,
+	}, nil
+}
+
+// =====================================
+// CONSULTAR RESUMEN HPC
+// =====================================
+
+func (s *MonitoringServer) GetHpcSummary(
+	ctx context.Context,
+	req *pb.GetHpcSummaryRequest,
+) (*pb.HpcSummaryResponse, error) {
+
+	summary, err :=
+		s.service.GetHpcSummary()
+
+	if err != nil {
+
+		return nil,
+			status.Error(
+				codes.Internal,
+				err.Error(),
+			)
+	}
+
+	return &pb.HpcSummaryResponse{
+		TotalJobs: summary.TotalJobs,
+
+		PendingJobs: summary.PendingJobs,
+
+		RunningJobs: summary.RunningJobs,
+
+		CompletedJobs: summary.CompletedJobs,
+
+		FailedJobs: summary.FailedJobs,
+
+		CancelledJobs: summary.CancelledJobs,
+
+		AverageExecutionMs: summary.AverageExecutionMs,
+
+		TotalNodes: summary.TotalNodes,
+
+		AvailableNodes: summary.AvailableNodes,
+
+		BusyNodes: summary.BusyNodes,
+
+		InactiveNodes: summary.InactiveNodes,
+
+		Timestamp: summary.Timestamp.Unix(),
 	}, nil
 }
 
