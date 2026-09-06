@@ -170,7 +170,7 @@ func main() {
 	}
 
 	log.Println("===================================")
-	log.Println(" FILE SYNC CLIENT - LINUX")
+	log.Println(" FILE SYNC CLIENT")
 	log.Println("===================================")
 	log.Println("Servidor:", config.ServerAddress)
 	log.Println("Device:", config.DeviceID)
