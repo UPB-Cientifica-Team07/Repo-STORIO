@@ -2564,6 +2564,1311 @@ async function removePhotoFromAlbum(
   }
 }
 
+
+// =====================================
+// MONITORING
+// =====================================
+
+async function loadMonitoring() {
+
+  contentView.innerHTML = `
+    <div class="section-header">
+
+      <div>
+        <h3>
+          Monitoreo del sistema
+        </h3>
+
+        <p>
+          Estado operativo, recursos,
+          HPC y alertas.
+        </p>
+      </div>
+
+      <button
+        id="refreshMonitoring"
+      >
+        Actualizar
+      </button>
+
+    </div>
+
+    <p
+      id="monitoringMessage"
+      class="message"
+    >
+      Consultando Monitoring Service...
+    </p>
+
+    <div
+      id="monitoringContent"
+      class="hidden"
+    >
+
+      <div
+        id="monitoringMetrics"
+        class="monitoring-grid"
+      ></div>
+
+      <section
+        class="monitoring-section"
+      >
+        <h4>
+          HPC Cluster
+        </h4>
+
+        <div
+          id="hpcSummary"
+          class="monitoring-grid"
+        ></div>
+      </section>
+
+      <section
+        class="monitoring-section"
+      >
+        <h4>
+          Servicios
+        </h4>
+
+        <div
+          id="serviceStatusList"
+          class="monitoring-list"
+        ></div>
+      </section>
+
+      <section
+        class="monitoring-section"
+      >
+        <div class="section-header">
+
+          <div>
+            <h4>
+              Reglas de alerta
+            </h4>
+
+            <p>
+              Umbrales configurables del sistema.
+            </p>
+          </div>
+
+          <button
+            id="newAlertRule"
+          >
+            Nueva regla
+          </button>
+
+        </div>
+
+        <div
+          id="alertRulesList"
+          class="monitoring-list"
+        ></div>
+      </section>
+
+      <section
+        class="monitoring-section"
+      >
+        <h4>
+          Alertas activas
+        </h4>
+
+        <div
+          id="activeAlertsList"
+          class="monitoring-list"
+        ></div>
+      </section>
+
+      <section
+        class="monitoring-section"
+      >
+        <h4>
+          Últimas métricas
+        </h4>
+
+        <div
+          id="metricsTable"
+          class="monitoring-table-wrapper"
+        ></div>
+      </section>
+
+    </div>
+  `;
+
+  document
+    .getElementById(
+      "refreshMonitoring"
+    )
+    .addEventListener(
+      "click",
+      loadMonitoring
+    );
+
+  const message =
+    document.getElementById(
+      "monitoringMessage"
+    );
+
+  const content =
+    document.getElementById(
+      "monitoringContent"
+    );
+
+  try {
+
+    const [
+      hpcResponse,
+      metricsResponse,
+      alertsResponse,
+      rulesResponse
+    ] =
+      await Promise.all([
+        apiFetch(
+          "/api/monitoring/hpc"
+        ),
+        apiFetch(
+          "/api/monitoring/metrics"
+        ),
+        apiFetch(
+          "/api/monitoring/alerts"
+        ),
+        apiFetch(
+          "/api/monitoring/rules"
+        )
+      ]);
+
+    const hpcData =
+      await hpcResponse.json();
+
+    const metricsData =
+      await metricsResponse.json();
+
+    const alertsData =
+      await alertsResponse.json();
+
+    const rulesData =
+      await rulesResponse.json();
+
+    if (
+      !hpcResponse.ok ||
+      !hpcData.success
+    ) {
+
+      throw new Error(
+        hpcData.message ||
+        "Error consultando HPC"
+      );
+    }
+
+    if (
+      !metricsResponse.ok ||
+      !metricsData.success
+    ) {
+
+      throw new Error(
+        metricsData.message ||
+        "Error consultando métricas"
+      );
+    }
+
+    if (
+      !alertsResponse.ok ||
+      !alertsData.success
+    ) {
+
+      throw new Error(
+        alertsData.message ||
+        "Error consultando alertas"
+      );
+    }
+
+
+    if (
+      !rulesResponse.ok ||
+      !rulesData.success
+    ) {
+
+      throw new Error(
+        rulesData.message ||
+        "Error consultando reglas"
+      );
+    }
+
+    const metrics =
+      metricsData.metrics ||
+      [];
+
+    const alerts =
+      alertsData.alerts ||
+      [];
+
+    const rules =
+      rulesData.rules ||
+      [];
+
+    const hpc =
+      hpcData.hpc ||
+      {};
+
+    const latest =
+      {};
+
+    for (
+      const metric of metrics
+    ) {
+
+      const name =
+        metric.componentName ||
+        "Desconocido";
+
+      const timestamp =
+        Number(
+          metric.timestamp ||
+          0
+        );
+
+      if (
+        !latest[name] ||
+        timestamp >
+          Number(
+            latest[name]
+              .timestamp ||
+            0
+          )
+      ) {
+
+        latest[name] =
+          metric;
+      }
+    }
+
+    const latestMetrics =
+      Object.values(
+        latest
+      );
+
+    renderMonitoringMetrics(
+      latestMetrics
+    );
+
+    renderHpcSummary(
+      hpc
+    );
+
+    const serviceStatuses =
+      await Promise.all(
+        latestMetrics.map(
+          async metric => {
+
+            try {
+
+              const response =
+                await apiFetch(
+                  `/api/monitoring/services/${
+                    encodeURIComponent(
+                      metric.componentName
+                    )
+                  }`
+                );
+
+              const data =
+                await response.json();
+
+              if (
+                !response.ok ||
+                !data.success
+              ) {
+
+                throw new Error(
+                  data.message ||
+                  "Estado no disponible"
+                );
+              }
+
+              return {
+                ...data.service,
+                metric
+              };
+
+            } catch (error) {
+
+              return {
+                componentId:
+                  metric.componentId,
+
+                componentName:
+                  metric.componentName,
+
+                status:
+                  "UNKNOWN",
+
+                message:
+                  error.message,
+
+                lastUpdated:
+                  metric.timestamp,
+
+                metric
+              };
+            }
+          }
+        )
+      );
+
+    renderServiceStatus(
+      serviceStatuses
+    );
+
+    renderAlertRules(
+      rules
+    );
+
+    renderActiveAlerts(
+      alerts
+    );
+
+    document
+      .getElementById(
+        "newAlertRule"
+      )
+      .addEventListener(
+        "click",
+        createAlertRuleFromPrompt
+      );
+
+    renderMetricsTable(
+      latestMetrics
+    );
+
+    message.textContent =
+      `Actualizado: ${new Date().toLocaleTimeString()}`;
+
+    content.classList.remove(
+      "hidden"
+    );
+
+  } catch (error) {
+
+    message.textContent =
+      error.message;
+  }
+}
+
+function renderMonitoringMetrics(
+  metrics
+) {
+
+  const container =
+    document.getElementById(
+      "monitoringMetrics"
+    );
+
+  if (
+    metrics.length === 0
+  ) {
+
+    container.innerHTML = `
+      <div class="monitor-card">
+        <strong>
+          Sin métricas
+        </strong>
+      </div>
+    `;
+
+    return;
+  }
+
+  const cpu =
+    averageMetric(
+      metrics,
+      "cpuUsage"
+    );
+
+  const memory =
+    averageMetric(
+      metrics,
+      "memoryUsage"
+    );
+
+  const storage =
+    metrics.reduce(
+      (
+        total,
+        metric
+      ) =>
+        total +
+        Number(
+          metric.storageUsage ||
+          0
+        ),
+      0
+    );
+
+  const requests =
+    metrics.reduce(
+      (
+        total,
+        metric
+      ) =>
+        total +
+        Number(
+          metric.totalRequests ||
+          0
+        ),
+      0
+    );
+
+  container.innerHTML = `
+    ${monitorCard(
+      "CPU promedio",
+      `${cpu.toFixed(2)} %`
+    )}
+
+    ${monitorCard(
+      "Memoria reportada",
+      `${memory.toFixed(2)}`
+    )}
+
+    ${monitorCard(
+      "Almacenamiento",
+      formatBytes(
+        storage
+      )
+    )}
+
+    ${monitorCard(
+      "Solicitudes",
+      String(
+        requests
+      )
+    )}
+  `;
+}
+
+function renderHpcSummary(
+  hpc
+) {
+
+  const container =
+    document.getElementById(
+      "hpcSummary"
+    );
+
+  container.innerHTML = `
+    ${monitorCard(
+      "Jobs totales",
+      hpc.totalJobs || "0"
+    )}
+
+    ${monitorCard(
+      "Ejecutando",
+      hpc.runningJobs || "0"
+    )}
+
+    ${monitorCard(
+      "Finalizados",
+      hpc.completedJobs || "0"
+    )}
+
+    ${monitorCard(
+      "Errores",
+      hpc.failedJobs || "0"
+    )}
+
+    ${monitorCard(
+      "Nodos",
+      hpc.totalNodes || "0"
+    )}
+
+    ${monitorCard(
+      "Disponibles",
+      hpc.availableNodes || "0"
+    )}
+
+    ${monitorCard(
+      "Ocupados",
+      hpc.busyNodes || "0"
+    )}
+
+    ${monitorCard(
+      "Inactivos",
+      hpc.inactiveNodes || "0"
+    )}
+
+    ${monitorCard(
+      "Tiempo promedio",
+      `${
+        Number(
+          hpc.averageExecutionMs ||
+          0
+        ).toFixed(2)
+      } ms`
+    )}
+  `;
+}
+
+function renderServiceStatus(
+  services
+) {
+
+  const container =
+    document.getElementById(
+      "serviceStatusList"
+    );
+
+  if (
+    services.length === 0
+  ) {
+
+    container.innerHTML =
+      "<p>No hay servicios registrados.</p>";
+
+    return;
+  }
+
+  container.innerHTML =
+    services
+      .map(
+        service => {
+
+          const status =
+            String(
+              service.status ||
+              "UNKNOWN"
+            ).toUpperCase();
+
+          let statusClass =
+            "status-unknown";
+
+          if (
+            status ===
+            "AVAILABLE"
+          ) {
+
+            statusClass =
+              "status-up";
+
+          } else if (
+            status ===
+              "UNAVAILABLE" ||
+            status ===
+              "ERROR"
+          ) {
+
+            statusClass =
+              "status-down";
+
+          } else if (
+            status ===
+              "INACTIVE" ||
+            status ===
+              "STALE"
+          ) {
+
+            statusClass =
+              "status-inactive";
+          }
+
+          return `
+            <div
+              class="monitor-row"
+            >
+              <div>
+                <strong>
+                  ${escapeHtml(
+                    service.componentName ||
+                    "Servicio"
+                  )}
+                </strong>
+
+                <small>
+                  ${escapeHtml(
+                    service.componentId ||
+                    ""
+                  )}
+                </small>
+
+                <small>
+                  ${escapeHtml(
+                    service.message ||
+                    ""
+                  )}
+                </small>
+
+                <small>
+                  Última actualización:
+                  ${formatTimestamp(
+                    service.lastUpdated
+                  )}
+                </small>
+              </div>
+
+              <span
+                class="status-badge ${statusClass}"
+              >
+                ${escapeHtml(
+                  status
+                )}
+              </span>
+            </div>
+          `;
+        }
+      )
+      .join("");
+}
+
+
+function renderAlertRules(
+  rules
+) {
+
+  const container =
+    document.getElementById(
+      "alertRulesList"
+    );
+
+  if (
+    rules.length === 0
+  ) {
+
+    container.innerHTML =
+      "<p>No hay reglas configuradas.</p>";
+
+    return;
+  }
+
+  container.innerHTML =
+    rules
+      .map(
+        rule => `
+          <div
+            class="monitor-row"
+          >
+            <div>
+              <strong>
+                ${escapeHtml(
+                  rule.name
+                )}
+              </strong>
+
+              <small>
+                ${escapeHtml(
+                  rule.componentName
+                )}
+              </small>
+
+              <small>
+                ${escapeHtml(
+                  rule.metric
+                )}
+                ${escapeHtml(
+                  rule.operator
+                )}
+                ${escapeHtml(
+                  String(
+                    rule.threshold
+                  )
+                )}
+              </small>
+            </div>
+
+            <div
+              class="monitor-rule-actions"
+            >
+              <span
+                class="status-badge ${
+                  rule.enabled
+                    ? "status-up"
+                    : "status-inactive"
+                }"
+              >
+                ${
+                  rule.enabled
+                    ? "ACTIVA"
+                    : "DESACTIVADA"
+                }
+              </span>
+
+              <button
+                type="button"
+                onclick="toggleAlertRule(
+                  '${escapeHtml(
+                    rule.id
+                  )}',
+                  ${JSON.stringify(
+                    rule
+                  ).replaceAll(
+                    '"',
+                    '&quot;'
+                  )}
+                )"
+              >
+                ${
+                  rule.enabled
+                    ? "Desactivar"
+                    : "Activar"
+                }
+              </button>
+
+              <button
+                type="button"
+                onclick="deleteAlertRule(
+                  '${escapeHtml(
+                    rule.id
+                  )}'
+                )"
+              >
+                Eliminar
+              </button>
+            </div>
+          </div>
+        `
+      )
+      .join("");
+}
+
+async function createAlertRuleFromPrompt() {
+
+  const name =
+    window.prompt(
+      "Nombre de la regla:"
+    );
+
+  if (!name) {
+    return;
+  }
+
+  const componentName =
+    window.prompt(
+      "Servicio, por ejemplo: Sync Service"
+    );
+
+  if (!componentName) {
+    return;
+  }
+
+  const metric =
+    window.prompt(
+      "Métrica: cpu_usage, memory_usage, storage_usage, active_connections"
+    );
+
+  if (!metric) {
+    return;
+  }
+
+  const operator =
+    window.prompt(
+      "Operador: >, >=, <, <="
+    );
+
+  if (!operator) {
+    return;
+  }
+
+  const thresholdInput =
+    window.prompt(
+      "Umbral:"
+    );
+
+  if (
+    thresholdInput === null
+  ) {
+
+    return;
+  }
+
+  const threshold =
+    Number(
+      thresholdInput
+    );
+
+  if (
+    Number.isNaN(
+      threshold
+    )
+  ) {
+
+    window.alert(
+      "Umbral inválido."
+    );
+
+    return;
+  }
+
+  try {
+
+    const response =
+      await apiFetch(
+        "/api/monitoring/rules",
+        {
+          method:
+            "POST",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              name,
+              componentName,
+              metric,
+              operator,
+              threshold,
+              enabled:
+                true
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
+      throw new Error(
+        data.message ||
+        "No fue posible crear la regla"
+      );
+    }
+
+    await loadMonitoring();
+
+  } catch (error) {
+
+    window.alert(
+      error.message
+    );
+  }
+}
+
+async function toggleAlertRule(
+  id,
+  rule
+) {
+
+  try {
+
+    const response =
+      await apiFetch(
+        `/api/monitoring/rules/${id}`,
+        {
+          method:
+            "PUT",
+
+          headers: {
+            "Content-Type":
+              "application/json"
+          },
+
+          body:
+            JSON.stringify({
+              name:
+                rule.name,
+
+              metric:
+                rule.metric,
+
+              operator:
+                rule.operator,
+
+              threshold:
+                Number(
+                  rule.threshold
+                ),
+
+              componentName:
+                rule.componentName,
+
+              enabled:
+                !rule.enabled
+            })
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
+      throw new Error(
+        data.message ||
+        "No fue posible actualizar la regla"
+      );
+    }
+
+    await loadMonitoring();
+
+  } catch (error) {
+
+    window.alert(
+      error.message
+    );
+  }
+}
+
+async function deleteAlertRule(
+  id
+) {
+
+  if (
+    !window.confirm(
+      "¿Eliminar esta regla?"
+    )
+  ) {
+
+    return;
+  }
+
+  try {
+
+    const response =
+      await apiFetch(
+        `/api/monitoring/rules/${id}`,
+        {
+          method:
+            "DELETE"
+        }
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
+      throw new Error(
+        data.message ||
+        "No fue posible eliminar la regla"
+      );
+    }
+
+    await loadMonitoring();
+
+  } catch (error) {
+
+    window.alert(
+      error.message
+    );
+  }
+}
+
+function renderActiveAlerts(
+  alerts
+) {
+
+  const container =
+    document.getElementById(
+      "activeAlertsList"
+    );
+
+  const active =
+    alerts.filter(
+      alert =>
+        alert.active === true
+    );
+
+  if (
+    active.length === 0
+  ) {
+
+    container.innerHTML = `
+      <div
+        class="monitor-row"
+      >
+        <strong>
+          Sin alertas activas
+        </strong>
+      </div>
+    `;
+
+    return;
+  }
+
+  container.innerHTML =
+    active
+      .map(
+        alert => `
+          <div
+            class="monitor-row alert-row"
+          >
+            <div>
+              <strong>
+                ${escapeHtml(
+                  alert.componentName ||
+                  "Sistema"
+                )}
+              </strong>
+
+              <small>
+                ${escapeHtml(
+                  alert.message ||
+                  ""
+                )}
+              </small>
+            </div>
+
+            <span
+              class="status-badge status-down"
+            >
+              ALERTA
+            </span>
+          </div>
+        `
+      )
+      .join("");
+}
+
+function renderMetricsTable(
+  metrics
+) {
+
+  const container =
+    document.getElementById(
+      "metricsTable"
+    );
+
+  if (
+    metrics.length === 0
+  ) {
+
+    container.innerHTML =
+      "<p>No hay métricas.</p>";
+
+    return;
+  }
+
+  container.innerHTML = `
+    <table
+      class="monitoring-table"
+    >
+      <thead>
+        <tr>
+          <th>
+            Servicio
+          </th>
+
+          <th>
+            CPU
+          </th>
+
+          <th>
+            RAM
+          </th>
+
+          <th>
+            Storage
+          </th>
+
+          <th>
+            Requests
+          </th>
+
+          <th>
+            Último dato
+          </th>
+        </tr>
+      </thead>
+
+      <tbody>
+        ${
+          metrics
+            .map(
+              metric => `
+                <tr>
+                  <td>
+                    ${escapeHtml(
+                      metric.componentName
+                    )}
+                  </td>
+
+                  <td>
+                    ${
+                      Number(
+                        metric.cpuUsage ||
+                        0
+                      ).toFixed(2)
+                    } %
+                  </td>
+
+                  <td>
+                    ${
+                      Number(
+                        metric.memoryUsage ||
+                        0
+                      ).toFixed(2)
+                    }
+                  </td>
+
+                  <td>
+                    ${formatBytes(
+                      Number(
+                        metric.storageUsage ||
+                        0
+                      )
+                    )}
+                  </td>
+
+                  <td>
+                    ${escapeHtml(
+                      String(
+                        metric.totalRequests ||
+                        0
+                      )
+                    )}
+                  </td>
+
+                  <td>
+                    ${formatTimestamp(
+                      metric.timestamp
+                    )}
+                  </td>
+                </tr>
+              `
+            )
+            .join("")
+        }
+      </tbody>
+    </table>
+  `;
+}
+
+function monitorCard(
+  label,
+  value
+) {
+
+  return `
+    <article
+      class="monitor-card"
+    >
+      <small>
+        ${escapeHtml(
+          label
+        )}
+      </small>
+
+      <strong>
+        ${escapeHtml(
+          value
+        )}
+      </strong>
+    </article>
+  `;
+}
+
+function averageMetric(
+  metrics,
+  field
+) {
+
+  if (
+    metrics.length === 0
+  ) {
+
+    return 0;
+  }
+
+  return (
+    metrics.reduce(
+      (
+        total,
+        metric
+      ) =>
+        total +
+        Number(
+          metric[field] ||
+          0
+        ),
+      0
+    ) /
+    metrics.length
+  );
+}
+
+function formatBytes(
+  bytes
+) {
+
+  const value =
+    Number(
+      bytes ||
+      0
+    );
+
+  if (
+    value < 1024
+  ) {
+
+    return `${value} B`;
+  }
+
+  if (
+    value <
+    1024 * 1024
+  ) {
+
+    return `${
+      (
+        value /
+        1024
+      ).toFixed(1)
+    } KB`;
+  }
+
+  if (
+    value <
+    1024 *
+    1024 *
+    1024
+  ) {
+
+    return `${
+      (
+        value /
+        1024 /
+        1024
+      ).toFixed(1)
+    } MB`;
+  }
+
+  return `${
+    (
+      value /
+      1024 /
+      1024 /
+      1024
+    ).toFixed(2)
+  } GB`;
+}
+
+function formatTimestamp(
+  timestamp
+) {
+
+  const value =
+    Number(
+      timestamp ||
+      0
+    );
+
+  if (!value) {
+    return "-";
+  }
+
+  return new Date(
+    value * 1000
+  ).toLocaleString();
+}
+
 // =====================================
 // UTILS
 // =====================================
@@ -2695,6 +4000,17 @@ document
           ) {
 
             loadVideos();
+
+            return;
+          }
+
+
+          if (
+            module ===
+            "monitoring"
+          ) {
+
+            loadMonitoring();
 
             return;
           }

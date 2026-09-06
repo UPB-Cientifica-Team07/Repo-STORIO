@@ -6,6 +6,11 @@ const multer = require("multer");
 const fileClient =
   require("./src/fileClient");
 
+const monitoringClient =
+  require(
+    "./src/monitoringClient"
+  );
+
 const app = express();
 
 const PORT =
@@ -2685,6 +2690,543 @@ app.delete(
           message:
             error.details ||
             "Error revocando acceso"
+        });
+    }
+  }
+);
+
+
+// =====================================
+// MONITORING API
+// =====================================
+
+// -------------------------------------
+// METRICS
+// -------------------------------------
+
+app.get(
+  "/api/monitoring/metrics",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const response =
+        await monitoringClient
+          .getMetrics();
+
+      return res.json({
+        success: true,
+        metrics:
+          response.metrics || []
+      });
+
+    } catch (error) {
+
+      console.error(
+        "MONITORING METRICS ERROR:",
+        error
+      );
+
+      return res
+        .status(502)
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error consultando métricas"
+        });
+    }
+  }
+);
+
+// -------------------------------------
+// SERVICE STATUS
+// -------------------------------------
+
+app.get(
+  "/api/monitoring/services/:name",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const response =
+        await monitoringClient
+          .getServiceStatus(
+            req.params.name
+          );
+
+      return res.json({
+        success: true,
+        service:
+          response
+      });
+
+    } catch (error) {
+
+      const status =
+        error.code === 5
+          ? 404
+          : 502;
+
+      return res
+        .status(status)
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error consultando estado del servicio"
+        });
+    }
+  }
+);
+
+// -------------------------------------
+// ALERTS
+// -------------------------------------
+
+app.get(
+  "/api/monitoring/alerts",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const response =
+        await monitoringClient
+          .getAlerts();
+
+      return res.json({
+        success: true,
+        alerts:
+          response.alerts || []
+      });
+
+    } catch (error) {
+
+      return res
+        .status(502)
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error consultando alertas"
+        });
+    }
+  }
+);
+
+// -------------------------------------
+// ALERT RULES
+// -------------------------------------
+
+app.get(
+  "/api/monitoring/rules",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const response =
+        await monitoringClient
+          .getAlertRules();
+
+      return res.json({
+        success: true,
+        rules:
+          response.rules || []
+      });
+
+    } catch (error) {
+
+      return res
+        .status(502)
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error consultando reglas de alerta"
+        });
+    }
+  }
+);
+
+
+// -------------------------------------
+// CREATE ALERT RULE
+// -------------------------------------
+
+app.post(
+  "/api/monitoring/rules",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const {
+        id = "",
+        name,
+        metric,
+        operator,
+        threshold,
+        componentName,
+        enabled = true
+      } = req.body || {};
+
+      if (
+        !name ||
+        !metric ||
+        !operator ||
+        !componentName
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+            message:
+              "Faltan datos obligatorios"
+          });
+      }
+
+      const response =
+        await monitoringClient
+          .createAlertRule({
+            id,
+            name,
+            metric,
+            operator,
+            threshold:
+              Number(
+                threshold
+              ),
+            componentName,
+            enabled:
+              Boolean(
+                enabled
+              )
+          });
+
+      return res.json({
+        success:
+          response.success,
+        message:
+          response.message,
+        ruleId:
+          response.ruleId
+      });
+
+    } catch (error) {
+
+      return res
+        .status(502)
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error creando regla"
+        });
+    }
+  }
+);
+
+// -------------------------------------
+// UPDATE ALERT RULE
+// -------------------------------------
+
+app.put(
+  "/api/monitoring/rules/:id",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const {
+        name,
+        metric,
+        operator,
+        threshold,
+        componentName,
+        enabled
+      } = req.body || {};
+
+      const response =
+        await monitoringClient
+          .updateAlertRule({
+            id:
+              req.params.id,
+            name,
+            metric,
+            operator,
+            threshold:
+              Number(
+                threshold
+              ),
+            componentName,
+            enabled:
+              Boolean(
+                enabled
+              )
+          });
+
+      return res.json({
+        success:
+          response.success,
+        message:
+          response.message,
+        rule:
+          response.rule
+      });
+
+    } catch (error) {
+
+      return res
+        .status(502)
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error actualizando regla"
+        });
+    }
+  }
+);
+
+// -------------------------------------
+// DELETE ALERT RULE
+// -------------------------------------
+
+app.delete(
+  "/api/monitoring/rules/:id",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const response =
+        await monitoringClient
+          .deleteAlertRule(
+            req.params.id
+          );
+
+      return res.json({
+        success:
+          response.success,
+        message:
+          response.message,
+        ruleId:
+          response.ruleId
+      });
+
+    } catch (error) {
+
+      return res
+        .status(502)
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error eliminando regla"
+        });
+    }
+  }
+);
+
+// -------------------------------------
+// HPC SUMMARY
+// -------------------------------------
+
+app.get(
+  "/api/monitoring/hpc",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const response =
+        await monitoringClient
+          .getHpcSummary();
+
+      return res.json({
+        success: true,
+        hpc:
+          response
+      });
+
+    } catch (error) {
+
+      console.error(
+        "MONITORING HPC ERROR:",
+        error
+      );
+
+      return res
+        .status(502)
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error consultando resumen HPC"
+        });
+    }
+  }
+);
+
+// -------------------------------------
+// HPC NODE
+// -------------------------------------
+
+app.get(
+  "/api/monitoring/nodes/:id",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const response =
+        await monitoringClient
+          .getNodeStatus(
+            req.params.id
+          );
+
+      return res.json({
+        success: true,
+        node:
+          response
+      });
+
+    } catch (error) {
+
+      const status =
+        error.code === 5
+          ? 404
+          : 502;
+
+      return res
+        .status(status)
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error consultando nodo HPC"
         });
     }
   }
