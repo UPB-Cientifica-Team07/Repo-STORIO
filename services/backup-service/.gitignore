@@ -1,0 +1,11 @@
+backups/*
+!backups/.gitkeep
+
+*.gpg
+*.tar.gz
+*.sha256
+
+private/
+*.key
+*.sec
+*-private.asc
