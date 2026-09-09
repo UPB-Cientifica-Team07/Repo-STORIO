@@ -42,8 +42,9 @@ async function authMiddleware(req, res, next) {
       await axios.get(
         `${config.authServiceUrl}/internal/auth/validate`,
         {
-          params: {
-            token
+          headers: {
+            Authorization:
+              `Bearer ${token}`
           },
           timeout: 3000
         }

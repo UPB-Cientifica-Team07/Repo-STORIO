@@ -2,11 +2,9 @@ package hpc.auth;
 
 import java.io.IOException;
 import java.net.URI;
-import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 public class AuthClient {
@@ -54,23 +52,20 @@ public class AuthClient {
             );
         }
 
-        String encoded =
-            URLEncoder.encode(
-                token,
-                StandardCharsets.UTF_8
-            );
-
         URI uri =
             URI.create(
                 baseUrl +
-                "/internal/auth/validate?token=" +
-                encoded
+                "/internal/auth/validate"
             );
 
         HttpRequest request =
             HttpRequest
                 .newBuilder(
                     uri
+                )
+                .header(
+                    "Authorization",
+                    "Bearer " + token
                 )
                 .GET()
                 .timeout(

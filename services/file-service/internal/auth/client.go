@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 )
@@ -58,13 +57,32 @@ func (c *Client) ValidateToken(
 
 	endpoint :=
 		c.baseURL +
-			"/internal/auth/validate?token=" +
-			url.QueryEscape(token)
+			"/internal/auth/validate"
+
+	request,
+		err :=
+		http.NewRequest(
+			http.MethodGet,
+			endpoint,
+			nil,
+		)
+
+	if err != nil {
+		return nil, fmt.Errorf(
+			"error creando petición de validación: %w",
+			err,
+		)
+	}
+
+	request.Header.Set(
+		"Authorization",
+		"Bearer "+token,
+	)
 
 	response,
 		err :=
-		c.httpClient.Get(
-			endpoint,
+		c.httpClient.Do(
+			request,
 		)
 
 	if err != nil {

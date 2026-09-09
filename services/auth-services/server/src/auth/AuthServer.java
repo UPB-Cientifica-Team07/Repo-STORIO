@@ -127,6 +127,16 @@ public class AuthServer {
                             )
             );
 
+            // Logout / revocación
+            httpServer.createContext(
+                    "/internal/auth/logout",
+                    exchange ->
+                            handleLogout(
+                                    exchange,
+                                    authService
+                            )
+            );
+
             httpServer.setExecutor(
                     null
             );
@@ -199,7 +209,7 @@ public class AuthServer {
 
             if (!exchange
                     .getRequestMethod()
-                    .equalsIgnoreCase("GET")) {
+                    .equalsIgnoreCase("POST")) {
 
                 sendResponse(
                         exchange,
@@ -210,20 +220,23 @@ public class AuthServer {
                 return;
             }
 
-            String query =
-                    exchange
-                            .getRequestURI()
-                            .getRawQuery();
+            String requestBody =
+                    new String(
+                            exchange
+                                    .getRequestBody()
+                                    .readAllBytes(),
+                            StandardCharsets.UTF_8
+                    );
 
             String username =
                     getQueryParameter(
-                            query,
+                            requestBody,
                             "username"
                     );
 
             String password =
                     getQueryParameter(
-                            query,
+                            requestBody,
                             "password"
                     );
 
@@ -314,15 +327,9 @@ public class AuthServer {
                 return;
             }
 
-            String query =
-                    exchange
-                            .getRequestURI()
-                            .getRawQuery();
-
             String token =
-                    getQueryParameter(
-                            query,
-                            "token"
+                    getBearerToken(
+                            exchange
                     );
 
             if (token == null ||
@@ -330,7 +337,7 @@ public class AuthServer {
 
                 sendResponse(
                         exchange,
-                        400,
+                        401,
                         "false|||TOKEN_REQUIRED"
                 );
 
@@ -374,7 +381,117 @@ public class AuthServer {
     }
 
     // =====================================
-    // QUERY PARAMETER
+    // LOGOUT HTTP
+    // =====================================
+
+    private static void handleLogout(
+            HttpExchange exchange,
+            AuthServiceImpl authService
+    ) throws IOException {
+
+        try {
+
+            if (!exchange
+                    .getRequestMethod()
+                    .equalsIgnoreCase("POST")) {
+
+                sendResponse(
+                        exchange,
+                        405,
+                        "false|METHOD_NOT_ALLOWED"
+                );
+
+                return;
+            }
+
+            String token =
+                    getBearerToken(
+                            exchange
+                    );
+
+            if (token == null ||
+                    token.isBlank()) {
+
+                sendResponse(
+                        exchange,
+                        401,
+                        "false|TOKEN_REQUIRED"
+                );
+
+                return;
+            }
+
+            boolean revoked =
+                    authService.logout(
+                            token
+                    );
+
+            sendResponse(
+                    exchange,
+                    200,
+                    revoked
+                            ? "true|TOKEN_REVOKED"
+                            : "false|TOKEN_INVALID"
+            );
+
+        } catch (Exception e) {
+
+            sendResponse(
+                    exchange,
+                    500,
+                    "false|INTERNAL_ERROR"
+            );
+        }
+    }
+
+    // =====================================
+    // BEARER TOKEN
+    // =====================================
+
+    private static String getBearerToken(
+            HttpExchange exchange
+    ) {
+
+        String authorization =
+                exchange
+                        .getRequestHeaders()
+                        .getFirst(
+                                "Authorization"
+                        );
+
+        if (authorization == null) {
+            return null;
+        }
+
+        String prefix =
+                "Bearer ";
+
+        if (!authorization
+                .regionMatches(
+                        true,
+                        0,
+                        prefix,
+                        0,
+                        prefix.length()
+                )) {
+
+            return null;
+        }
+
+        String token =
+                authorization
+                        .substring(
+                                prefix.length()
+                        )
+                        .trim();
+
+        return token.isEmpty()
+                ? null
+                : token;
+    }
+
+    // =====================================
+    // FORM PARAMETER
     // =====================================
 
     private static String getQueryParameter(

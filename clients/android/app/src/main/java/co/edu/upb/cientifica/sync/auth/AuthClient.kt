@@ -35,10 +35,12 @@ class AuthClient(
 
         val endpoint =
             URL(
-                "$baseUrl/internal/auth/login" +
-                    "?username=$encodedUsername" +
-                    "&password=$encodedPassword"
+                "$baseUrl/internal/auth/login"
             )
+
+        val requestBody =
+            "username=$encodedUsername" +
+                "&password=$encodedPassword"
 
         val connection =
             endpoint.openConnection()
@@ -47,13 +49,32 @@ class AuthClient(
         try {
 
             connection.requestMethod =
-                "GET"
+                "POST"
+
+            connection.doOutput =
+                true
+
+            connection.setRequestProperty(
+                "Content-Type",
+                "application/x-www-form-urlencoded"
+            )
 
             connection.connectTimeout =
                 5000
 
             connection.readTimeout =
                 5000
+
+            connection.outputStream.use {
+                output ->
+
+                output.write(
+                    requestBody
+                        .toByteArray(
+                            Charsets.UTF_8
+                        )
+                )
+            }
 
             val status =
                 connection.responseCode

@@ -73,13 +73,20 @@ app.post(
           });
       }
 
+      const loginBody =
+        new URLSearchParams({
+          username,
+          password
+        }).toString();
+
       const response =
-        await axios.get(
+        await axios.post(
           `${AUTH_SERVICE}/internal/auth/login`,
+          loginBody,
           {
-            params: {
-              username,
-              password
+            headers: {
+              "Content-Type":
+                "application/x-www-form-urlencoded"
             },
 
             timeout: 5000

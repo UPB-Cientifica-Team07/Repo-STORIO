@@ -36,10 +36,7 @@ final class AuthClient
 
         $url =
             $this->baseUrl .
-            '/internal/auth/validate?token=' .
-            rawurlencode(
-                $token
-            );
+            '/internal/auth/validate';
 
         $context =
             stream_context_create([
@@ -52,6 +49,10 @@ final class AuthClient
 
                     'ignore_errors' =>
                         true,
+
+                    'header' =>
+                        "Authorization: Bearer " .
+                        $token . "\r\n",
                 ],
             ]);
 
