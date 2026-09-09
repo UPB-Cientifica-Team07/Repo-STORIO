@@ -13,3 +13,6 @@
 .externalNativeBuild
 .cxx
 local.properties
+*.bak
+*.pre-grpc
+*.sync*.bak

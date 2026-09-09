@@ -1,5 +1,7 @@
 package co.edu.upb.cientifica.sync.grpc
 
+import co.edu.upb.cientifica.sync.proto.AcknowledgeChangesRequest
+import co.edu.upb.cientifica.sync.proto.AcknowledgeChangesResponse
 import co.edu.upb.cientifica.sync.proto.AuthenticateRequest
 import co.edu.upb.cientifica.sync.proto.AuthenticateResponse
 import co.edu.upb.cientifica.sync.proto.DownloadRequest
@@ -458,6 +460,45 @@ class SyncGrpcClient(
             bytesReceived =
                 response.bytesReceived
         )
+    }
+
+    fun acknowledgeChanges(
+        token: String,
+        deviceId: String,
+        changeId: Long
+    ): AcknowledgeChangesResponse {
+
+        val request =
+            AcknowledgeChangesRequest
+                .newBuilder()
+                .setDeviceId(
+                    deviceId
+                )
+                .setChangeId(
+                    changeId
+                )
+                .build()
+
+        val response =
+            authenticatedBlockingStub(
+                token
+            )
+                .withDeadlineAfter(
+                    10,
+                    TimeUnit.SECONDS
+                )
+                .acknowledgeChanges(
+                    request
+                )
+
+        if (!response.success) {
+
+            throw RuntimeException(
+                "ACK respondió false: ${response.message}"
+            )
+        }
+
+        return response
     }
 
     fun close() {

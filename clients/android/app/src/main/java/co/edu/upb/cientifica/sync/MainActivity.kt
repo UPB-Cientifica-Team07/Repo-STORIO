@@ -2,9 +2,11 @@ package co.edu.upb.cientifica.sync
 
 import android.os.Bundle
 import android.widget.Button
+import android.widget.EditText
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import co.edu.upb.cientifica.sync.auth.AuthClient
+import co.edu.upb.cientifica.sync.config.CredentialStore
 import co.edu.upb.cientifica.sync.grpc.SyncGrpcClient
 import co.edu.upb.cientifica.sync.network.LocalNetworkPolicy
 import co.edu.upb.cientifica.sync.network.NetworkMonitor
@@ -39,6 +41,15 @@ class MainActivity :
 
     private lateinit var statusText:
         TextView
+
+    private lateinit var usernameInput:
+        EditText
+
+    private lateinit var passwordInput:
+        EditText
+
+    private lateinit var saveCredentialsButton:
+        Button
 
     private lateinit var authButton:
         Button
@@ -77,6 +88,21 @@ class MainActivity :
                 R.id.statusText
             )
 
+        usernameInput =
+            findViewById(
+                R.id.usernameInput
+            )
+
+        passwordInput =
+            findViewById(
+                R.id.passwordInput
+            )
+
+        saveCredentialsButton =
+            findViewById(
+                R.id.saveCredentialsButton
+            )
+
         authButton =
             findViewById(
                 R.id.authButton
@@ -110,6 +136,49 @@ class MainActivity :
             ) {
 
                 evaluateNetwork()
+            }
+
+        CredentialStore(
+            applicationContext
+        ).load()
+            ?.let { credentials ->
+
+                usernameInput.setText(
+                    credentials.username
+                )
+            }
+
+        saveCredentialsButton
+            .setOnClickListener {
+
+                try {
+
+                    CredentialStore(
+                        applicationContext
+                    ).save(
+                        usernameInput
+                            .text
+                            .toString(),
+
+                        passwordInput
+                            .text
+                            .toString()
+                    )
+
+                    passwordInput.text.clear()
+
+                    updateStatus(
+                        "Credenciales guardadas localmente"
+                    )
+
+                } catch (
+                    error: Exception
+                ) {
+
+                    showError(
+                        error
+                    )
+                }
             }
 
         authButton
@@ -388,10 +457,18 @@ class MainActivity :
                 SyncEngine.AUTH_URL
             )
 
+        val credentials =
+            CredentialStore(
+                applicationContext
+            ).load()
+                ?: throw RuntimeException(
+                    "Credenciales no configuradas"
+                )
+
         val login =
             authClient.login(
-                SyncEngine.USERNAME,
-                SyncEngine.PASSWORD
+                credentials.username,
+                credentials.password
             )
 
         if (

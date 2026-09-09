@@ -2,6 +2,7 @@ package co.edu.upb.cientifica.sync.sync
 
 import android.content.Context
 import co.edu.upb.cientifica.sync.auth.AuthClient
+import co.edu.upb.cientifica.sync.config.CredentialStore
 import co.edu.upb.cientifica.sync.grpc.SyncGrpcClient
 import co.edu.upb.cientifica.sync.network.LocalNetworkPolicy
 import java.io.File
@@ -34,11 +35,6 @@ class SyncEngine(
         const val SYNC_PORT =
             50055
 
-        const val USERNAME =
-            "tercero"
-
-        const val PASSWORD =
-            "123456"
     }
 
     private val context =
@@ -88,6 +84,21 @@ class SyncEngine(
                         context
                     )
 
+            val credentials =
+                CredentialStore(
+                    context
+                ).load()
+                    ?: return SyncRunResult(
+                        success =
+                            true,
+
+                        skipped =
+                            true,
+
+                        message =
+                            "Credenciales no configuradas"
+                    )
+
             val authClient =
                 AuthClient(
                     AUTH_URL
@@ -95,8 +106,8 @@ class SyncEngine(
 
             val login =
                 authClient.login(
-                    USERNAME,
-                    PASSWORD
+                    credentials.username,
+                    credentials.password
                 )
 
             if (!login.success) {
@@ -218,7 +229,33 @@ class SyncEngine(
 
                             deleted++
                         }
+
+                        else -> {
+
+                            throw RuntimeException(
+                                "Tipo de cambio no soportado: ${change.type}"
+                            )
+                        }
                     }
+
+                    /*
+                     * El cursor solo avanza después de
+                     * aplicar correctamente el cambio.
+                     *
+                     * Si Download/Delete/escritura falla,
+                     * no se envía ACK y el servidor podrá
+                     * volver a entregar el evento.
+                     */
+                    grpcClient.acknowledgeChanges(
+                        token =
+                            login.token,
+
+                        deviceId =
+                            deviceId,
+
+                        changeId =
+                            change.changeId
+                    )
 
                 } catch (
                     error: Exception
