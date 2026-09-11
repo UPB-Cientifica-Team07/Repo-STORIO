@@ -1,0 +1,33 @@
+services/monitoring-service/generated/monitoring_grpc.pb.go:249:func _MonitoringService_ReportMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:254:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:264:	return interceptor(ctx, in, info, handler)
+services/monitoring-service/generated/monitoring_grpc.pb.go:267:func _MonitoringService_GetMetrics_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:272:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:282:	return interceptor(ctx, in, info, handler)
+services/monitoring-service/generated/monitoring_grpc.pb.go:285:func _MonitoringService_ReportStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:290:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:300:	return interceptor(ctx, in, info, handler)
+services/monitoring-service/generated/monitoring_grpc.pb.go:303:func _MonitoringService_GetServiceStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:308:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:318:	return interceptor(ctx, in, info, handler)
+services/monitoring-service/generated/monitoring_grpc.pb.go:321:func _MonitoringService_GetNodeStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:326:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:336:	return interceptor(ctx, in, info, handler)
+services/monitoring-service/generated/monitoring_grpc.pb.go:339:func _MonitoringService_GetHpcSummary_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:344:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:354:	return interceptor(ctx, in, info, handler)
+services/monitoring-service/generated/monitoring_grpc.pb.go:357:func _MonitoringService_CreateAlertRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:362:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:372:	return interceptor(ctx, in, info, handler)
+services/monitoring-service/generated/monitoring_grpc.pb.go:375:func _MonitoringService_UpdateAlertRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:380:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:390:	return interceptor(ctx, in, info, handler)
+services/monitoring-service/generated/monitoring_grpc.pb.go:393:func _MonitoringService_DeleteAlertRule_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:398:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:408:	return interceptor(ctx, in, info, handler)
+services/monitoring-service/generated/monitoring_grpc.pb.go:411:func _MonitoringService_GetAlertRules_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:416:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:426:	return interceptor(ctx, in, info, handler)
+services/monitoring-service/generated/monitoring_grpc.pb.go:429:func _MonitoringService_GetAlerts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+services/monitoring-service/generated/monitoring_grpc.pb.go:434:	if interceptor == nil {
+services/monitoring-service/generated/monitoring_grpc.pb.go:444:	return interceptor(ctx, in, info, handler)

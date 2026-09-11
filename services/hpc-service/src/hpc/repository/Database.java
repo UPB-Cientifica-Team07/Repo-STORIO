@@ -21,13 +21,31 @@ public final class Database {
             );
 
     private static final String PASSWORD =
-        System.getenv()
-            .getOrDefault(
-                "HPC_DB_PASSWORD",
-                "upb_dev_2026"
-            );
+        requireEnvironment(
+            "HPC_DB_PASSWORD"
+        );
 
     private Database() {
+    }
+
+    private static String requireEnvironment(
+        String key
+    ) {
+        String value =
+            System.getenv(
+                key
+            );
+
+        if (
+            value == null ||
+            value.isBlank()
+        ) {
+            throw new IllegalStateException(
+                key + " es obligatorio"
+            );
+        }
+
+        return value;
     }
 
     public static Connection getConnection()

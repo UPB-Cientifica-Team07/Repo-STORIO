@@ -1,0 +1,25 @@
+services/hpc-service/src/hpc/repository/UserRepository.java:16:            SELECT id_usuario
+services/hpc-service/src/hpc/repository/UserRepository.java:17:            FROM usuario
+services/hpc-service/src/hpc/repository/UserRepository.java:49:                    "id_usuario",
+services/hpc-service/src/hpc/repository/JobRepository.java:21:                id_usuario,
+services/hpc-service/src/hpc/common/ClusterCoordinator.java:26:        String token,
+services/hpc-service/src/hpc/client/JobClient.java:35:                    "Uso: JobClient <host> <port> <token> [processes]"
+services/hpc-service/src/hpc/client/JobClient.java:39:            String token =
+services/hpc-service/src/hpc/client/JobClient.java:80:                    token,
+services/hpc-service/src/hpc/coordinator/ClusterCoordinatorImpl.java:294:        String token,
+services/hpc-service/src/hpc/coordinator/ClusterCoordinatorImpl.java:335:                authClient.validate(
+services/hpc-service/src/hpc/coordinator/ClusterCoordinatorImpl.java:336:                    token
+services/hpc-service/src/hpc/coordinator/ClusterCoordinatorImpl.java:345:                    "Token HPC inválido"
+services/hpc-service/src/hpc/coordinator/ClusterCoordinatorImpl.java:358:                    "Usuario autenticado no existe en PostgreSQL"
+services/hpc-service/src/hpc/coordinator/ClusterCoordinatorImpl.java:366:                identity.role()
+services/hpc-service/src/hpc/auth/AuthIdentity.java:6:    String role,
+services/hpc-service/src/hpc/auth/AuthClient.java:37:    public AuthIdentity validate(
+services/hpc-service/src/hpc/auth/AuthClient.java:38:        String token
+services/hpc-service/src/hpc/auth/AuthClient.java:43:            token == null ||
+services/hpc-service/src/hpc/auth/AuthClient.java:44:            token.isBlank()
+services/hpc-service/src/hpc/auth/AuthClient.java:51:                "Token requerido"
+services/hpc-service/src/hpc/auth/AuthClient.java:58:                "/internal/auth/validate"
+services/hpc-service/src/hpc/auth/AuthClient.java:67:                    "Authorization",
+services/hpc-service/src/hpc/auth/AuthClient.java:68:                    "Bearer " + token
+services/hpc-service/src/hpc/auth/AuthClient.java:125:        String role =
+services/hpc-service/src/hpc/auth/AuthClient.java:138:            role,

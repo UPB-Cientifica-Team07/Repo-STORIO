@@ -1,0 +1,13 @@
+LISTEN 0      2048         0.0.0.0:389        0.0.0.0:*                                    
+LISTEN 0      200        127.0.0.1:5434       0.0.0.0:*                                    
+LISTEN 0      4096         0.0.0.0:8082       0.0.0.0:*    users:(("php",pid=10236,fd=4))  
+LISTEN 0      2048            [::]:389           [::]:*                                    
+LISTEN 0      200            [::1]:5434          [::]:*                                    
+LISTEN 0      511                *:50052            *:*    users:(("node",pid=10097,fd=21))
+LISTEN 0      4096               *:50053            *:*    users:(("server",pid=9703,fd=7))
+LISTEN 0      4096               *:50055            *:*    users:(("server",pid=9836,fd=8))
+LISTEN 0      4096               *:50051            *:*    users:(("server",pid=9581,fd=7))
+LISTEN 0      50                 *:1100             *:*    users:(("java",pid=10462,fd=8)) 
+LISTEN 0      50                 *:1099             *:*    users:(("java",pid=9436,fd=9))  
+LISTEN 0      511                *:8080             *:*    users:(("node",pid=9973,fd=21)) 
+LISTEN 0      50                 *:8081             *:*    users:(("java",pid=9436,fd=10)) 

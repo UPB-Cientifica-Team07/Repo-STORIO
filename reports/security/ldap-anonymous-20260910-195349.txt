@@ -1,0 +1,18 @@
+# extended LDIF
+#
+# LDAPv3
+# base <> with scope baseObject
+# filter: (objectclass=*)
+# requesting: namingContexts 
+#
+
+#
+dn:
+namingContexts: dc=upb-cientifica,dc=local
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 2
+# numEntries: 1

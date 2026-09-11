@@ -31,10 +31,24 @@ func Open() (*sql.DB, error) {
 		"upb_app",
 	)
 
-	password := getenv(
-		"POSTGRES_PASSWORD",
-		"upb_dev_2026",
-	)
+	password :=
+		os.Getenv(
+			"SYNC_DB_PASSWORD",
+		)
+
+	if password == "" {
+		password =
+			os.Getenv(
+				"POSTGRES_PASSWORD",
+			)
+	}
+
+	if password == "" {
+		return nil,
+			fmt.Errorf(
+				"SYNC_DB_PASSWORD o POSTGRES_PASSWORD es obligatorio",
+			)
+	}
 
 	databaseName := getenv(
 		"POSTGRES_DB",

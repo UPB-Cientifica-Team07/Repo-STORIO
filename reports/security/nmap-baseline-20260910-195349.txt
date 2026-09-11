@@ -1,0 +1,55 @@
+Starting Nmap 7.99 ( https://nmap.org ) at 2026-09-10 19:53 -0500
+Stats: 0:00:18 elapsed; 0 hosts completed (1 up), 1 undergoing Service Scan
+Service scan Timing: About 90.91% done; ETC: 19:54 (0:00:02 remaining)
+Nmap scan report for localhost (127.0.0.1)
+Host is up (0.000016s latency).
+
+PORT      STATE SERVICE         VERSION
+389/tcp   open  ldap            OpenLDAP 2.2.X - 2.3.X
+1099/tcp  open  java-rmi        Java RMI
+1100/tcp  open  java-rmi        Java RMI
+5434/tcp  open  ssl/sgi-arrayd?
+8080/tcp  open  http            Node.js Express framework
+8081/tcp  open  nagios-nsca     Nagios NSCA
+8082/tcp  open  http            (PHP 8.4.24)
+50051/tcp open  grpc
+50052/tcp open  http            Node.js Express framework
+50053/tcp open  grpc
+50055/tcp open  grpc
+1 service unrecognized despite returning data. If you know the service/version, please submit the following fingerprint at https://nmap.org/cgi-bin/submit.cgi?new-service :
+SF-Port8082-TCP:V=7.99%I=9%D=9/10%Time=6AA35123%P=x86_64-pc-linux-gnu%r(Ge
+SF:tRequest,FE,"HTTP/1\.0\x20405\x20Method\x20Not\x20Allowed\r\nDate:\x20F
+SF:ri,\x2011\x20Sep\x202026\x2000:53:55\x20GMT\r\nConnection:\x20close\r\n
+SF:X-Powered-By:\x20PHP/8\.4\.24\r\nContent-Type:\x20application/json;\x20
+SF:charset=utf-8\r\n\r\n{\"success\":false,\"message\":\"Use\x20POST\x20pa
+SF:ra\x20SOAP,\x20\\/\?wsdl\x20para\x20WSDL\x20o\x20\\/health\x20para\x20e
+SF:stado\"}")%r(FourOhFourRequest,FE,"HTTP/1\.0\x20405\x20Method\x20Not\x2
+SF:0Allowed\r\nDate:\x20Fri,\x2011\x20Sep\x202026\x2000:53:55\x20GMT\r\nCo
+SF:nnection:\x20close\r\nX-Powered-By:\x20PHP/8\.4\.24\r\nContent-Type:\x2
+SF:0application/json;\x20charset=utf-8\r\n\r\n{\"success\":false,\"message
+SF:\":\"Use\x20POST\x20para\x20SOAP,\x20\\/\?wsdl\x20para\x20WSDL\x20o\x20
+SF:\\/health\x20para\x20estado\"}")%r(HTTPOptions,FE,"HTTP/1\.0\x20405\x20
+SF:Method\x20Not\x20Allowed\r\nDate:\x20Fri,\x2011\x20Sep\x202026\x2000:54
+SF::00\x20GMT\r\nConnection:\x20close\r\nX-Powered-By:\x20PHP/8\.4\.24\r\n
+SF:Content-Type:\x20application/json;\x20charset=utf-8\r\n\r\n{\"success\"
+SF::false,\"message\":\"Use\x20POST\x20para\x20SOAP,\x20\\/\?wsdl\x20para\
+SF:x20WSDL\x20o\x20\\/health\x20para\x20estado\"}")%r(OfficeScan,FE,"HTTP/
+SF:1\.1\x20405\x20Method\x20Not\x20Allowed\r\nDate:\x20Fri,\x2011\x20Sep\x
+SF:202026\x2000:54:41\x20GMT\r\nConnection:\x20close\r\nX-Powered-By:\x20P
+SF:HP/8\.4\.24\r\nContent-Type:\x20application/json;\x20charset=utf-8\r\n\
+SF:r\n{\"success\":false,\"message\":\"Use\x20POST\x20para\x20SOAP,\x20\\/
+SF:\?wsdl\x20para\x20WSDL\x20o\x20\\/health\x20para\x20estado\"}")%r(apple
+SF:-iphoto,FE,"HTTP/1\.1\x20405\x20Method\x20Not\x20Allowed\r\nDate:\x20Fr
+SF:i,\x2011\x20Sep\x202026\x2000:54:41\x20GMT\r\nConnection:\x20close\r\nX
+SF:-Powered-By:\x20PHP/8\.4\.24\r\nContent-Type:\x20application/json;\x20c
+SF:harset=utf-8\r\n\r\n{\"success\":false,\"message\":\"Use\x20POST\x20par
+SF:a\x20SOAP,\x20\\/\?wsdl\x20para\x20WSDL\x20o\x20\\/health\x20para\x20es
+SF:tado\"}")%r(metasploit-msgrpc,FE,"HTTP/1\.0\x20405\x20Method\x20Not\x20
+SF:Allowed\r\nDate:\x20Fri,\x2011\x20Sep\x202026\x2000:54:41\x20GMT\r\nCon
+SF:nection:\x20close\r\nX-Powered-By:\x20PHP/8\.4\.24\r\nContent-Type:\x20
+SF:application/json;\x20charset=utf-8\r\n\r\n{\"success\":false,\"message\
+SF:":\"Use\x20POST\x20para\x20SOAP,\x20\\/\?wsdl\x20para\x20WSDL\x20o\x20\
+SF:\/health\x20para\x20estado\"}");
+
+Service detection performed. Please report any incorrect results at https://nmap.org/submit/ .
+Nmap done: 1 IP address (1 host up) scanned in 67.47 seconds

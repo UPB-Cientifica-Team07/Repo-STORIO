@@ -1,0 +1,12 @@
+HTTP/1.1 200 OK
+X-Powered-By: Express
+Accept-Ranges: bytes
+Cache-Control: public, max-age=0
+Last-Modified: Sun, 06 Sep 2026 04:40:58 GMT
+ETag: W/"b66-1a07505062b"
+Content-Type: text/html; charset=utf-8
+Content-Length: 2918
+Date: Fri, 11 Sep 2026 00:54:56 GMT
+Connection: keep-alive
+Keep-Alive: timeout=5
+

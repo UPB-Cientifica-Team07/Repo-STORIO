@@ -1,0 +1,98 @@
+services/directory-service/README.md:172:    LDAP_URL=ldap://127.0.0.1:389
+services/directory-service/README.md:177:    LDAP_URL="ldap://127.0.0.1:389" \
+services/directory-service/README.md:191:      -H ldap://127.0.0.1:389 \
+services/directory-service/README.md:200:      -H ldap://127.0.0.1:389 \
+services/directory-service/README.md:209:      -H ldap://127.0.0.1:389 \
+services/directory-service/scripts/provision-users.sh:5:LDAP_URL="${LDAP_URL:-ldap://127.0.0.1:389}"
+services/directory-service/scripts/bootstrap-directory.sh:5:LDAP_URL="${LDAP_URL:-ldap://127.0.0.1:389}"
+services/stream-service/config/config.php:47:                ?: 'http://127.0.0.1:8081',
+services/stream-service/wsdl/streaming.wsdl:4:    xmlns="http://schemas.xmlsoap.org/wsdl/"
+services/stream-service/wsdl/streaming.wsdl:5:    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+services/stream-service/wsdl/streaming.wsdl:7:    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+services/stream-service/wsdl/streaming.wsdl:198:            transport="http://schemas.xmlsoap.org/soap/http"/>
+services/stream-service/wsdl/streaming.wsdl:249:                location="http://127.0.0.1:50054/"/>
+services/monitoring-service/cmd/client/main.go:26:			insecure.NewCredentials(),
+services/file-service/cmd/acl-revoke-test/main.go:28:			insecure.NewCredentials(),
+services/file-service/cmd/quota-concurrency-test/main.go:37:			insecure.NewCredentials(),
+services/file-service/cmd/acl-delegation-test/main.go:28:			insecure.NewCredentials(),
+services/file-service/cmd/acl-user3-update-test/main.go:49:			insecure.NewCredentials(),
+services/file-service/cmd/storage-test/main.go:77:				insecure.NewCredentials(),
+services/file-service/cmd/acl-user3-read-test/main.go:28:			insecure.NewCredentials(),
+services/file-service/cmd/acl-user3-delete-denied-test/main.go:30:			insecure.NewCredentials(),
+services/file-service/cmd/acl-user3-share-denied-test/main.go:30:			insecure.NewCredentials(),
+services/file-service/cmd/verify/main.go:46:				insecure.NewCredentials(),
+services/file-service/cmd/acl-escalation-denied-test/main.go:30:			insecure.NewCredentials(),
+services/file-service/cmd/security-test/main.go:36:				insecure.NewCredentials(),
+services/file-service/cmd/home-delete-test/main.go:29:			insecure.NewCredentials(),
+services/file-service/cmd/acl-delete-test/main.go:30:			insecure.NewCredentials(),
+services/file-service/cmd/acl-user3-list-test/main.go:29:				insecure.NewCredentials(),
+services/file-service/cmd/storage-delete/main.go:45:				insecure.NewCredentials(),
+services/file-service/cmd/acl-share-test/main.go:28:			insecure.NewCredentials(),
+services/file-service/cmd/acl-user3-write-grant-test/main.go:27:			insecure.NewCredentials(),
+services/file-service/cmd/update-quota-denied-test/main.go:40:			insecure.NewCredentials(),
+services/file-service/cmd/quota-test/main.go:27:			insecure.NewCredentials(),
+services/file-service/cmd/acl-read-test/main.go:28:			insecure.NewCredentials(),
+services/file-service/cmd/acl-user3-update-denied-test/main.go:30:			insecure.NewCredentials(),
+services/file-service/cmd/server/main.go:37:	authURL         = "http://localhost:8081"
+services/file-service/cmd/server/main.go:135:			"http://127.0.0.1:50054"
+services/file-service/cmd/authorization-test/main.go:72:				insecure.NewCredentials(),
+services/file-service/cmd/client/main.go:37:			insecure.NewCredentials(),
+services/file-service/cmd/acl-user3-list-denied-test/main.go:29:				insecure.NewCredentials(),
+services/file-service/internal/streaming/client.go:108:    xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+services/file-service/internal/monitoring/client.go:32:			insecure.NewCredentials(),
+services/auth-services/server/src/auth/AuthServiceImpl.java:68:                                        "ldap://127.0.0.1:389"
+services/auth-services/server/src/auth/LdapDirectoryClient.java:29:                                "ldap://127.0.0.1:389"
+services/photo-service/src/config/config.js:6:    "http://localhost:8081",
+services/hpc-service/src/hpc/coordinator/ClusterCoordinatorImpl.java:89:                        "http://127.0.0.1:8081"
+services/sync-service/cmd/tree-security-test/main.go:21:	authURL     = "http://localhost:8081"
+services/sync-service/cmd/tree-security-test/main.go:75:				insecure.NewCredentials(),
+services/sync-service/cmd/tree-integration-test/main.go:20:	authURL     = "http://localhost:8081"
+services/sync-service/cmd/tree-integration-test/main.go:87:				insecure.NewCredentials(),
+services/sync-service/cmd/update-integration-test/main.go:20:	authURL     = "http://localhost:8081"
+services/sync-service/cmd/update-integration-test/main.go:118:				insecure.NewCredentials(),
+services/sync-service/cmd/home-integration-test/main.go:20:	authURL       = "http://localhost:8081"
+services/sync-service/cmd/home-integration-test/main.go:73:				insecure.NewCredentials(),
+services/sync-service/cmd/delete-integration-test/main.go:20:	authURL     = "http://localhost:8081"
+services/sync-service/cmd/delete-integration-test/main.go:114:				insecure.NewCredentials(),
+services/sync-service/cmd/persistence-integration-test/main.go:20:	authURL     = "http://localhost:8081"
+services/sync-service/cmd/persistence-integration-test/main.go:102:				insecure.NewCredentials(),
+services/sync-service/cmd/security-test/main.go:21:	authURL       = "http://localhost:8081"
+services/sync-service/cmd/security-test/main.go:86:				insecure.NewCredentials(),
+services/sync-service/cmd/home-delete-test/main.go:18:	authURL       = "http://localhost:8081"
+services/sync-service/cmd/home-delete-test/main.go:65:				insecure.NewCredentials(),
+services/sync-service/cmd/persistence-restart-test/main.go:20:	authURL     = "http://localhost:8081"
+services/sync-service/cmd/persistence-restart-test/main.go:93:				insecure.NewCredentials(),
+services/sync-service/cmd/server/main.go:27:	authURL = "http://localhost:8081"
+services/sync-service/cmd/client/main.go:20:	authURL       = "http://localhost:8081"
+services/sync-service/cmd/client/main.go:96:			insecure.NewCredentials(),
+services/sync-service/cmd/watcher/main.go:32:	defaultAuthURL       = "http://localhost:8081"
+services/sync-service/cmd/watcher/main.go:258:				insecure.NewCredentials(),
+services/sync-service/internal/monitoring/client.go:26:			insecure.NewCredentials(),
+services/sync-service/internal/fileclient/client.go:47:				insecure.NewCredentials(),
+services/analysis-service/cmd/client/main.go:19:			insecure.NewCredentials(),
+services/analysis-service/internal/monitoring/client.go:29:			insecure.NewCredentials(),
+services/analysis-service/internal/fileclient/client.go:24:			insecure.NewCredentials(),
+clients/web/server.js:22:  "http://127.0.0.1:8081";
+clients/web/server.js:26:  "http://127.0.0.1:50052";
+clients/web/server.js:30:  "http://127.0.0.1:50054";
+clients/web/server.js:1733:  xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/"
+clients/linux/README.md:37:    export SYNC_AUTH_URL="http://127.0.0.1:8081"
+clients/linux/config.example.env:5:SYNC_AUTH_URL=http://127.0.0.1:8081
+clients/windows/config.example.ps1:5:$env:SYNC_AUTH_URL = "http://192.168.1.100:8081"
+clients/windows/README.md:69:    $env:SYNC_AUTH_URL = "http://192.168.1.100:8081"
+clients/android/gradle.properties:6:# http://www.gradle.org/docs/current/userguide/build_environment.html
+clients/android/app/proguard-rules.pro:6:#   http://developer.android.com/guide/developing/tools/proguard.html
+clients/android/app/src/main/java/co/edu/upb/cientifica/sync/sync/SyncEngine.kt:33:            "http://192.168.10.13:8081"
+clients/android/app/src/main/java/co/edu/upb/cientifica/sync/grpc/SyncGrpcClient.kt:62:            .usePlaintext()
+clients/android/app/src/main/res/layout/activity_main.xml:4:    xmlns:android="http://schemas.android.com/apk/res/android"
+clients/android/app/src/main/res/values-night/themes.xml:1:<resources xmlns:tools="http://schemas.android.com/tools">
+clients/android/app/src/main/res/values/themes.xml:1:<resources xmlns:tools="http://schemas.android.com/tools">
+clients/android/app/src/main/res/drawable/ic_launcher_foreground.xml:1:<vector xmlns:android="http://schemas.android.com/apk/res/android"
+clients/android/app/src/main/res/drawable/ic_launcher_foreground.xml:2:    xmlns:aapt="http://schemas.android.com/aapt"
+clients/android/app/src/main/res/drawable/ic_launcher_background.xml:2:<vector xmlns:android="http://schemas.android.com/apk/res/android"
+clients/android/app/src/main/res/mipmap-anydpi/ic_launcher_round.xml:2:<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+clients/android/app/src/main/res/mipmap-anydpi/ic_launcher.xml:2:<adaptive-icon xmlns:android="http://schemas.android.com/apk/res/android">
+clients/android/app/src/main/AndroidManifest.xml:4:    xmlns:android="http://schemas.android.com/apk/res/android">
+clients/android/app/src/main/AndroidManifest.xml:25:        android:usesCleartextTraffic="true">
+clients/android/app/src/androidTest/java/co/edu/upb/cientifica/sync/ExampleInstrumentedTest.kt:14: * See [testing documentation](http://d.android.com/tools/testing).
+clients/android/app/src/test/java/co/edu/upb/cientifica/sync/ExampleUnitTest.kt:10: * See [testing documentation](http://d.android.com/tools/testing).

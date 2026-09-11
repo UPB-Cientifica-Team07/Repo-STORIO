@@ -8,6 +8,26 @@ $defaultStorageRoot =
         '/../../file-service/data/shared-storage'
     );
 
+$dbPassword =
+    getenv('STREAM_DB_PASSWORD');
+
+if (
+    $dbPassword === false ||
+    trim($dbPassword) === ''
+) {
+    $dbPassword =
+        getenv('DB_PASSWORD');
+}
+
+if (
+    $dbPassword === false ||
+    trim($dbPassword) === ''
+) {
+    throw new RuntimeException(
+        'STREAM_DB_PASSWORD o DB_PASSWORD es obligatorio'
+    );
+}
+
 return [
     'database' => [
         'host' =>
@@ -27,8 +47,7 @@ return [
                 ?: 'upb_app',
 
         'password' =>
-            getenv('DB_PASSWORD')
-                ?: 'upb_dev_2026',
+            $dbPassword,
     ],
 
     'service' => [

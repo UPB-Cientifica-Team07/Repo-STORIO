@@ -1,0 +1,23 @@
+services/auth-services/contract/auth/IAuthService.java:6:public interface IAuthService extends Remote {
+services/auth-services/server/src/auth/AuthServer.java:12:import java.rmi.registry.LocateRegistry;
+services/auth-services/server/src/auth/AuthServer.java:72:                        LocateRegistry.createRegistry(
+services/auth-services/server/src/auth/AuthServer.java:84:                        LocateRegistry.getRegistry(
+services/auth-services/server/src/auth/AuthServer.java:93:            registry.rebind(
+services/auth-services/server/src/auth/AuthServiceImpl.java:4:import java.rmi.server.UnicastRemoteObject;
+services/auth-services/server/src/auth/AuthServiceImpl.java:13:        extends UnicastRemoteObject
+services/auth-services/client/src/auth/AuthClient.java:3:import java.rmi.registry.LocateRegistry;
+services/auth-services/client/src/auth/AuthClient.java:70:                    LocateRegistry.getRegistry(
+services/hpc-service/src/hpc/common/HpcWorker.java:7:    extends Remote {
+services/hpc-service/src/hpc/common/ClusterCoordinator.java:8:    extends Remote {
+services/hpc-service/src/hpc/client/JobClient.java:6:import java.rmi.registry.LocateRegistry;
+services/hpc-service/src/hpc/client/JobClient.java:55:                LocateRegistry
+services/hpc-service/src/hpc/node/WorkerNode.java:12:import java.rmi.registry.LocateRegistry;
+services/hpc-service/src/hpc/node/WorkerNode.java:14:import java.rmi.server.UnicastRemoteObject;
+services/hpc-service/src/hpc/node/WorkerNode.java:20:    extends UnicastRemoteObject
+services/hpc-service/src/hpc/node/WorkerNode.java:329:                LocateRegistry
+services/hpc-service/src/hpc/coordinator/CoordinatorServer.java:5:import java.rmi.registry.LocateRegistry;
+services/hpc-service/src/hpc/coordinator/CoordinatorServer.java:31:                LocateRegistry
+services/hpc-service/src/hpc/coordinator/CoordinatorServer.java:32:                    .createRegistry(
+services/hpc-service/src/hpc/coordinator/CoordinatorServer.java:39:            registry.rebind(
+services/hpc-service/src/hpc/coordinator/ClusterCoordinatorImpl.java:15:import java.rmi.server.UnicastRemoteObject;
+services/hpc-service/src/hpc/coordinator/ClusterCoordinatorImpl.java:28:    extends UnicastRemoteObject

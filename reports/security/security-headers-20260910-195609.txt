@@ -1,0 +1,12 @@
+
+---- http://127.0.0.1:8080/ ----
+HTTP/1.1 200 OK
+X-Powered-By: Express
+
+---- http://127.0.0.1:50052/ ----
+HTTP/1.1 404 Not Found
+X-Powered-By: Express
+
+---- http://127.0.0.1:8082/ ----
+HTTP/1.1 405 Method Not Allowed
+X-Powered-By: PHP/8.4.24

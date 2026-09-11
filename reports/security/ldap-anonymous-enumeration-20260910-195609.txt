@@ -1,0 +1,47 @@
+# extended LDIF
+#
+# LDAPv3
+# base <dc=upb-cientifica,dc=local> with scope subtree
+# filter: (objectClass=*)
+# requesting: dn 
+#
+
+# upb-cientifica.local
+dn: dc=upb-cientifica,dc=local
+
+# people, upb-cientifica.local
+dn: ou=people,dc=upb-cientifica,dc=local
+
+# groups, upb-cientifica.local
+dn: ou=groups,dc=upb-cientifica,dc=local
+
+# services, upb-cientifica.local
+dn: ou=services,dc=upb-cientifica,dc=local
+
+# resources, upb-cientifica.local
+dn: ou=resources,dc=upb-cientifica,dc=local
+
+# ADMIN, groups, upb-cientifica.local
+dn: cn=ADMIN,ou=groups,dc=upb-cientifica,dc=local
+
+# INVESTIGADOR, groups, upb-cientifica.local
+dn: cn=INVESTIGADOR,ou=groups,dc=upb-cientifica,dc=local
+
+# USUARIO, groups, upb-cientifica.local
+dn: cn=USUARIO,ou=groups,dc=upb-cientifica,dc=local
+
+# samuel, people, upb-cientifica.local
+dn: uid=samuel,ou=people,dc=upb-cientifica,dc=local
+
+# prueba, people, upb-cientifica.local
+dn: uid=prueba,ou=people,dc=upb-cientifica,dc=local
+
+# tercero, people, upb-cientifica.local
+dn: uid=tercero,ou=people,dc=upb-cientifica,dc=local
+
+# search result
+search: 2
+result: 0 Success
+
+# numResponses: 12
+# numEntries: 11
