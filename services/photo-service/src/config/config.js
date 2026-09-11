@@ -1,4 +1,8 @@
 module.exports = {
+  host:
+    process.env.PHOTO_BIND_ADDRESS ||
+    "127.0.0.1",
+
   port: process.env.PORT || 50052,
 
   authServiceUrl:

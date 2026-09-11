@@ -27,7 +27,7 @@ const PHOTO_SERVICE =
 
 const STREAMING_SERVICE =
   process.env.STREAMING_SERVICE ||
-  "http://127.0.0.1:50054";
+  "http://127.0.0.1:8082";
 
 const upload =
   multer({

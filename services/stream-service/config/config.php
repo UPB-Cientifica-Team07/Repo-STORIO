@@ -57,7 +57,7 @@ return [
 
         'port' =>
             getenv('STREAM_PORT')
-                ?: '50054',
+                ?: '8082',
     ],
 
     'auth' => [

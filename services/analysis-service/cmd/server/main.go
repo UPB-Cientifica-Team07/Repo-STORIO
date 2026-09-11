@@ -19,7 +19,7 @@ import (
 )
 
 const (
-	servicePort = ":50054"
+	servicePort = "127.0.0.1:50054"
 
 	componentID   = "analysis-service-01"
 	componentName = "Analysis Service"
@@ -144,7 +144,7 @@ func main() {
 
 		log.Println("===================================")
 		log.Println(" ANALYSIS SERVICE ACTIVO")
-		log.Println(" Escuchando en :50054")
+		log.Printf(" Escuchando en %s", servicePort)
 		log.Println("===================================")
 
 		if err := grpcServer.Serve(

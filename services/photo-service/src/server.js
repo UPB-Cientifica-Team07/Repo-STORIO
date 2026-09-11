@@ -104,6 +104,7 @@ app.use(
 const server =
   app.listen(
     config.port,
+    config.host,
     () => {
       console.log(
         "==================================="

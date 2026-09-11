@@ -23,7 +23,7 @@ Fecha de evaluación: 2026-09-10
 | R-08 | Android permite tráfico cleartext | Alta | Alta | ALTO | Abierto |
 | R-09 | Android almacena contraseña en SharedPreferences sin cifrado | Media | Alta | ALTO | Abierto |
 | R-10 | LDAP permite enumeración anónima de estructura, usuarios y grupos | Media | Media | MEDIO | Abierto |
-| R-11 | Servicios internos escuchan en todas las interfaces de red | Media | Alta | ALTO | Abierto |
+| R-11 | Servicios internos escuchan en todas las interfaces de red | Media | Alta | ALTO | Mitigado |
 | R-12 | Web, Photo y Streaming carecen de headers HTTP defensivos | Media | Media | MEDIO | Abierto |
 | R-13 | Express/PHP revelan tecnología y versión mediante headers | Media | Baja | BAJO | Abierto |
 | R-14 | Java RMI expuesto en puertos 1099 y 1100 | Media | Alta | ALTO | Abierto |
@@ -50,7 +50,7 @@ Fecha de evaluación: 2026-09-10
 2. Eliminar credenciales embebidas. ✅ Mitigado ✅ Mitigado
 3. Proteger Auth contra fuerza bruta. ✅ Mitigado ✅ Mitigado
 4. Añadir autenticación/autorización a Monitoring. ✅ Mitigado
-5. Restringir interfaces y puertos internos.
+5. Restringir interfaces y puertos internos. ✅ Mitigado
 6. TLS/LDAPS/gRPC TLS.
 7. Endurecer Android.
 8. Headers HTTP y eliminación de banners.
@@ -130,3 +130,36 @@ Estado: MITIGADO.
 - File, Sync y Photo reportaron métricas correctamente después de activar el service token.
 - Las reglas creadas durante las pruebas fueron eliminadas.
 - Estado: MITIGADO.
+
+### R-11 — Restricción de interfaces de servicios internos
+
+Se redujo la superficie de exposición de los servicios que no requieren acceso directo desde otros equipos.
+
+Bindings aplicados:
+
+- Monitoring Service: `127.0.0.1:50051`.
+- Photo Service: `127.0.0.1:50052`.
+- File Service: `127.0.0.1:50053`.
+- Analysis Service: `127.0.0.1:50054`.
+- Streaming SOAP Service: `127.0.0.1:8082`.
+
+Se mantienen accesibles por red los servicios que forman parte de la interfaz distribuida del sistema:
+
+- Sync Service `50055`: requerido por clientes Windows, Linux y Android.
+- Web `8080`: interfaz de usuario accesible por red.
+- Auth HTTP `8081`: requerido por clientes distribuidos.
+
+Los puertos Java RMI `1099` y `1100` se gestionan separadamente en R-14.
+
+Validación runtime mediante `ss` confirmó que los servicios internos anteriores escuchan exclusivamente en loopback.
+
+Después de la restricción:
+
+- File Service continuó enviando métricas.
+- Sync Service continuó enviando métricas.
+- Photo Service continuó enviando métricas.
+- Analysis Service registró estado correctamente.
+- Web respondió HTTP 200.
+- Streaming permaneció accesible en `127.0.0.1:8082`.
+
+Estado: MITIGADO.

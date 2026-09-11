@@ -1,0 +1,77 @@
+R-11 - Restricción de interfaces de servicios internos
+Fecha: 2026-09-10
+
+ANTES
+
+Los servicios internos utilizaban listeners sin dirección específica,
+por ejemplo :50051, :50052, :50053 y :50054, lo cual provocaba
+exposición sobre todas las interfaces.
+
+Streaming había sido iniciado explícitamente mediante:
+
+php -S 0.0.0.0:8082
+
+MITIGACIÓN
+
+Servicios restringidos a loopback:
+
+Monitoring Service
+127.0.0.1:50051
+
+Photo Service
+127.0.0.1:50052
+
+File Service
+127.0.0.1:50053
+
+Analysis Service
+127.0.0.1:50054
+
+Streaming SOAP Service
+127.0.0.1:8082
+
+SERVICIOS QUE PERMANECEN ACCESIBLES POR LAN
+
+Sync Service :50055
+Necesario para clientes distribuidos Windows, Linux y Android.
+
+Web :8080
+Punto de acceso de usuario.
+
+Auth HTTP :8081
+Necesario para autenticación de clientes distribuidos.
+
+Java RMI :1099 y :1100
+Pendiente de tratamiento específico en R-14.
+
+EVIDENCIA RUNTIME
+
+ss confirmó:
+
+127.0.0.1:50051
+127.0.0.1:50052
+127.0.0.1:50053
+127.0.0.1:50054
+127.0.0.1:8082
+
+VALIDACIÓN FUNCIONAL
+
+Monitoring continuó recibiendo métricas de:
+- Sync Service
+- Photo Service
+- File Service
+
+Analysis Service:
+ACTIVE
+
+Web:
+HTTP 200
+
+Streaming:
+Servidor HTTP activo en 127.0.0.1:8082.
+Una solicitud GET a / respondió HTTP 405, confirmando conectividad,
+aunque dicho recurso no admite ese método HTTP.
+
+RESULTADO
+
+R-11 MITIGADO

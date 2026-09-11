@@ -246,7 +246,7 @@
             binding="tns:StreamingServiceBinding">
 
             <soap:address
-                location="http://127.0.0.1:50054/"/>
+                location="http://127.0.0.1:8082/"/>
 
         </port>
     </service>

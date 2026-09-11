@@ -30,7 +30,7 @@ import (
 )
 
 const (
-	fileServicePort = ":50053"
+	fileServicePort = "127.0.0.1:50053"
 	componentID     = "file-service-01"
 	componentName   = "File Service"
 	metricsInterval = 5 * time.Second
@@ -132,7 +132,7 @@ func main() {
 
 	if streamingURL == "" {
 		streamingURL =
-			"http://127.0.0.1:50054"
+			"http://127.0.0.1:8082"
 	}
 
 	log.Printf(
