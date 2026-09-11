@@ -26,6 +26,27 @@ const COMPONENT_ID =
 const COMPONENT_NAME =
   "Photo Service";
 
+const MONITORING_SERVICE_TOKEN =
+  process.env.MONITORING_SERVICE_TOKEN;
+
+if (!MONITORING_SERVICE_TOKEN) {
+  throw new Error(
+    "MONITORING_SERVICE_TOKEN es obligatorio"
+  );
+}
+
+function serviceMetadata() {
+  const metadata =
+    new grpc.Metadata();
+
+  metadata.set(
+    "x-monitoring-service-token",
+    MONITORING_SERVICE_TOKEN
+  );
+
+  return metadata;
+}
+
 const PROTO_PATH =
   path.resolve(
     __dirname,
@@ -203,6 +224,8 @@ function reportStatus(
             )
         },
 
+        serviceMetadata(),
+
         (error, response) => {
           if (error) {
             return reject(error);
@@ -265,6 +288,8 @@ async function reportMetrics() {
     (resolve, reject) => {
       client.ReportMetrics(
         payload,
+
+        serviceMetadata(),
 
         (error, response) => {
           if (error) {

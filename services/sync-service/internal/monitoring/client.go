@@ -3,22 +3,38 @@ package monitoring
 import (
 	"context"
 	"fmt"
+	"os"
+	"strings"
 	"time"
 
 	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/generated"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 type Client struct {
-	conn   *grpc.ClientConn
-	client pb.MonitoringServiceClient
+	conn         *grpc.ClientConn
+	client       pb.MonitoringServiceClient
+	serviceToken string
 }
 
 func NewClient(
 	address string,
 ) (*Client, error) {
+
+	serviceToken :=
+		strings.TrimSpace(
+			os.Getenv("MONITORING_SERVICE_TOKEN"),
+		)
+
+	if serviceToken == "" {
+		return nil,
+			fmt.Errorf(
+				"MONITORING_SERVICE_TOKEN es obligatorio",
+			)
+	}
 
 	conn, err := grpc.NewClient(
 		address,
@@ -40,8 +56,9 @@ func NewClient(
 		)
 
 	return &Client{
-		conn:   conn,
-		client: client,
+		conn:         conn,
+		client:       client,
+		serviceToken: serviceToken,
 	}, nil
 }
 
@@ -72,6 +89,13 @@ func (c *Client) ReportStatus(
 		)
 
 	defer cancel()
+
+	ctx =
+		metadata.AppendToOutgoingContext(
+			ctx,
+			"x-monitoring-service-token",
+			c.serviceToken,
+		)
 
 	response, err :=
 		c.client.ReportStatus(
@@ -123,6 +147,13 @@ func (c *Client) ReportMetrics(
 		)
 
 	defer cancel()
+
+	ctx =
+		metadata.AppendToOutgoingContext(
+			ctx,
+			"x-monitoring-service-token",
+			c.serviceToken,
+		)
 
 	response, err :=
 		c.client.ReportMetrics(

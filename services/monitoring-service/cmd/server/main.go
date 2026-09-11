@@ -12,6 +12,7 @@ import (
 	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/generated"
 	monitoringgrpc "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/internal/grpc"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/internal/repository"
+	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/internal/security"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/monitoring-service/internal/service"
 
 	"google.golang.org/grpc"
@@ -110,8 +111,31 @@ func main() {
 	// GRPC SERVER
 	// =====================================
 
+	// =====================================
+	// SEGURIDAD GRPC
+	// =====================================
+
+	securityInterceptor, err :=
+		security.NewInterceptor()
+
+	if err != nil {
+
+		log.Fatalf(
+			"No se pudo inicializar seguridad Monitoring: %v",
+			err,
+		)
+	}
+
+	// =====================================
+	// GRPC SERVER
+	// =====================================
+
 	grpcServer :=
-		grpc.NewServer()
+		grpc.NewServer(
+			grpc.UnaryInterceptor(
+				securityInterceptor.Unary(),
+			),
+		)
 
 	pb.RegisterMonitoringServiceServer(
 		grpcServer,

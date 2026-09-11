@@ -95,3 +95,6 @@ services/hpc-service/mpi/sleep_mpi
 
 # Directory Service local credentials
 services/directory-service/ldif/*.local.ldif
+
+# Monitoring runtime data
+/data/monitoring/

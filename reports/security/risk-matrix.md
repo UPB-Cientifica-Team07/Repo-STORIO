@@ -19,7 +19,7 @@ Fecha de evaluación: 2026-09-10
 | R-04 | Credenciales PostgreSQL embebidas como valores por defecto | Alta | Alta | ALTO | Mitigado |
 | R-05 | Photo Service presenta vulnerabilidades conocidas en multer y qs | Alta | Alta | ALTO | Mitigado |
 | R-06 | Auth Service sin rate limiting o bloqueo de intentos fallidos | Alta | Alta | ALTO | Mitigado |
-| R-07 | Monitoring Service sin autenticación/autorización confirmada | Alta | Alta | ALTO | Abierto |
+| R-07 | Monitoring Service sin autenticación/autorización confirmada | Alta | Alta | ALTO | Mitigado |
 | R-08 | Android permite tráfico cleartext | Alta | Alta | ALTO | Abierto |
 | R-09 | Android almacena contraseña en SharedPreferences sin cifrado | Media | Alta | ALTO | Abierto |
 | R-10 | LDAP permite enumeración anónima de estructura, usuarios y grupos | Media | Media | MEDIO | Abierto |
@@ -47,9 +47,9 @@ Fecha de evaluación: 2026-09-10
 ## Orden de remediación
 
 1. Dependencias vulnerables de Photo Service. ✅ Mitigado
-2. Eliminar credenciales embebidas. ✅ Mitigado
-3. Proteger Auth contra fuerza bruta. ✅ Mitigado
-4. Añadir autenticación/autorización a Monitoring.
+2. Eliminar credenciales embebidas. ✅ Mitigado ✅ Mitigado
+3. Proteger Auth contra fuerza bruta. ✅ Mitigado ✅ Mitigado
+4. Añadir autenticación/autorización a Monitoring. ✅ Mitigado
 5. Restringir interfaces y puertos internos.
 6. TLS/LDAPS/gRPC TLS.
 7. Endurecer Android.
@@ -111,3 +111,22 @@ Pruebas realizadas:
 - La misma secuencia fue validada directamente mediante Java RMI.
 
 Estado: MITIGADO.
+
+### R-07 — Autenticación y autorización de Monitoring Service
+
+- Se añadió interceptor gRPC obligatorio en Monitoring Service.
+- `ReportMetrics` y `ReportStatus` requieren un token interno mediante metadata `x-monitoring-service-token`.
+- El token interno se obtiene desde `MONITORING_SERVICE_TOKEN` y no se almacena en el repositorio.
+- File Service, Sync Service, Analysis Service y Photo Service fueron migrados para enviar el token interno.
+- Las consultas de Monitoring requieren `Authorization: Bearer <token>` validado contra Auth Service.
+- Web Client reenvía el Bearer token hacia Monitoring mediante metadata gRPC.
+- `CreateAlertRule`, `UpdateAlertRule` y `DeleteAlertRule` requieren rol `ADMIN`.
+- El Web traduce `Unauthenticated` a HTTP 401 y `PermissionDenied` a HTTP 403.
+- Prueba sin credenciales: HTTP 401.
+- Prueba con token inválido: HTTP 401.
+- Prueba con rol USUARIO sobre lectura de métricas: HTTP 200.
+- Prueba con rol USUARIO sobre creación de regla: HTTP 403, `rol ADMIN requerido`.
+- Prueba con rol ADMIN sobre creación de regla: operación permitida.
+- File, Sync y Photo reportaron métricas correctamente después de activar el service token.
+- Las reglas creadas durante las pruebas fueron eliminadas.
+- Estado: MITIGADO.

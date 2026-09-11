@@ -2733,7 +2733,9 @@ app.get(
 
       const response =
         await monitoringClient
-          .getMetrics();
+          .getMetrics(
+            token
+          );
 
       return res.json({
         success: true,
@@ -2749,7 +2751,13 @@ app.get(
       );
 
       return res
-        .status(502)
+        .status(
+          error.code === 7
+            ? 403
+            : error.code === 16
+              ? 401
+              : 502
+        )
         .json({
           success: false,
           message:
@@ -2787,7 +2795,8 @@ app.get(
       const response =
         await monitoringClient
           .getServiceStatus(
-            req.params.name
+            req.params.name,
+            token
           );
 
       return res.json({
@@ -2841,7 +2850,9 @@ app.get(
 
       const response =
         await monitoringClient
-          .getAlerts();
+          .getAlerts(
+            token
+          );
 
       return res.json({
         success: true,
@@ -2852,7 +2863,13 @@ app.get(
     } catch (error) {
 
       return res
-        .status(502)
+        .status(
+          error.code === 7
+            ? 403
+            : error.code === 16
+              ? 401
+              : 502
+        )
         .json({
           success: false,
           message:
@@ -2889,7 +2906,9 @@ app.get(
 
       const response =
         await monitoringClient
-          .getAlertRules();
+          .getAlertRules(
+            token
+          );
 
       return res.json({
         success: true,
@@ -2900,7 +2919,13 @@ app.get(
     } catch (error) {
 
       return res
-        .status(502)
+        .status(
+          error.code === 7
+            ? 403
+            : error.code === 16
+              ? 401
+              : 502
+        )
         .json({
           success: false,
           message:
@@ -2964,21 +2989,24 @@ app.post(
 
       const response =
         await monitoringClient
-          .createAlertRule({
-            id,
-            name,
-            metric,
-            operator,
-            threshold:
-              Number(
-                threshold
-              ),
-            componentName,
-            enabled:
-              Boolean(
-                enabled
-              )
-          });
+          .createAlertRule(
+            {
+              id,
+              name,
+              metric,
+              operator,
+              threshold:
+                Number(
+                  threshold
+                ),
+              componentName,
+              enabled:
+                Boolean(
+                  enabled
+                )
+            },
+            token
+          );
 
       return res.json({
         success:
@@ -2992,7 +3020,13 @@ app.post(
     } catch (error) {
 
       return res
-        .status(502)
+        .status(
+          error.code === 7
+            ? 403
+            : error.code === 16
+              ? 401
+              : 502
+        )
         .json({
           success: false,
           message:
@@ -3038,22 +3072,25 @@ app.put(
 
       const response =
         await monitoringClient
-          .updateAlertRule({
-            id:
-              req.params.id,
-            name,
-            metric,
-            operator,
-            threshold:
-              Number(
-                threshold
-              ),
-            componentName,
-            enabled:
-              Boolean(
-                enabled
-              )
-          });
+          .updateAlertRule(
+            {
+              id:
+                req.params.id,
+              name,
+              metric,
+              operator,
+              threshold:
+                Number(
+                  threshold
+                ),
+              componentName,
+              enabled:
+                Boolean(
+                  enabled
+                )
+            },
+            token
+          );
 
       return res.json({
         success:
@@ -3067,7 +3104,13 @@ app.put(
     } catch (error) {
 
       return res
-        .status(502)
+        .status(
+          error.code === 7
+            ? 403
+            : error.code === 16
+              ? 401
+              : 502
+        )
         .json({
           success: false,
           message:
@@ -3105,7 +3148,8 @@ app.delete(
       const response =
         await monitoringClient
           .deleteAlertRule(
-            req.params.id
+            req.params.id,
+            token
           );
 
       return res.json({
@@ -3120,7 +3164,13 @@ app.delete(
     } catch (error) {
 
       return res
-        .status(502)
+        .status(
+          error.code === 7
+            ? 403
+            : error.code === 16
+              ? 401
+              : 502
+        )
         .json({
           success: false,
           message:
@@ -3157,7 +3207,9 @@ app.get(
 
       const response =
         await monitoringClient
-          .getHpcSummary();
+          .getHpcSummary(
+            token
+          );
 
       return res.json({
         success: true,
@@ -3173,7 +3225,13 @@ app.get(
       );
 
       return res
-        .status(502)
+        .status(
+          error.code === 7
+            ? 403
+            : error.code === 16
+              ? 401
+              : 502
+        )
         .json({
           success: false,
           message:
@@ -3211,7 +3269,8 @@ app.get(
       const response =
         await monitoringClient
           .getNodeStatus(
-            req.params.id
+            req.params.id,
+            token
           );
 
       return res.json({

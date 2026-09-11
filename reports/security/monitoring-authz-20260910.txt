@@ -1,0 +1,61 @@
+R-07 - Monitoring authentication and authorization validation
+Fecha: 2026-09-10
+
+CONTROLES IMPLEMENTADOS
+
+1. RPC internos:
+   ReportMetrics
+   ReportStatus
+
+   Requieren:
+   x-monitoring-service-token
+
+2. RPC de lectura:
+   GetMetrics
+   GetServiceStatus
+   GetNodeStatus
+   GetHpcSummary
+   GetAlertRules
+   GetAlerts
+
+   Requieren:
+   Authorization: Bearer <token válido>
+
+3. RPC administrativos:
+   CreateAlertRule
+   UpdateAlertRule
+   DeleteAlertRule
+
+   Requieren:
+   Authorization: Bearer <token válido>
+   Rol: ADMIN
+
+RESULTADOS DE VALIDACIÓN
+
+Sin credenciales:
+HTTP 401
+{"success":false,"message":"Token requerido"}
+
+Token inválido:
+HTTP 401
+{"success":false,"message":"token inválido o expirado"}
+
+Usuario USUARIO - lectura:
+HTTP 200
+
+Usuario USUARIO - creación de regla:
+HTTP 403
+{"success":false,"message":"rol ADMIN requerido"}
+
+Usuario ADMIN - creación de regla:
+success=true
+
+Productores internos:
+- File Service: métricas recibidas correctamente.
+- Sync Service: métricas recibidas correctamente.
+- Photo Service: métricas recibidas correctamente.
+
+Las reglas temporales utilizadas para las pruebas fueron eliminadas.
+
+RESULTADO
+R-07 MITIGADO

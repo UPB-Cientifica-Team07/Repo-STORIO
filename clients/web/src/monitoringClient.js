@@ -46,9 +46,34 @@ const client =
     grpc.credentials.createInsecure()
   );
 
+function userMetadata(
+  token
+) {
+  if (
+    !token ||
+    typeof token !== "string" ||
+    !token.trim()
+  ) {
+    throw new Error(
+      "Token de usuario requerido"
+    );
+  }
+
+  const metadata =
+    new grpc.Metadata();
+
+  metadata.set(
+    "authorization",
+    `Bearer ${token.trim()}`
+  );
+
+  return metadata;
+}
+
 function call(
   method,
-  request = {}
+  request = {},
+  token
 ) {
 
   return new Promise(
@@ -56,6 +81,9 @@ function call(
 
       client[method](
         request,
+        userMetadata(
+          token
+        ),
         {
           deadline:
             Date.now() +
@@ -81,88 +109,114 @@ function call(
   );
 }
 
-async function getMetrics() {
+async function getMetrics(
+  token
+) {
 
   return call(
-    "getMetrics"
+    "getMetrics",
+    {},
+    token
   );
 }
 
 async function getServiceStatus(
-  componentName
+  componentName,
+  token
 ) {
 
   return call(
     "getServiceStatus",
     {
       componentName
-    }
+    },
+    token
   );
 }
 
-async function getAlerts() {
+async function getAlerts(
+  token
+) {
 
   return call(
-    "getAlerts"
+    "getAlerts",
+    {},
+    token
   );
 }
 
-async function getAlertRules() {
+async function getAlertRules(
+  token
+) {
 
   return call(
-    "getAlertRules"
+    "getAlertRules",
+    {},
+    token
   );
 }
 
 
 async function createAlertRule(
-  rule
+  rule,
+  token
 ) {
 
   return call(
     "createAlertRule",
-    rule
+    rule,
+    token
   );
 }
 
 async function updateAlertRule(
-  rule
+  rule,
+  token
 ) {
 
   return call(
     "updateAlertRule",
-    rule
+    rule,
+    token
   );
 }
 
 async function deleteAlertRule(
-  id
+  id,
+  token
 ) {
 
   return call(
     "deleteAlertRule",
     {
       id
-    }
+    },
+    token
   );
 }
 
-async function getHpcSummary() {
+async function getHpcSummary(
+  token
+) {
 
   return call(
-    "getHpcSummary"
+    "getHpcSummary",
+    {},
+    token
   );
 }
 
 async function getNodeStatus(
-  nodeId
+  nodeId,
+  token
 ) {
 
   return call(
     "getNodeStatus",
     {
       nodeId
-    }
+    },
+    token
   );
 }
 
