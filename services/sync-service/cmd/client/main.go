@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"os"
+	"strings"
 	"time"
 
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/internal/auth"
@@ -12,7 +14,7 @@ import (
 	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/proto"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -86,16 +88,46 @@ func main() {
 	token :=
 		loginResult.Token
 
-	// =====================================
-	// CONEXIÓN GRPC
-	// =====================================
+		// =====================================
+		// CONEXIÓN GRPC
+		// =====================================
+	tlsCAFile :=
+		os.Getenv(
+			"SYNC_TLS_CA_FILE",
+		)
 
-	conn, err := grpc.NewClient(
-		serverAddress,
-		grpc.WithTransportCredentials(
-			insecure.NewCredentials(),
-		),
-	)
+	if tlsCAFile == "" {
+		tlsCAFile =
+			"security/pki/runtime/ca.crt"
+	}
+
+	serverName :=
+		strings.Split(
+			serverAddress,
+			":",
+		)[0]
+
+	transportCredentials, err :=
+		credentials.NewClientTLSFromFile(
+			tlsCAFile,
+			serverName,
+		)
+
+	if err != nil {
+
+		log.Fatalf(
+			"Error cargando CA TLS de Sync Service: %v",
+			err,
+		)
+	}
+
+	conn, err :=
+		grpc.NewClient(
+			serverAddress,
+			grpc.WithTransportCredentials(
+				transportCredentials,
+			),
+		)
 
 	if err != nil {
 		log.Fatalf(

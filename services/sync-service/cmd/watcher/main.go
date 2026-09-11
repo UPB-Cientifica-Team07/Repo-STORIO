@@ -23,7 +23,7 @@ import (
 	"github.com/fsnotify/fsnotify"
 
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 )
 
@@ -250,12 +250,41 @@ func main() {
 		"Usuario autenticado:",
 		loginResult.UserID,
 	)
+	tlsCAFile :=
+		os.Getenv(
+			"SYNC_TLS_CA_FILE",
+		)
+
+	if tlsCAFile == "" {
+		tlsCAFile =
+			"security/pki/runtime/ca.crt"
+	}
+
+	serverName :=
+		strings.Split(
+			config.ServerAddress,
+			":",
+		)[0]
+
+	transportCredentials, err :=
+		credentials.NewClientTLSFromFile(
+			tlsCAFile,
+			serverName,
+		)
+
+	if err != nil {
+
+		log.Fatalf(
+			"No se pudo cargar CA TLS de Sync Service: %v",
+			err,
+		)
+	}
 
 	connection, err :=
 		grpc.NewClient(
 			config.ServerAddress,
 			grpc.WithTransportCredentials(
-				insecure.NewCredentials(),
+				transportCredentials,
 			),
 		)
 

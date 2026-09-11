@@ -19,6 +19,7 @@ import (
 	pb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/sync-service/proto"
 
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
 )
 
 const (
@@ -312,6 +313,47 @@ func main() {
 			)
 		}
 	}()
+	// =====================================
+	// TLS
+	// =====================================
+
+	tlsCertFile :=
+		os.Getenv(
+			"SYNC_TLS_CERT_FILE",
+		)
+
+	if tlsCertFile == "" {
+		tlsCertFile =
+			"security/pki/runtime/sync.crt"
+	}
+
+	tlsKeyFile :=
+		os.Getenv(
+			"SYNC_TLS_KEY_FILE",
+		)
+
+	if tlsKeyFile == "" {
+		tlsKeyFile =
+			"security/pki/runtime/sync.key"
+	}
+
+	transportCredentials, err :=
+		credentials.NewServerTLSFromFile(
+			tlsCertFile,
+			tlsKeyFile,
+		)
+
+	if err != nil {
+
+		log.Fatalf(
+			"No se pudo cargar TLS de Sync Service: %v",
+			err,
+		)
+	}
+
+	log.Println(
+		"TLS gRPC: ACTIVO",
+	)
 
 	// =====================================
 	// GRPC SERVER
@@ -319,6 +361,10 @@ func main() {
 
 	grpcServer :=
 		grpc.NewServer(
+
+			grpc.Creds(
+				transportCredentials,
+			),
 
 			grpc.ChainUnaryInterceptor(
 				runtimeMetrics.UnaryInterceptor,

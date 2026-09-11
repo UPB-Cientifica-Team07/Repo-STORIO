@@ -1,0 +1,81 @@
+R-03 - TLS para Sync gRPC
+Fecha: 2026-09-10
+
+RIESGO ORIGINAL
+
+Sync Service expone el puerto 50055 a clientes distribuidos en la LAN.
+
+Antes de la mitigación, el servidor gRPC no configuraba TLS y sus
+clientes utilizaban transporte plaintext.
+
+Android utilizaba explícitamente:
+
+usePlaintext()
+
+MITIGACIÓN
+
+Se creó una PKI local de desarrollo para UPB-CIENTIFICA.
+
+La clave privada de la CA y la clave privada del servidor permanecen
+fuera de Git mediante:
+
+/security/pki/runtime/
+
+El certificado del servidor Sync incluye:
+
+DNS:localhost
+IP:127.0.0.1
+IP:192.168.10.13
+
+Sync Server utiliza:
+
+SYNC_TLS_CERT_FILE
+SYNC_TLS_KEY_FILE
+
+Los clientes Go utilizan:
+
+SYNC_TLS_CA_FILE
+
+Android incluye únicamente el certificado público de la CA y construye
+un X509TrustManager dedicado para el canal gRPC.
+
+VALIDACIÓN DE COMPILACIÓN
+
+go test ./services/sync-service/...
+Exit code: 0
+
+Android:
+:app:compileDebugKotlin
+Exit code: 0
+
+VALIDACIÓN RUNTIME
+
+Sync Service:
+TLS gRPC: ACTIVO
+
+Puerto:
+*:50055
+
+Verificación del certificado:
+
+Verification: OK
+Verify return code: 0 (ok)
+
+La conexión gRPC plaintext fue rechazada:
+
+connection reset by peer
+
+El listener permaneció activo después de la prueba.
+
+Sync continuó reportando métricas a Monitoring cada 5 segundos.
+
+PRUEBA POSITIVA TLS
+
+Un cliente gRPC configurado con la CA del proyecto realizó el handshake
+TLS y alcanzó la capa de aplicación de Sync Service.
+
+RESULTADO
+
+El puerto distribuido 50055 requiere TLS.
+
+R-03 MITIGADO

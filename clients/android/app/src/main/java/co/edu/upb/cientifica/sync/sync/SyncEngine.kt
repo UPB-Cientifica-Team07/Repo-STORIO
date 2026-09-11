@@ -119,8 +119,14 @@ class SyncEngine(
 
             grpcClient =
                 SyncGrpcClient(
-                    SERVER_HOST,
-                    SYNC_PORT
+                    context =
+                        context,
+
+                    host =
+                        SERVER_HOST,
+
+                    port =
+                        SYNC_PORT
                 )
 
             val authentication =

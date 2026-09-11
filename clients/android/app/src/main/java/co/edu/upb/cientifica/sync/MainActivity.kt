@@ -512,8 +512,9 @@ class MainActivity :
 
             grpcClient =
                 SyncGrpcClient(
-                    SyncEngine.SERVER_HOST,
-                    SyncEngine.SYNC_PORT
+                    context = this@MainActivity,
+                    host = SyncEngine.SERVER_HOST,
+                    port = SyncEngine.SYNC_PORT
                 )
 
             val deviceId =
@@ -575,8 +576,9 @@ class MainActivity :
 
             grpcClient =
                 SyncGrpcClient(
-                    SyncEngine.SERVER_HOST,
-                    SyncEngine.SYNC_PORT
+                    context = this@MainActivity,
+                    host = SyncEngine.SERVER_HOST,
+                    port = SyncEngine.SYNC_PORT
                 )
 
             val deviceId =

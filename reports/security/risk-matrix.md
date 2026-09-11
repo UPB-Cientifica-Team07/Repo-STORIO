@@ -15,7 +15,7 @@ Fecha de evaluación: 2026-09-10
 |---|---|---:|---:|---|---|
 | R-01 | Auth Service opera mediante HTTP sin TLS | Alta | Alta | ALTO | Abierto |
 | R-02 | OpenLDAP opera mediante LDAP sin TLS en puerto 389 | Alta | Alta | ALTO | Abierto |
-| R-03 | Servicios gRPC utilizan transporte plaintext | Alta | Alta | ALTO | Abierto |
+| R-03 | Servicios gRPC utilizan transporte plaintext | Alta | Alta | ALTO | Mitigado |
 | R-04 | Credenciales PostgreSQL embebidas como valores por defecto | Alta | Alta | ALTO | Mitigado |
 | R-05 | Photo Service presenta vulnerabilidades conocidas en multer y qs | Alta | Alta | ALTO | Mitigado |
 | R-06 | Auth Service sin rate limiting o bloqueo de intentos fallidos | Alta | Alta | ALTO | Mitigado |
@@ -212,5 +212,44 @@ Validación funcional:
 - Código de salida: 0.
 
 Los puertos efímeros observados previamente dejaron de existir.
+
+Estado: MITIGADO.
+
+### R-03 — Cifrado TLS para Sync gRPC
+
+El servicio Sync expone `50055` a la red local para atender clientes
+Linux, Windows y Android. Antes de la mitigación, el transporte gRPC
+utilizaba credenciales inseguras y los clientes Android utilizaban
+`usePlaintext()`.
+
+La mitigación implementó:
+
+- TLS obligatorio en Sync Service mediante credenciales gRPC de servidor;
+- certificado X.509 firmado por una CA local del proyecto;
+- SAN para `localhost`, `127.0.0.1` y la dirección LAN autorizada;
+- CA configurable mediante `SYNC_TLS_CA_FILE` en clientes Go;
+- certificado y clave configurables mediante `SYNC_TLS_CERT_FILE` y
+  `SYNC_TLS_KEY_FILE`;
+- validación TLS en el watcher Linux y cliente CLI;
+- validación explícita de la CA en el cliente Android;
+- eliminación de `usePlaintext()` en Android;
+- exclusión del material criptográfico privado mediante `.gitignore`.
+
+Las claves privadas y artefactos PKI runtime no se versionan en Git.
+
+Validación runtime:
+
+- Sync Service inició con `TLS gRPC: ACTIVO`;
+- handshake OpenSSL: `Verification: OK`;
+- `Verify return code: 0 (ok)`;
+- el certificado servido contiene los SAN esperados;
+- una conexión gRPC plaintext fue rechazada;
+- una conexión gRPC TLS alcanzó la capa de aplicación;
+- Sync continuó enviando métricas a Monitoring;
+- `go test ./services/sync-service/...`: código 0;
+- Android `:app:compileDebugKotlin`: código 0.
+
+Los servicios gRPC internos `50051`, `50053` y `50054` permanecen
+restringidos a loopback y no atraviesan la red LAN.
 
 Estado: MITIGADO.

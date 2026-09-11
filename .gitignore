@@ -98,3 +98,6 @@ services/directory-service/ldif/*.local.ldif
 
 # Monitoring runtime data
 /data/monitoring/
+
+# Local TLS/PKI private material
+/security/pki/runtime/

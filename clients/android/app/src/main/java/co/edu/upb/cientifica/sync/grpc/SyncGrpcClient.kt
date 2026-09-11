@@ -1,5 +1,7 @@
 package co.edu.upb.cientifica.sync.grpc
 
+import android.content.Context
+import co.edu.upb.cientifica.sync.R
 import co.edu.upb.cientifica.sync.proto.AcknowledgeChangesRequest
 import co.edu.upb.cientifica.sync.proto.AcknowledgeChangesResponse
 import co.edu.upb.cientifica.sync.proto.AuthenticateRequest
@@ -20,6 +22,12 @@ import io.grpc.okhttp.OkHttpChannelBuilder
 import io.grpc.stub.MetadataUtils
 import io.grpc.stub.StreamObserver
 import java.io.ByteArrayOutputStream
+import java.security.KeyStore
+import java.security.cert.CertificateFactory
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManager
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicReference
@@ -40,11 +48,79 @@ data class DownloadedFile(
 )
 
 class SyncGrpcClient(
+    context: Context,
     host: String,
     port: Int
 ) {
 
     companion object {
+
+        private fun createTrustManager(
+            context: Context
+        ): X509TrustManager {
+
+            val certificateFactory =
+                CertificateFactory
+                    .getInstance(
+                        "X.509"
+                    )
+
+            val caCertificate =
+                context.resources
+                    .openRawResource(
+                        R.raw.upb_dev_ca
+                    )
+                    .use {
+                        input ->
+
+                        certificateFactory
+                            .generateCertificate(
+                                input
+                            )
+                    }
+
+            val keyStore =
+                KeyStore
+                    .getInstance(
+                        KeyStore
+                            .getDefaultType()
+                    )
+                    .apply {
+
+                        load(
+                            null,
+                            null
+                        )
+
+                        setCertificateEntry(
+                            "upb-dev-ca",
+                            caCertificate
+                        )
+                    }
+
+            val trustManagerFactory =
+                TrustManagerFactory
+                    .getInstance(
+                        TrustManagerFactory
+                            .getDefaultAlgorithm()
+                    )
+                    .apply {
+
+                        init(
+                            keyStore
+                        )
+                    }
+
+            return trustManagerFactory
+                .trustManagers
+                .filterIsInstance<
+                    X509TrustManager
+                >()
+                .firstOrNull()
+                ?: throw IllegalStateException(
+                    "No se pudo crear X509TrustManager"
+                )
+        }
 
         private val AUTHORIZATION_KEY =
             Metadata.Key.of(
@@ -53,13 +129,37 @@ class SyncGrpcClient(
             )
     }
 
+    private val trustManager:
+        X509TrustManager =
+        createTrustManager(
+            context
+        )
+
+    private val sslContext:
+        SSLContext =
+        SSLContext
+            .getInstance(
+                "TLS"
+            )
+            .apply {
+                init(
+                    null,
+                    arrayOf<TrustManager>(
+                        trustManager
+                    ),
+                    null
+                )
+            }
+
     private val channel: ManagedChannel =
         OkHttpChannelBuilder
             .forAddress(
                 host,
                 port
             )
-            .usePlaintext()
+            .sslSocketFactory(
+                sslContext.socketFactory
+            )
             .build()
 
     private val blockingStub =
