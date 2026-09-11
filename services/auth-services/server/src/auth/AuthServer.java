@@ -19,7 +19,22 @@ import java.util.Map;
 public class AuthServer {
 
     private static final int RMI_PORT = 1099;
+    private static final int RMI_EXPORT_PORT = 1101;
     private static final int HTTP_PORT = 8081;
+
+    private static final String RMI_BIND_ADDRESS =
+            System.getenv()
+                    .getOrDefault(
+                            "AUTH_RMI_BIND_ADDRESS",
+                            "127.0.0.1"
+                    );
+
+    private static final String RMI_ADVERTISE_ADDRESS =
+            System.getenv()
+                    .getOrDefault(
+                            "AUTH_RMI_ADVERTISE_ADDRESS",
+                            RMI_BIND_ADDRESS
+                    );
 
     private static final String SERVICE_NAME = "AuthService";
 
@@ -101,38 +116,47 @@ public class AuthServer {
              * RMI y HTTP comparten exactamente el mismo
              * AuthServiceImpl y, por lo tanto, los mismos tokens.
              */
+            System.setProperty(
+                    "java.rmi.server.hostname",
+                    RMI_ADVERTISE_ADDRESS
+            );
+
+            BindAddressRMIServerSocketFactory
+                    rmiServerSocketFactory =
+                    new BindAddressRMIServerSocketFactory(
+                            RMI_BIND_ADDRESS
+                    );
+
             AuthServiceImpl authService =
-                    new AuthServiceImpl();
+                    new AuthServiceImpl(
+                            RMI_EXPORT_PORT,
+                            rmiServerSocketFactory
+                    );
 
             // =====================================
             // RMI
             // =====================================
 
-            Registry registry;
+            Registry registry =
+                    LocateRegistry.createRegistry(
+                            RMI_PORT,
+                            null,
+                            rmiServerSocketFactory
+                    );
 
-            try {
+            System.out.println(
+                    "RMI Registry creado en "
+                            + RMI_BIND_ADDRESS
+                            + ":"
+                            + RMI_PORT
+            );
 
-                registry =
-                        LocateRegistry.createRegistry(
-                                RMI_PORT
-                        );
-
-                System.out.println(
-                        "RMI Registry creado en puerto "
-                                + RMI_PORT
-                );
-
-            } catch (Exception e) {
-
-                registry =
-                        LocateRegistry.getRegistry(
-                                RMI_PORT
-                        );
-
-                System.out.println(
-                        "RMI Registry existente detectado"
-                );
-            }
+            System.out.println(
+                    "RMI objeto Auth exportado en "
+                            + RMI_BIND_ADDRESS
+                            + ":"
+                            + RMI_EXPORT_PORT
+            );
 
             registry.rebind(
                     SERVICE_NAME,

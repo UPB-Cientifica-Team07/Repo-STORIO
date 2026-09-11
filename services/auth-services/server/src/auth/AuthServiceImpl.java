@@ -2,6 +2,7 @@ package auth;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.rmi.server.RMIServerSocketFactory;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
@@ -52,10 +53,17 @@ public class AuthServiceImpl
     private final long
             loginBlockMillis;
 
-    public AuthServiceImpl()
+    public AuthServiceImpl(
+            int exportPort,
+            RMIServerSocketFactory serverSocketFactory
+    )
             throws RemoteException {
 
-        super();
+        super(
+                exportPort,
+                null,
+                serverSocketFactory
+        );
 
         sessions =
                 new HashMap<>();

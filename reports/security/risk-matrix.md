@@ -26,7 +26,7 @@ Fecha de evaluación: 2026-09-10
 | R-11 | Servicios internos escuchan en todas las interfaces de red | Media | Alta | ALTO | Mitigado |
 | R-12 | Web, Photo y Streaming carecen de headers HTTP defensivos | Media | Media | MEDIO | Abierto |
 | R-13 | Express/PHP revelan tecnología y versión mediante headers | Media | Baja | BAJO | Abierto |
-| R-14 | Java RMI expuesto en puertos 1099 y 1100 | Media | Alta | ALTO | Abierto |
+| R-14 | Java RMI expuesto en puertos 1099 y 1100 | Media | Alta | ALTO | Mitigado |
 | R-15 | PostgreSQL restringido a loopback | Baja | Baja | BAJO | Mitigado |
 
 ## Evidencia principal
@@ -161,5 +161,56 @@ Después de la restricción:
 - Analysis Service registró estado correctamente.
 - Web respondió HTTP 200.
 - Streaming permaneció accesible en `127.0.0.1:8082`.
+
+Estado: MITIGADO.
+
+### R-14 — Endurecimiento de Java RMI
+
+Se eliminó la exposición RMI mediante puertos dinámicos y listeners
+sin restricción de interfaz.
+
+Antes de la mitigación, Java RMI utilizaba:
+
+- Auth Registry: `*:1099`.
+- HPC Registry: `*:1100`.
+- Auth Service: puerto efímero.
+- HPC Coordinator: puerto efímero.
+- Worker node-01: puerto efímero.
+- Worker node-02: puerto efímero.
+
+Los objetos que extendían `UnicastRemoteObject` utilizaban `super()`,
+por lo que la JVM seleccionaba puertos dinámicos.
+
+La mitigación implementó:
+
+- puertos explícitos para todos los objetos RMI;
+- `RMIServerSocketFactory` con bind sobre dirección configurable;
+- dirección anunciada mediante `java.rmi.server.hostname`;
+- separación entre dirección de bind y dirección publicada;
+- configuración independiente para Coordinator y Workers.
+
+Topología validada localmente:
+
+- Auth Registry: `127.0.0.1:1099`.
+- Auth remote object: `127.0.0.1:1101`.
+- HPC Registry: `127.0.0.1:1100`.
+- HPC Coordinator object: `127.0.0.1:1102`.
+- HPC Worker node-01: `127.0.0.1:12001`.
+- HPC Worker node-02: `127.0.0.1:12002`.
+
+Los bindings HPC son configurables mediante variables de entorno para
+permitir despliegues distribuidos en una interfaz LAN autorizada sin
+volver a utilizar `0.0.0.0` ni puertos efímeros.
+
+Validación funcional:
+
+- Auth RMI lookup: OK.
+- HPC Coordinator lookup: OK.
+- HPC health: ACTIVE.
+- Workers registrados: 2.
+- RMI smoke test: OK.
+- Código de salida: 0.
+
+Los puertos efímeros observados previamente dejaron de existir.
 
 Estado: MITIGADO.

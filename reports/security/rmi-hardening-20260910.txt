@@ -1,0 +1,106 @@
+R-14 - Endurecimiento de Java RMI
+Fecha: 2026-09-10
+
+RIESGO ORIGINAL
+
+Java RMI exponía registries y objetos remotos sin restricción de
+interfaz.
+
+Listeners observados antes de la mitigación:
+
+*:1099
+*:1100
+
+También se generaban puertos efímeros para objetos UnicastRemoteObject:
+
+35723
+42095
+44003
+37965
+
+CAUSA
+
+AuthServiceImpl, ClusterCoordinatorImpl y WorkerNode heredaban de
+UnicastRemoteObject y utilizaban super() sin puerto explícito.
+
+La JVM asignaba puertos dinámicos a cada objeto remoto.
+
+MITIGACIÓN
+
+Se implementó una RMIServerSocketFactory que realiza bind explícito
+sobre una dirección configurada.
+
+Se establecieron puertos deterministas:
+
+Auth Registry
+127.0.0.1:1099
+
+Auth remote object
+127.0.0.1:1101
+
+HPC Registry
+127.0.0.1:1100
+
+HPC Coordinator remote object
+127.0.0.1:1102
+
+HPC Worker node-01
+127.0.0.1:12001
+
+HPC Worker node-02
+127.0.0.1:12002
+
+CONFIGURACIÓN DISTRIBUIDA
+
+HPC mantiene capacidad de operación distribuida mediante variables:
+
+HPC_BIND_ADDRESS
+HPC_ADVERTISE_ADDRESS
+HPC_RMI_PORT
+HPC_COORDINATOR_RMI_PORT
+HPC_WORKER_BIND_ADDRESS
+HPC_WORKER_ADVERTISE_ADDRESS
+HPC_WORKER_RMI_PORT
+
+En una máquina remota se debe configurar una dirección LAN autorizada
+en lugar de utilizar un listener wildcard.
+
+VALIDACIÓN
+
+Auth RMI lookup:
+OK
+
+Auth stub:
+jdk.proxy1.$Proxy0
+
+HPC Coordinator lookup:
+OK
+
+HPC health:
+ACTIVE
+
+Workers registrados:
+2
+
+node-01:
+REGISTERED
+
+node-02:
+REGISTERED
+
+RMI SMOKE TEST:
+OK
+
+Exit code:
+0
+
+PUERTOS EFÍMEROS ANTIGUOS
+
+35723 -> cerrado
+42095 -> cerrado
+44003 -> cerrado
+37965 -> cerrado
+
+RESULTADO
+
+R-14 MITIGADO

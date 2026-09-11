@@ -1,6 +1,7 @@
 package hpc.coordinator;
 
 import hpc.common.ClusterCoordinator;
+import hpc.common.BindAddressRMIServerSocketFactory;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -27,14 +28,53 @@ public class CoordinatorServer {
                         )
                 );
 
+            String bindAddress =
+                System.getenv()
+                    .getOrDefault(
+                        "HPC_BIND_ADDRESS",
+                        "127.0.0.1"
+                    );
+
+            String advertiseAddress =
+                System.getenv()
+                    .getOrDefault(
+                        "HPC_ADVERTISE_ADDRESS",
+                        bindAddress
+                    );
+
+            int exportPort =
+                Integer.parseInt(
+                    System.getenv()
+                        .getOrDefault(
+                            "HPC_COORDINATOR_RMI_PORT",
+                            "1102"
+                        )
+                );
+
+            System.setProperty(
+                "java.rmi.server.hostname",
+                advertiseAddress
+            );
+
+            BindAddressRMIServerSocketFactory
+                serverSocketFactory =
+                    new BindAddressRMIServerSocketFactory(
+                        bindAddress
+                    );
+
             Registry registry =
                 LocateRegistry
                     .createRegistry(
-                        port
+                        port,
+                        null,
+                        serverSocketFactory
                     );
 
             ClusterCoordinator coordinator =
-                new ClusterCoordinatorImpl();
+                new ClusterCoordinatorImpl(
+                    exportPort,
+                    serverSocketFactory
+                );
 
             registry.rebind(
                 ClusterCoordinator.SERVICE_NAME,
@@ -51,7 +91,20 @@ public class CoordinatorServer {
                 " Tecnología: Java RMI"
             );
             System.out.println(
-                " Puerto RMI: " + port
+                " Registry RMI: " +
+                bindAddress +
+                ":" +
+                port
+            );
+            System.out.println(
+                " Objeto Coordinator: " +
+                bindAddress +
+                ":" +
+                exportPort
+            );
+            System.out.println(
+                " Dirección anunciada: " +
+                advertiseAddress
             );
             System.out.println(
                 " Servicio: " +

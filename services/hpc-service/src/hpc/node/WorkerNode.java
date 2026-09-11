@@ -1,6 +1,7 @@
 package hpc.node;
 
 import hpc.common.ClusterCoordinator;
+import hpc.common.BindAddressRMIServerSocketFactory;
 import hpc.common.HpcWorker;
 import hpc.common.MpiJobResult;
 import hpc.common.NodeInfo;
@@ -12,6 +13,7 @@ import java.nio.file.Path;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
+import java.rmi.server.RMIServerSocketFactory;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -33,10 +35,16 @@ public class WorkerNode
 
     protected WorkerNode(
         String nodeId,
-        Path mpiDirectory
+        Path mpiDirectory,
+        int exportPort,
+        RMIServerSocketFactory serverSocketFactory
     ) throws Exception {
 
-        super();
+        super(
+            exportPort,
+            null,
+            serverSocketFactory
+        );
 
         this.nodeId =
             nodeId;
@@ -309,10 +317,53 @@ public class WorkerNode
                     /
                     (1024L * 1024L);
 
+            if (
+                args.length < 6
+            ) {
+                throw new IllegalArgumentException(
+                    "Uso: WorkerNode <coordinatorHost> "
+                    + "<coordinatorPort> <nodeId> "
+                    + "<logicalHostname> <cpuCores> "
+                    + "<workerRmiPort>"
+                );
+            }
+
+            int workerRmiPort =
+                Integer.parseInt(
+                    args[5]
+                );
+
+            String workerBindAddress =
+                System.getenv()
+                    .getOrDefault(
+                        "HPC_WORKER_BIND_ADDRESS",
+                        "127.0.0.1"
+                    );
+
+            String workerAdvertiseAddress =
+                System.getenv()
+                    .getOrDefault(
+                        "HPC_WORKER_ADVERTISE_ADDRESS",
+                        workerBindAddress
+                    );
+
+            System.setProperty(
+                "java.rmi.server.hostname",
+                workerAdvertiseAddress
+            );
+
+            BindAddressRMIServerSocketFactory
+                workerSocketFactory =
+                    new BindAddressRMIServerSocketFactory(
+                        workerBindAddress
+                    );
+
             WorkerNode worker =
                 new WorkerNode(
                     nodeId,
-                    mpiDirectory
+                    mpiDirectory,
+                    workerRmiPort,
+                    workerSocketFactory
                 );
 
             NodeInfo node =

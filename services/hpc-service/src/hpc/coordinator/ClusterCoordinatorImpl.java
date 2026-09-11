@@ -13,6 +13,7 @@ import hpc.scheduler.HpcScheduler;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.rmi.server.RMIServerSocketFactory;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -90,10 +91,17 @@ public class ClusterCoordinatorImpl
                     )
             );
 
-    public ClusterCoordinatorImpl()
+    public ClusterCoordinatorImpl(
+        int exportPort,
+        RMIServerSocketFactory serverSocketFactory
+    )
         throws RemoteException {
 
-        super();
+        super(
+            exportPort,
+            null,
+            serverSocketFactory
+        );
 
         nodeSupervisor
             .scheduleAtFixedRate(

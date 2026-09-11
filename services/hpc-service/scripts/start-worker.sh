@@ -14,6 +14,14 @@ COORDINATOR_PORT="${2:-1100}"
 NODE_ID="${3:-node-01}"
 LOGICAL_HOSTNAME="${4:-$NODE_ID}"
 CPU_CORES="${5:-4}"
+WORKER_RMI_PORT="${6:-${HPC_WORKER_RMI_PORT:-}}"
+
+if [[ -z "$WORKER_RMI_PORT" ]]; then
+  echo "ERROR: debe indicar puerto RMI fijo del worker."
+  echo "Uso:"
+  echo "  $0 <host> <port> <node-id> <hostname> <cpu> <worker-rmi-port>"
+  exit 1
+fi
 
 cd "$ROOT_DIR"
 
@@ -24,4 +32,5 @@ exec java \
   "$COORDINATOR_PORT" \
   "$NODE_ID" \
   "$LOGICAL_HOSTNAME" \
-  "$CPU_CORES"
+  "$CPU_CORES" \
+  "$WORKER_RMI_PORT"
