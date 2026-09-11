@@ -249,3 +249,43 @@ Se verificó:
 - integración con Sync Service;
 - integración con Streaming Service;
 - rechazo de tokens inválidos.
+
+## Cuenta técnica de Auth y control de acceso
+
+Auth Service no realiza búsquedas internas mediante conexiones LDAP
+anónimas.
+
+Las lecturas necesarias para resolución de usuarios y roles utilizan:
+
+    uid=auth-reader,ou=services,dc=upb-cientifica,dc=local
+
+La contraseña de esta cuenta nunca se versiona. Debe proporcionarse
+mediante:
+
+    LDAP_AUTH_READER_PASSWORD
+
+En el servidor LDAP, aprovisionar o rotar la cuenta técnica con:
+
+    export LDAP_AUTH_READER_PASSWORD='<valor-local>'
+    services/directory-service/scripts/provision-auth-reader.sh
+
+Después aplicar las ACL restrictivas:
+
+    services/directory-service/scripts/configure-access-control.sh
+
+Las ACL permiten:
+
+- autenticación anónima exclusivamente contra `userPassword`;
+- lectura del directorio mediante `auth-reader`;
+- administración local privilegiada mediante SASL/EXTERNAL y `ldapi:///`;
+- acceso administrativo del `root` local sin exponer credenciales por red.
+
+Las ACL niegan la lectura genérica a conexiones anónimas.
+
+Auth Service requiere:
+
+    LDAP_AUTH_READER_DN=uid=auth-reader,ou=services,dc=upb-cientifica,dc=local
+    LDAP_AUTH_READER_PASSWORD=<secreto-runtime>
+
+La contraseña debe suministrarse mediante variables de entorno o el
+mecanismo de secretos del entorno de despliegue.

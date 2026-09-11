@@ -22,7 +22,7 @@ Fecha de evaluación: 2026-09-10
 | R-07 | Monitoring Service sin autenticación/autorización confirmada | Alta | Alta | ALTO | Mitigado |
 | R-08 | Android permite tráfico cleartext | Alta | Alta | ALTO | Mitigado |
 | R-09 | Android almacena contraseña en SharedPreferences sin cifrado | Media | Alta | ALTO | Abierto |
-| R-10 | LDAP permite enumeración anónima de estructura, usuarios y grupos | Media | Media | MEDIO | Abierto |
+| R-10 | LDAP permite enumeración anónima de estructura, usuarios y grupos | Media | Media | MEDIO | Mitigado |
 | R-11 | Servicios internos escuchan en todas las interfaces de red | Media | Alta | ALTO | Mitigado |
 | R-12 | Web, Photo y Streaming carecen de headers HTTP defensivos | Media | Media | MEDIO | Abierto |
 | R-13 | Express/PHP revelan tecnología y versión mediante headers | Media | Baja | BAJO | Abierto |
@@ -345,5 +345,36 @@ Validación:
 
 La enumeración anónima del directorio se aborda de forma separada
 en `R-10`.
+
+Estado: MITIGADO.
+
+### R-10 — Enumeración LDAP anónima restringida
+
+La configuración anterior permitía lectura general del directorio mediante
+`by * read`, lo que permitía enumerar usuarios, identificadores, grupos y
+membresías sin autenticación.
+
+La mitigación implementa una cuenta técnica `auth-reader` con permisos de
+solo lectura. Auth Service utiliza el bind del usuario exclusivamente para
+validar la contraseña y emplea `auth-reader` para consultar atributos y
+resolver roles.
+
+Las ACL finales conservan únicamente `anonymous auth` sobre `userPassword`,
+necesario para verificar un bind simple, y niegan lectura general a
+conexiones anónimas.
+
+La administración local mediante `ldapi:///` y SASL/EXTERNAL permanece
+disponible exclusivamente para `root`.
+
+Las pruebas confirmaron:
+
+- bind de `auth-reader`: exitoso;
+- lectura de usuarios mediante `auth-reader`: exit code 0;
+- login `prueba`: exitoso;
+- usuario: `user-002`;
+- rol: `USUARIO`;
+- token emitido correctamente;
+- enumeración anónima de usuarios: bloqueada;
+- enumeración anónima de grupos: bloqueada.
 
 Estado: MITIGADO.

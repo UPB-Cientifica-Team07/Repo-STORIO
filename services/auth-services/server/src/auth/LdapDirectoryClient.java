@@ -27,6 +27,10 @@ public class LdapDirectoryClient {
     private final String peopleBase;
     private final String groupsBase;
 
+    private final String serviceBindDn;
+
+    private final String serviceBindPassword;
+
     public LdapDirectoryClient() {
 
         this.ldapUrl =
@@ -48,6 +52,28 @@ public class LdapDirectoryClient {
 
         this.groupsBase =
                 "ou=groups," + baseDn;
+
+        this.serviceBindDn =
+                System.getenv()
+                        .getOrDefault(
+                                "LDAP_AUTH_READER_DN",
+                                "uid=auth-reader,ou=services,"
+                                        + baseDn
+                        );
+
+        this.serviceBindPassword =
+                System.getenv(
+                        "LDAP_AUTH_READER_PASSWORD"
+                );
+
+        if (
+                serviceBindPassword == null ||
+                serviceBindPassword.isBlank()
+        ) {
+            throw new IllegalStateException(
+                    "LDAP_AUTH_READER_PASSWORD es obligatoria"
+            );
+        }
 
         if (
                 ldapUrl.startsWith(
@@ -114,6 +140,22 @@ public class LdapDirectoryClient {
             context =
                     new InitialDirContext(
                             environment
+                    );
+
+            /*
+             * El bind anterior valida exclusivamente
+             * las credenciales del usuario.
+             *
+             * Las lecturas del directorio se realizan
+             * mediante la cuenta técnica de solo lectura.
+             */
+            closeQuietly(
+                    context
+            );
+
+            context =
+                    new InitialDirContext(
+                            serviceEnvironment()
                     );
 
             Attributes attributes =
@@ -201,14 +243,12 @@ public class LdapDirectoryClient {
         try {
 
             /*
-             * Consulta anónima.
-             *
-             * La ACL predeterminada de este
-             * laboratorio permite lectura.
+             * Consulta interna mediante cuenta
+             * técnica LDAP de solo lectura.
              */
             context =
                     new InitialDirContext(
-                            baseEnvironment()
+                            serviceEnvironment()
                     );
 
             SearchControls controls =
@@ -404,6 +444,30 @@ public class LdapDirectoryClient {
         }
 
         return null;
+    }
+
+    private Hashtable<String, Object>
+    serviceEnvironment() {
+
+        Hashtable<String, Object> environment =
+                baseEnvironment();
+
+        environment.put(
+                Context.SECURITY_AUTHENTICATION,
+                "simple"
+        );
+
+        environment.put(
+                Context.SECURITY_PRINCIPAL,
+                serviceBindDn
+        );
+
+        environment.put(
+                Context.SECURITY_CREDENTIALS,
+                serviceBindPassword
+        );
+
+        return environment;
     }
 
     private void configureLdapsTrust() {

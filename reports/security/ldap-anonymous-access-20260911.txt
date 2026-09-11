@@ -1,0 +1,82 @@
+R-10 - Enumeración anónima de OpenLDAP
+Fecha: 2026-09-11
+
+RIESGO ORIGINAL
+
+La base LDAP utilizaba:
+
+olcAccess: to * by * read
+
+Como consecuencia, una conexión no autenticada podía enumerar:
+
+- usuarios;
+- uid;
+- employeeNumber;
+- grupos;
+- miembros de grupos.
+
+La enumeración fue reproducida mediante LDAPS sin bind autenticado.
+
+MITIGACIÓN
+
+Se creó una cuenta técnica específica:
+
+uid=auth-reader,ou=services,dc=upb-cientifica,dc=local
+
+La cuenta se utiliza exclusivamente para las lecturas internas requeridas
+por Auth Service.
+
+La contraseña no se almacena en el repositorio y se entrega mediante:
+
+LDAP_AUTH_READER_PASSWORD
+
+Auth Service fue modificado para separar:
+
+1. bind del usuario para validar credenciales;
+2. bind de auth-reader para consultar atributos y roles.
+
+ACL FINAL
+
+userPassword:
+- self: write
+- anonymous: auth
+- resto: none
+
+shadowLastChange:
+- self: write
+- auth-reader: read
+- resto: none
+
+directorio general:
+- auth-reader: read
+- resto: none
+
+La identidad root local mediante SASL/EXTERNAL sobre ldapi:/// conserva
+permiso manage para administración local.
+
+VALIDACIÓN
+
+Cuenta técnica:
+
+ldapwhoami auth-reader: exit code 0
+lectura auth-reader: exit code 0
+
+Autenticación:
+
+User: user-002
+Role: USUARIO
+Token emitido: sí
+Token length: 43
+Message: Login correcto
+
+Enumeración anónima:
+
+usuarios: bloqueados
+grupos: bloqueados
+
+OpenLDAP permanece exclusivamente en LDAPS TCP 636.
+LDAP plaintext TCP 389 permanece deshabilitado.
+
+RESULTADO
+
+R-10 MITIGADO
