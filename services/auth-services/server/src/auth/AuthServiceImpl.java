@@ -113,7 +113,7 @@ public class AuthServiceImpl
                         + System.getenv()
                                 .getOrDefault(
                                         "LDAP_URL",
-                                        "ldap://127.0.0.1:389"
+                                        "ldaps://127.0.0.1:636"
                                 )
         );
 

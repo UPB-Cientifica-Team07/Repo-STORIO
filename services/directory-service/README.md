@@ -169,12 +169,13 @@ El script usa slappasswd para generar hashes antes de crear el LDIF local.
 
 Variables soportadas:
 
-    LDAP_URL=ldap://127.0.0.1:389
+    LDAP_URL=ldaps://127.0.0.1:636
     LDAP_BASE_DN=dc=upb-cientifica,dc=local
+    LDAP_TLS_CA_FILE=security/pki/upb_dev_ca.crt
 
 Ejemplo:
 
-    LDAP_URL="ldap://127.0.0.1:389" \
+    LDAP_URL="ldaps://127.0.0.1:636" \
     LDAP_BASE_DN="dc=upb-cientifica,dc=local" \
     java -cp services/auth-services/bin auth.AuthServer
 
@@ -188,7 +189,7 @@ Base DN:
 
     ldapsearch \
       -x \
-      -H ldap://127.0.0.1:389 \
+      -H ldaps://127.0.0.1:636 \
       -s base \
       -b "" \
       namingContexts
@@ -197,7 +198,7 @@ Usuarios:
 
     ldapsearch \
       -x \
-      -H ldap://127.0.0.1:389 \
+      -H ldaps://127.0.0.1:636 \
       -b "ou=people,dc=upb-cientifica,dc=local" \
       "(objectClass=inetOrgPerson)" \
       uid employeeNumber cn
@@ -206,7 +207,7 @@ Grupos:
 
     ldapsearch \
       -x \
-      -H ldap://127.0.0.1:389 \
+      -H ldaps://127.0.0.1:636 \
       -b "ou=groups,dc=upb-cientifica,dc=local" \
       "(objectClass=groupOfNames)" \
       cn member
@@ -219,9 +220,19 @@ No se versionan:
 - contraseñas administrativas;
 - hashes locales de usuarios.
 
-El entorno actual utiliza LDAP simple sobre localhost.
+El Directory Service utiliza LDAPS sobre el puerto 636.
 
-Antes de exponer LDAP por red en un despliegue distribuido se debe habilitar TLS/StartTLS o LDAPS.
+El certificado del servidor LDAP está firmado por la CA privada del
+proyecto UPB-CIENTIFICA. Los clientes deben validar explícitamente:
+
+    security/pki/upb_dev_ca.crt
+
+Las claves privadas y certificados runtime del servidor permanecen
+fuera del repositorio bajo:
+
+    security/pki/runtime/
+
+LDAP plaintext por el puerto 389 está deshabilitado.
 
 ## Pruebas realizadas
 

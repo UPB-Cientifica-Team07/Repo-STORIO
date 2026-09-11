@@ -14,7 +14,7 @@ Fecha de evaluación: 2026-09-10
 | ID | Hallazgo | Probabilidad | Impacto | Nivel | Estado |
 |---|---|---:|---:|---|---|
 | R-01 | Auth Service opera mediante HTTP sin TLS | Alta | Alta | ALTO | Mitigado |
-| R-02 | OpenLDAP opera mediante LDAP sin TLS en puerto 389 | Alta | Alta | ALTO | Abierto |
+| R-02 | OpenLDAP opera mediante LDAP sin TLS en puerto 389 | Alta | Alta | ALTO | Mitigado |
 | R-03 | Servicios gRPC utilizan transporte plaintext | Alta | Alta | ALTO | Mitigado |
 | R-04 | Credenciales PostgreSQL embebidas como valores por defecto | Alta | Alta | ALTO | Mitigado |
 | R-05 | Photo Service presenta vulnerabilidades conocidas en multer y qs | Alta | Alta | ALTO | Mitigado |
@@ -312,5 +312,38 @@ Validación:
 - configuración de cleartext deshabilitada.
 
 No se realizó validación sobre dispositivo físico en esta sesión.
+
+Estado: MITIGADO.
+
+### R-02 — OpenLDAP protegido mediante LDAPS
+
+OpenLDAP exponía originalmente LDAP plaintext sobre el puerto `389`.
+El Auth Service realizaba binds mediante `ldap://127.0.0.1:389`.
+
+La mitigación implementó:
+
+- certificado X.509 específico para OpenLDAP;
+- certificado firmado por la CA privada de UPB-CIENTIFICA;
+- `ldaps:///` sobre el puerto `636`;
+- configuración TLS mediante `cn=config`;
+- validación explícita de la CA en el cliente Java JNDI;
+- migración de Auth a `ldaps://127.0.0.1:636`;
+- migración de los scripts administrativos a LDAPS;
+- eliminación de `ldap:///` de `SLAPD_SERVICES`;
+- cierre completo del listener TCP `389`.
+
+Validación:
+
+- `openssl s_client`: `Verification: OK`;
+- `Verify return code: 0 (ok)`;
+- consulta LDAPS sobre `636`: exit code `0`;
+- consulta LDAP plaintext sobre `389`: exit code `255`;
+- login real `HTTPS -> Auth -> LDAPS -> OpenLDAP`: exitoso;
+- usuario `user-002`;
+- rol `USUARIO`;
+- token de 43 caracteres emitido correctamente.
+
+La enumeración anónima del directorio se aborda de forma separada
+en `R-10`.
 
 Estado: MITIGADO.

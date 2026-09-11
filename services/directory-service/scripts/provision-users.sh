@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-LDAP_URL="${LDAP_URL:-ldap://127.0.0.1:389}"
+LDAP_URL="${LDAP_URL:-ldaps://127.0.0.1:636}"
 LDAP_BASE_DN="${LDAP_BASE_DN:-dc=upb-cientifica,dc=local}"
 LDAP_ADMIN_DN="${LDAP_ADMIN_DN:-cn=admin,${LDAP_BASE_DN}}"
 
@@ -20,6 +20,15 @@ ROOT_DIR="$(
     cd "$(dirname "${BASH_SOURCE[0]}")/../../.." &&
     pwd
 )"
+
+LDAP_TLS_CA_FILE="${LDAP_TLS_CA_FILE:-${ROOT_DIR}/security/pki/upb_dev_ca.crt}"
+
+if [[ ! -r "${LDAP_TLS_CA_FILE}" ]]; then
+    echo "ERROR: CA LDAP no legible: ${LDAP_TLS_CA_FILE}" >&2
+    exit 1
+fi
+
+export LDAPTLS_CACERT="${LDAP_TLS_CA_FILE}"
 
 DIRECTORY_DIR="${ROOT_DIR}/services/directory-service"
 LOCAL_LDIF="${DIRECTORY_DIR}/ldif/03-users.local.ldif"

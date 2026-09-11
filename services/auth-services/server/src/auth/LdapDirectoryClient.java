@@ -1,6 +1,13 @@
 package auth;
 
+import java.io.FileInputStream;
+import java.security.KeyStore;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
 import java.util.Hashtable;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
@@ -26,7 +33,7 @@ public class LdapDirectoryClient {
                 System.getenv()
                         .getOrDefault(
                                 "LDAP_URL",
-                                "ldap://127.0.0.1:389"
+                                "ldaps://127.0.0.1:636"
                         );
 
         this.baseDn =
@@ -41,6 +48,14 @@ public class LdapDirectoryClient {
 
         this.groupsBase =
                 "ou=groups," + baseDn;
+
+        if (
+                ldapUrl.startsWith(
+                        "ldaps://"
+                )
+        ) {
+            configureLdapsTrust();
+        }
     }
 
     public DirectoryUser authenticate(
@@ -389,6 +404,91 @@ public class LdapDirectoryClient {
         }
 
         return null;
+    }
+
+    private void configureLdapsTrust() {
+
+        String caFile =
+                System.getenv()
+                        .getOrDefault(
+                                "LDAP_TLS_CA_FILE",
+                                "security/pki/upb_dev_ca.crt"
+                        );
+
+        try (
+                FileInputStream input =
+                        new FileInputStream(
+                                caFile
+                        )
+        ) {
+
+            CertificateFactory certificateFactory =
+                    CertificateFactory.getInstance(
+                            "X.509"
+                    );
+
+            X509Certificate caCertificate =
+                    (X509Certificate)
+                            certificateFactory
+                                    .generateCertificate(
+                                            input
+                                    );
+
+            KeyStore trustStore =
+                    KeyStore.getInstance(
+                            KeyStore.getDefaultType()
+                    );
+
+            trustStore.load(
+                    null,
+                    null
+            );
+
+            trustStore.setCertificateEntry(
+                    "upb-cientifica-ca",
+                    caCertificate
+            );
+
+            TrustManagerFactory trustManagerFactory =
+                    TrustManagerFactory.getInstance(
+                            TrustManagerFactory
+                                    .getDefaultAlgorithm()
+                    );
+
+            trustManagerFactory.init(
+                    trustStore
+            );
+
+            SSLContext sslContext =
+                    SSLContext.getInstance(
+                            "TLS"
+                    );
+
+            sslContext.init(
+                    null,
+                    trustManagerFactory.getTrustManagers(),
+                    null
+            );
+
+            /*
+             * JNDI LDAPS utiliza el SSLSocketFactory
+             * predeterminado de la JVM.
+             *
+             * Esta JVM pertenece exclusivamente al
+             * Auth Service, por lo que establecemos
+             * explícitamente la CA del proyecto.
+             */
+            SSLContext.setDefault(
+                    sslContext
+            );
+
+        } catch (Exception error) {
+
+            throw new IllegalStateException(
+                    "No fue posible configurar la CA para LDAPS",
+                    error
+            );
+        }
     }
 
     private Hashtable<String, Object>

@@ -1,0 +1,129 @@
+R-02 - OpenLDAP sin TLS
+Fecha: 2026-09-11
+
+RIESGO ORIGINAL
+
+OpenLDAP exponía LDAP plaintext en:
+
+ldap://0.0.0.0:389
+ldap://[::]:389
+
+El Auth Service realizaba binds LDAP mediante:
+
+ldap://127.0.0.1:389
+
+Esto permitía que credenciales y consultas LDAP
+se transportaran sin cifrado.
+
+MITIGACIÓN
+
+Se generó un certificado X.509 específico para LDAP
+firmado por la CA privada de UPB-CIENTIFICA.
+
+Certificado:
+
+CN=localhost
+OU=Directory
+O=UPB-CIENTIFICA
+
+SAN:
+
+DNS:localhost
+IP:127.0.0.1
+IP:192.168.10.13
+IP:192.168.10.18
+
+OpenLDAP fue configurado mediante cn=config con:
+
+olcTLSCertificateFile: /etc/ldap/tls/ldap.crt
+olcTLSCertificateKeyFile: /etc/ldap/tls/ldap.key
+olcTLSCACertificateFile: /etc/ldap/tls/ca.crt
+
+Listener final:
+
+SLAPD_SERVICES="ldaps:/// ldapi:///"
+
+LDAP plaintext en 389 fue deshabilitado.
+
+AUTH SERVICE
+
+Default anterior:
+
+ldap://127.0.0.1:389
+
+Default nuevo:
+
+ldaps://127.0.0.1:636
+
+El cliente Java JNDI carga explícitamente la CA:
+
+security/pki/upb_dev_ca.crt
+
+Variable soportada:
+
+LDAP_TLS_CA_FILE
+
+DIRECTORY SERVICE
+
+Los scripts:
+
+bootstrap-directory.sh
+provision-users.sh
+
+utilizan por defecto:
+
+ldaps://127.0.0.1:636
+
+y validan la CA mediante LDAPTLS_CACERT.
+
+VALIDACIÓN TLS
+
+openssl s_client:
+
+Verification: OK
+Verify return code: 0 (ok)
+
+Consulta LDAPS:
+
+ldaps://127.0.0.1:636
+exit code: 0
+
+Consulta LDAP plaintext:
+
+ldap://127.0.0.1:389
+exit code: 255
+
+Resultado:
+
+puerto 389 rechazado
+
+VALIDACIÓN END-TO-END
+
+Flujo:
+
+Cliente
+  -> HTTPS :8081
+Auth Service
+  -> LDAPS :636
+OpenLDAP
+
+Login:
+
+User: user-002
+Role: USUARIO
+Token: recibido
+Token length: 43
+Message: Login correcto
+
+LISTENERS FINALES
+
+636  LDAPS
+8081 HTTPS Auth
+1099 Auth RMI Registry
+1101 Auth RMI Object
+
+389 no se encuentra escuchando.
+
+RESULTADO
+
+R-02 MITIGADO
