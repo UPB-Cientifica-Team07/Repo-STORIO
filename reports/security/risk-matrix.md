@@ -21,7 +21,7 @@ Fecha de evaluación: 2026-09-10
 | R-06 | Auth Service sin rate limiting o bloqueo de intentos fallidos | Alta | Alta | ALTO | Mitigado |
 | R-07 | Monitoring Service sin autenticación/autorización confirmada | Alta | Alta | ALTO | Mitigado |
 | R-08 | Android permite tráfico cleartext | Alta | Alta | ALTO | Mitigado |
-| R-09 | Android almacena contraseña en SharedPreferences sin cifrado | Media | Alta | ALTO | Abierto |
+| R-09 | Android almacena contraseña en SharedPreferences sin cifrado | Media | Alta | ALTO | Mitigado |
 | R-10 | LDAP permite enumeración anónima de estructura, usuarios y grupos | Media | Media | MEDIO | Mitigado |
 | R-11 | Servicios internos escuchan en todas las interfaces de red | Media | Alta | ALTO | Mitigado |
 | R-12 | Web, Photo y Streaming carecen de headers HTTP defensivos | Media | Media | MEDIO | Abierto |
@@ -376,5 +376,37 @@ Las pruebas confirmaron:
 - token emitido correctamente;
 - enumeración anónima de usuarios: bloqueada;
 - enumeración anónima de grupos: bloqueada.
+
+Estado: MITIGADO.
+
+### R-09 — Credenciales Android protegidas con Android Keystore
+
+`CredentialStore` almacenaba anteriormente `username/password`
+directamente mediante `SharedPreferences`.
+
+La mitigación reemplaza la persistencia plaintext de la contraseña por
+cifrado autenticado `AES-256-GCM`. La clave AES se genera y conserva
+mediante `AndroidKeyStore` y no se almacena en el repositorio ni en
+`SharedPreferences`.
+
+La aplicación persiste únicamente:
+
+- `username`;
+- `password_ciphertext`;
+- `password_iv`.
+
+Las instalaciones que todavía contengan la clave legacy `password` son
+migradas automáticamente: la contraseña se cifra y la entrada plaintext
+se elimina.
+
+La aplicación también mantiene `android:allowBackup="false"`.
+
+La implementación fue validada mediante revisión estática y compilación
+Android. No se detectó almacenamiento directo de password ni claves AES
+embebidas.
+
+La ejecución del Android Keystore sobre hardware real queda pendiente de
+validación posterior debido a que actualmente no se dispone de dispositivo
+Android físico y no se utiliza emulador.
 
 Estado: MITIGADO.
