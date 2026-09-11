@@ -1,5 +1,7 @@
 const express = require("express");
 const path = require("path");
+const fs = require("fs");
+const https = require("https");
 const axios = require("axios");
 const multer = require("multer");
 
@@ -19,7 +21,28 @@ const PORT =
 
 const AUTH_SERVICE =
   process.env.AUTH_SERVICE ||
-  "http://127.0.0.1:8081";
+  "https://127.0.0.1:8081";
+
+const AUTH_TLS_CA_FILE =
+  process.env.AUTH_TLS_CA_FILE ||
+  path.resolve(
+    __dirname,
+    "../../security/pki/upb_dev_ca.crt"
+  );
+
+const AUTH_HTTPS_AGENT =
+  new https.Agent({
+    ca:
+      fs.readFileSync(
+        AUTH_TLS_CA_FILE
+      ),
+
+    minVersion:
+      "TLSv1.2",
+
+    rejectUnauthorized:
+      true
+  });
 
 const PHOTO_SERVICE =
   process.env.PHOTO_SERVICE ||
@@ -89,7 +112,10 @@ app.post(
                 "application/x-www-form-urlencoded"
             },
 
-            timeout: 5000
+            timeout: 5000,
+
+            httpsAgent:
+              AUTH_HTTPS_AGENT
           }
         );
 

@@ -1,0 +1,31 @@
+R-08 - Android cleartext
+Fecha: 2026-09-11
+
+MITIGACIÓN
+
+Auth:
+HTTPS obligatorio
+HttpsURLConnection
+CA privada del proyecto validada explícitamente
+
+Sync:
+gRPC TLS
+sin usePlaintext()
+
+AndroidManifest:
+android:usesCleartextTraffic="false"
+
+VALIDACIÓN
+
+Android :app:compileDebugKotlin:
+exit code 0
+
+No quedan URLs http:// en código productivo Android.
+
+No queda usePlaintext() en código productivo Android.
+
+No se realizó prueba en dispositivo físico en esta sesión.
+
+RESULTADO
+
+R-08 MITIGADO

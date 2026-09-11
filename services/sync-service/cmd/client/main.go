@@ -19,7 +19,7 @@ import (
 
 const (
 	serverAddress = "localhost:50055"
-	authURL       = "http://localhost:8081"
+	authURL       = "https://localhost:8081"
 )
 
 func main() {

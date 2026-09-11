@@ -17,7 +17,7 @@ import (
 
 const (
 	syncAddress = "localhost:50055"
-	authURL     = "http://localhost:8081"
+	authURL     = "https://localhost:8081"
 
 	username = "tercero"
 	password = "123456"

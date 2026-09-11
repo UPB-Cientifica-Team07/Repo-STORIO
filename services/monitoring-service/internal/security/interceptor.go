@@ -3,6 +3,8 @@ package security
 import (
 	"context"
 	"crypto/subtle"
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"io"
 	"net/http"
@@ -31,6 +33,54 @@ type Interceptor struct {
 	httpClient   *http.Client
 }
 
+func newTLSHTTPClient() *http.Client {
+
+	caFile :=
+		os.Getenv(
+			"AUTH_TLS_CA_FILE",
+		)
+
+	if caFile == "" {
+		caFile =
+			"security/pki/upb_dev_ca.crt"
+	}
+
+	caPEM, err :=
+		os.ReadFile(
+			caFile,
+		)
+
+	if err != nil {
+		panic(
+			"no se pudo leer CA de Auth Service: " +
+				err.Error(),
+		)
+	}
+
+	certPool :=
+		x509.NewCertPool()
+
+	if !certPool.AppendCertsFromPEM(
+		caPEM,
+	) {
+		panic(
+			"CA de Auth Service inválida",
+		)
+	}
+
+	return &http.Client{
+		Timeout: 5 * time.Second,
+
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: certPool,
+
+				MinVersion: tls.VersionTLS12,
+			},
+		},
+	}
+}
+
 func NewInterceptor() (*Interceptor, error) {
 	serviceToken :=
 		strings.TrimSpace(
@@ -55,15 +105,13 @@ func NewInterceptor() (*Interceptor, error) {
 
 	if authURL == "" {
 		authURL =
-			"http://127.0.0.1:8081"
+			"https://127.0.0.1:8081"
 	}
 
 	return &Interceptor{
 		serviceToken: serviceToken,
 		authURL:      strings.TrimRight(authURL, "/"),
-		httpClient: &http.Client{
-			Timeout: 5 * time.Second,
-		},
+		httpClient:   newTLSHTTPClient(),
 	}, nil
 }
 

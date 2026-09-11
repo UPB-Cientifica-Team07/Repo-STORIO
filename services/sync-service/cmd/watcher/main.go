@@ -29,7 +29,7 @@ import (
 
 const (
 	defaultServerAddress = "localhost:50055"
-	defaultAuthURL       = "http://localhost:8081"
+	defaultAuthURL       = "https://localhost:8081"
 
 	defaultDeviceID = "linux-client-001"
 

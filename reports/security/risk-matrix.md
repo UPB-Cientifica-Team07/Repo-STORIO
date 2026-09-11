@@ -13,14 +13,14 @@ Fecha de evaluación: 2026-09-10
 
 | ID | Hallazgo | Probabilidad | Impacto | Nivel | Estado |
 |---|---|---:|---:|---|---|
-| R-01 | Auth Service opera mediante HTTP sin TLS | Alta | Alta | ALTO | Abierto |
+| R-01 | Auth Service opera mediante HTTP sin TLS | Alta | Alta | ALTO | Mitigado |
 | R-02 | OpenLDAP opera mediante LDAP sin TLS en puerto 389 | Alta | Alta | ALTO | Abierto |
 | R-03 | Servicios gRPC utilizan transporte plaintext | Alta | Alta | ALTO | Mitigado |
 | R-04 | Credenciales PostgreSQL embebidas como valores por defecto | Alta | Alta | ALTO | Mitigado |
 | R-05 | Photo Service presenta vulnerabilidades conocidas en multer y qs | Alta | Alta | ALTO | Mitigado |
 | R-06 | Auth Service sin rate limiting o bloqueo de intentos fallidos | Alta | Alta | ALTO | Mitigado |
 | R-07 | Monitoring Service sin autenticación/autorización confirmada | Alta | Alta | ALTO | Mitigado |
-| R-08 | Android permite tráfico cleartext | Alta | Alta | ALTO | Abierto |
+| R-08 | Android permite tráfico cleartext | Alta | Alta | ALTO | Mitigado |
 | R-09 | Android almacena contraseña en SharedPreferences sin cifrado | Media | Alta | ALTO | Abierto |
 | R-10 | LDAP permite enumeración anónima de estructura, usuarios y grupos | Media | Media | MEDIO | Abierto |
 | R-11 | Servicios internos escuchan en todas las interfaces de red | Media | Alta | ALTO | Mitigado |
@@ -251,5 +251,66 @@ Validación runtime:
 
 Los servicios gRPC internos `50051`, `50053` y `50054` permanecen
 restringidos a loopback y no atraviesan la red LAN.
+
+Estado: MITIGADO.
+
+### R-01 — Auth Service protegido mediante HTTPS
+
+El Auth Service exponía el bridge de autenticación en el puerto `8081`
+mediante HTTP plano. Esto afectaba login, validación y revocación de
+tokens utilizados por los componentes distribuidos.
+
+La mitigación implementó:
+
+- `HttpsServer` en el Auth Service Java;
+- certificado X.509 independiente para Auth;
+- reutilización de la CA del proyecto;
+- SAN para `localhost`, `127.0.0.1` y la dirección LAN autorizada;
+- PKCS#12 local para el servidor Java;
+- TLS mínimo 1.2 en los clientes que lo soportan;
+- validación explícita de la CA en Go, Java, Node.js, PHP y Android;
+- migración de File, Sync, Monitoring, Photo, Streaming, HPC, Web,
+  Linux, Windows y Android a `https://...:8081`;
+- rechazo de HTTP plaintext en el puerto `8081`;
+- claves privadas excluidas de Git.
+
+Validación runtime:
+
+- handshake TLS: `Verification: OK`;
+- `Verify return code: 0 (ok)`;
+- `/internal/auth/validate` sobre HTTPS respondió `401` sin token;
+- HTTP plaintext respondió `000` / conexión cerrada;
+- login HTTPS real exitoso;
+- token de 43 caracteres generado;
+- Web realizó login correctamente a través de Auth HTTPS;
+- File, Sync y Photo continuaron reportando métricas;
+- HPC Coordinator se reinició con Auth HTTPS;
+- workers `node-01` y `node-02` se registraron correctamente;
+- job MPI autenticado terminó con `Success: true` y `Exit code: 0`.
+
+Estado: MITIGADO.
+
+### R-08 — Android sin transporte cleartext
+
+El cliente Android utilizaba HTTP para Auth y permitía tráfico cleartext.
+El canal gRPC Sync también utilizaba anteriormente transporte plaintext.
+
+La mitigación implementó:
+
+- Auth URL migrada a HTTPS;
+- `HttpsURLConnection` con CA del proyecto;
+- Sync gRPC protegido mediante TLS;
+- CA pública embebida en `res/raw`;
+- `android:usesCleartextTraffic="false"`;
+- eliminación de `usePlaintext()`.
+
+Validación:
+
+- `:app:compileDebugKotlin`: código 0;
+- no quedan URLs `http://` en el código productivo Android;
+- no queda `usePlaintext()` en Android;
+- configuración de cleartext deshabilitada.
+
+No se realizó validación sobre dispositivo físico en esta sesión.
 
 Estado: MITIGADO.

@@ -30,7 +30,7 @@ class SyncEngine(
             "192.168.10.13"
 
         const val AUTH_URL =
-            "http://192.168.10.13:8081"
+            "https://192.168.10.13:8081"
 
         const val SYNC_PORT =
             50055
@@ -101,7 +101,11 @@ class SyncEngine(
 
             val authClient =
                 AuthClient(
-                    AUTH_URL
+                    context =
+                        context,
+
+                    baseUrl =
+                        AUTH_URL
                 )
 
             val login =

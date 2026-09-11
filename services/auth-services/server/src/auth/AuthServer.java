@@ -1,13 +1,21 @@
 package auth;
 
 import com.sun.net.httpserver.HttpExchange;
-import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpsServer;
+import com.sun.net.httpserver.HttpsConfigurator;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
+
+import java.io.FileInputStream;
+import java.security.KeyStore;
+
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -20,7 +28,7 @@ public class AuthServer {
 
     private static final int RMI_PORT = 1099;
     private static final int RMI_EXPORT_PORT = 1101;
-    private static final int HTTP_PORT = 8081;
+    private static final int HTTPS_PORT = 8081;
 
     private static final String RMI_BIND_ADDRESS =
             System.getenv()
@@ -81,7 +89,7 @@ public class AuthServer {
             );
 
             System.out.println(
-                    " Bridge HTTP interno: " + HTTP_PORT
+                    " Bridge HTTPS interno: " + HTTPS_PORT
             );
 
             System.out.println(
@@ -113,7 +121,7 @@ public class AuthServer {
             /*
              * Una sola instancia del servicio.
              *
-             * RMI y HTTP comparten exactamente el mismo
+             * RMI y HTTPS comparten exactamente el mismo
              * AuthServiceImpl y, por lo tanto, los mismos tokens.
              */
             System.setProperty(
@@ -164,16 +172,92 @@ public class AuthServer {
             );
 
             // =====================================
-            // HTTP BRIDGE
+            // HTTPS BRIDGE
             // =====================================
 
-            HttpServer httpServer =
-                    HttpServer.create(
+            HttpsServer httpServer =
+                    HttpsServer.create(
                             new InetSocketAddress(
-                                    HTTP_PORT
+                                    HTTPS_PORT
                             ),
                             0
                     );
+
+            String keyStorePath =
+                    System.getenv()
+                            .getOrDefault(
+                                    "AUTH_TLS_KEYSTORE_FILE",
+                                    "security/pki/runtime/auth.p12"
+                            );
+
+            String keyStorePassword =
+                    System.getenv(
+                            "AUTH_TLS_KEYSTORE_PASSWORD"
+                    );
+
+            if (
+                    keyStorePassword == null ||
+                    keyStorePassword.isBlank()
+            ) {
+                throw new IllegalStateException(
+                        "AUTH_TLS_KEYSTORE_PASSWORD es obligatorio"
+                );
+            }
+
+            KeyStore keyStore =
+                    KeyStore.getInstance(
+                            "PKCS12"
+                    );
+
+            try (
+                    FileInputStream input =
+                            new FileInputStream(
+                                    keyStorePath
+                            )
+            ) {
+                keyStore.load(
+                        input,
+                        keyStorePassword.toCharArray()
+                );
+            }
+
+            KeyManagerFactory keyManagerFactory =
+                    KeyManagerFactory.getInstance(
+                            KeyManagerFactory
+                                    .getDefaultAlgorithm()
+                    );
+
+            keyManagerFactory.init(
+                    keyStore,
+                    keyStorePassword.toCharArray()
+            );
+
+            TrustManagerFactory trustManagerFactory =
+                    TrustManagerFactory.getInstance(
+                            TrustManagerFactory
+                                    .getDefaultAlgorithm()
+                    );
+
+            trustManagerFactory.init(
+                    keyStore
+            );
+
+            SSLContext sslContext =
+                    SSLContext.getInstance(
+                            "TLS"
+                    );
+
+            sslContext.init(
+                    keyManagerFactory.getKeyManagers(),
+                    trustManagerFactory.getTrustManagers(),
+                    null
+            );
+
+            httpServer.setHttpsConfigurator(
+                    new HttpsConfigurator(
+                            sslContext
+                    )
+            );
 
             // Validar token
             httpServer.createContext(
@@ -230,8 +314,8 @@ public class AuthServer {
             );
 
             System.out.println(
-                    " HTTP Bridge: "
-                            + HTTP_PORT
+                    " HTTPS Bridge: "
+                            + HTTPS_PORT
             );
 
             System.out.println(
@@ -265,7 +349,7 @@ public class AuthServer {
     }
 
     // =====================================
-    // LOGIN HTTP
+    // LOGIN HTTPS
     // =====================================
 
     private static void handleLogin(
@@ -456,7 +540,7 @@ public class AuthServer {
     }
 
     // =====================================
-    // VALIDATE TOKEN HTTP
+    // VALIDATE TOKEN HTTPS
     // =====================================
 
     private static void handleValidateToken(
@@ -533,7 +617,7 @@ public class AuthServer {
     }
 
     // =====================================
-    // LOGOUT HTTP
+    // LOGOUT HTTPS
     // =====================================
 
     private static void handleLogout(
@@ -962,7 +1046,7 @@ public class AuthServer {
     }
 
     // =====================================
-    // HTTP RESPONSE
+    // HTTPS RESPONSE
     // =====================================
 
     private static void sendResponse(

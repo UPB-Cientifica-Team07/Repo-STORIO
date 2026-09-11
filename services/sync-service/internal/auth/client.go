@@ -1,11 +1,14 @@
 package auth
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"net/url"
+	"os"
 	"strings"
 	"time"
 )
@@ -34,6 +37,48 @@ func NewClient(
 	baseURL string,
 ) *Client {
 
+	caFile :=
+		os.Getenv(
+			"AUTH_TLS_CA_FILE",
+		)
+
+	if caFile == "" {
+		caFile =
+			"security/pki/upb_dev_ca.crt"
+	}
+
+	caPEM, err :=
+		os.ReadFile(
+			caFile,
+		)
+
+	if err != nil {
+		panic(
+			"no se pudo leer CA de Auth Service: " +
+				err.Error(),
+		)
+	}
+
+	certPool :=
+		x509.NewCertPool()
+
+	if !certPool.AppendCertsFromPEM(
+		caPEM,
+	) {
+		panic(
+			"CA de Auth Service inválida",
+		)
+	}
+
+	transport :=
+		&http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: certPool,
+
+				MinVersion: tls.VersionTLS12,
+			},
+		}
+
 	return &Client{
 		baseURL: strings.TrimRight(
 			baseURL,
@@ -42,6 +87,8 @@ func NewClient(
 
 		httpClient: &http.Client{
 			Timeout: 5 * time.Second,
+
+			Transport: transport,
 		},
 	}
 }

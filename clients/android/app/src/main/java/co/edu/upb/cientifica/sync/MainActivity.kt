@@ -454,7 +454,11 @@ class MainActivity :
 
         val authClient =
             AuthClient(
-                SyncEngine.AUTH_URL
+                context =
+                    applicationContext,
+
+                baseUrl =
+                    SyncEngine.AUTH_URL
             )
 
         val credentials =

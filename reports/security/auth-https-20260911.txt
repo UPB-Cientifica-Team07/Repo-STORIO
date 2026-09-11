@@ -1,0 +1,111 @@
+R-01 - Auth Service HTTPS
+Fecha: 2026-09-11
+
+RIESGO ORIGINAL
+
+El bridge de autenticación en 8081 utilizaba HTTP plaintext.
+
+MITIGACIÓN
+
+Auth Service:
+Java HttpsServer
+Puerto: 8081
+
+PKI:
+CA local UPB-CIENTIFICA
+Certificado independiente para Auth
+PKCS12 local para Java
+
+SAN del certificado:
+
+DNS:localhost
+IP:127.0.0.1
+IP:192.168.10.13
+
+Los artefactos privados permanecen en:
+
+security/pki/runtime/
+
+y no se versionan en Git.
+
+CONSUMIDORES MIGRADOS
+
+File Service
+Sync Service
+Monitoring Service
+Photo Service
+Streaming Service
+HPC Coordinator
+Web
+Linux Sync client config
+Windows Sync client config
+Android
+
+VALIDACIÓN TLS
+
+Verification: OK
+Verify return code: 0 (ok)
+
+HTTPS /internal/auth/validate sin token:
+HTTP 401
+Respuesta:
+false|||TOKEN_REQUIRED
+
+HTTP plaintext:
+status 000
+conexión cerrada por el servidor
+
+LOGIN HTTPS
+
+Login success: true
+User ID: user-002
+Role: USUARIO
+Token length: 43
+Message: Login correcto
+
+VALIDACIÓN DE SERVICIOS
+
+Web -> Auth HTTPS:
+success: true
+token recibido: sí
+
+File Service:
+ACTIVE
+continúa enviando métricas
+
+Sync Service:
+ACTIVE
+Auth Bridge: https://localhost:8081
+TLS gRPC: ACTIVO
+continúa enviando métricas
+
+Photo Service:
+ACTIVE
+Auth Service: https://localhost:8081
+continúa enviando métricas
+
+HPC Coordinator:
+127.0.0.1:1100
+127.0.0.1:1102
+
+Workers:
+node-01 REGISTERED
+127.0.0.1:12001
+
+node-02 REGISTERED
+127.0.0.1:12002
+
+JOB MPI AUTENTICADO
+
+Nodo seleccionado: node-02
+Success: true
+Exit code: 0
+Procesos MPI: 2
+
+RESULTADO
+
+Auth 8081 requiere HTTPS.
+HTTP plaintext es rechazado.
+Los consumidores distribuidos utilizan la CA del proyecto.
+
+R-01 MITIGADO

@@ -7,7 +7,11 @@ module.exports = {
 
   authServiceUrl:
     process.env.AUTH_SERVICE_URL ||
-    "http://localhost:8081",
+    "https://localhost:8081",
+
+  authTlsCaFile:
+    process.env.AUTH_TLS_CA_FILE ||
+    "security/pki/upb_dev_ca.crt",
 
   monitoringServiceAddress:
     process.env.MONITORING_SERVICE_ADDRESS ||

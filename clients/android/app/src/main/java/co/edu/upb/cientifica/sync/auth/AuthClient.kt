@@ -1,6 +1,13 @@
 package co.edu.upb.cientifica.sync.auth
 
-import java.net.HttpURLConnection
+import android.content.Context
+import co.edu.upb.cientifica.sync.R
+import java.security.KeyStore
+import java.security.cert.CertificateFactory
+import javax.net.ssl.HttpsURLConnection
+import javax.net.ssl.SSLContext
+import javax.net.ssl.TrustManagerFactory
+import javax.net.ssl.X509TrustManager
 import java.net.URL
 import java.net.URLEncoder
 
@@ -13,8 +20,88 @@ data class LoginResult(
 )
 
 class AuthClient(
+    context: Context,
     private val baseUrl: String
 ) {
+
+    private val sslContext:
+        SSLContext
+
+    init {
+
+        val certificateFactory =
+            CertificateFactory
+                .getInstance(
+                    "X.509"
+                )
+
+        val caCertificate =
+            context.resources
+                .openRawResource(
+                    R.raw.upb_dev_ca
+                )
+                .use {
+                    input ->
+
+                    certificateFactory
+                        .generateCertificate(
+                            input
+                        )
+                }
+
+        val keyStore =
+            KeyStore
+                .getInstance(
+                    KeyStore
+                        .getDefaultType()
+                )
+
+        keyStore.load(
+            null,
+            null
+        )
+
+        keyStore.setCertificateEntry(
+            "upb-dev-ca",
+            caCertificate
+        )
+
+        val trustManagerFactory =
+            TrustManagerFactory
+                .getInstance(
+                    TrustManagerFactory
+                        .getDefaultAlgorithm()
+                )
+
+        trustManagerFactory.init(
+            keyStore
+        )
+
+        val trustManager =
+            trustManagerFactory
+                .trustManagers
+                .filterIsInstance<
+                    X509TrustManager
+                >()
+                .firstOrNull()
+                ?: throw IllegalStateException(
+                    "X509TrustManager no disponible"
+                )
+
+        sslContext =
+            SSLContext
+                .getInstance(
+                    "TLS"
+                )
+
+        sslContext.init(
+            null,
+            arrayOf(
+                trustManager
+            ),
+            null
+        )
+    }
 
     fun login(
         username: String,
@@ -44,7 +131,10 @@ class AuthClient(
 
         val connection =
             endpoint.openConnection()
-                as HttpURLConnection
+                as HttpsURLConnection
+
+        connection.sslSocketFactory =
+            sslContext.socketFactory
 
         try {
 

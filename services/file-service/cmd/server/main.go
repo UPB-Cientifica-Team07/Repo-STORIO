@@ -34,7 +34,7 @@ const (
 	componentID     = "file-service-01"
 	componentName   = "File Service"
 	metricsInterval = 5 * time.Second
-	authURL         = "http://localhost:8081"
+	authURL         = "https://localhost:8081"
 )
 
 // =====================================

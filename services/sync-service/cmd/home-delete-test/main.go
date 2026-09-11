@@ -15,7 +15,7 @@ import (
 
 const (
 	serverAddress = "localhost:50055"
-	authURL       = "http://localhost:8081"
+	authURL       = "https://localhost:8081"
 
 	fileID = "d3ef9c22-8300-44de-900f-e5806b581274"
 

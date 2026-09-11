@@ -25,7 +25,7 @@ import (
 const (
 	port = ":50055"
 
-	authURL = "http://localhost:8081"
+	authURL = "https://localhost:8081"
 
 	fileServiceAddress = "localhost:50053"
 

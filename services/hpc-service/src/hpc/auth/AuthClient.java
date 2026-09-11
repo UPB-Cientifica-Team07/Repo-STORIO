@@ -1,6 +1,13 @@
 package hpc.auth;
 
 import java.io.IOException;
+import java.io.FileInputStream;
+import java.security.KeyStore;
+import java.security.cert.CertificateFactory;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManagerFactory;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -23,15 +30,98 @@ public class AuthClient {
                 ""
             );
 
-        this.client =
-            HttpClient
-                .newBuilder()
-                .connectTimeout(
-                    Duration.ofSeconds(
-                        3
+        try {
+
+            String caFile =
+                System.getenv()
+                    .getOrDefault(
+                        "AUTH_TLS_CA_FILE",
+                        "security/pki/upb_dev_ca.crt"
+                    );
+
+            CertificateFactory
+                certificateFactory =
+                    CertificateFactory.getInstance(
+                        "X.509"
+                    );
+
+            X509Certificate caCertificate;
+
+            try (
+                FileInputStream input =
+                    new FileInputStream(
+                        caFile
                     )
-                )
-                .build();
+            ) {
+
+                caCertificate =
+                    (X509Certificate)
+                        certificateFactory
+                            .generateCertificate(
+                                input
+                            );
+            }
+
+            KeyStore trustStore =
+                KeyStore.getInstance(
+                    KeyStore
+                        .getDefaultType()
+                );
+
+            trustStore.load(
+                null,
+                null
+            );
+
+            trustStore.setCertificateEntry(
+                "upb-dev-ca",
+                caCertificate
+            );
+
+            TrustManagerFactory
+                trustManagerFactory =
+                    TrustManagerFactory
+                        .getInstance(
+                            TrustManagerFactory
+                                .getDefaultAlgorithm()
+                        );
+
+            trustManagerFactory.init(
+                trustStore
+            );
+
+            SSLContext sslContext =
+                SSLContext.getInstance(
+                    "TLS"
+                );
+
+            sslContext.init(
+                null,
+                trustManagerFactory
+                    .getTrustManagers(),
+                null
+            );
+
+            this.client =
+                HttpClient
+                    .newBuilder()
+                    .sslContext(
+                        sslContext
+                    )
+                    .connectTimeout(
+                        Duration.ofSeconds(
+                            3
+                        )
+                    )
+                    .build();
+
+        } catch (Exception error) {
+
+            throw new IllegalStateException(
+                "No fue posible configurar TLS para Auth Service",
+                error
+            );
+        }
     }
 
     public AuthIdentity validate(

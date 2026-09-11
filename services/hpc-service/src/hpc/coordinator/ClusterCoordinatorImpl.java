@@ -87,7 +87,7 @@ public class ClusterCoordinatorImpl
                 System.getenv()
                     .getOrDefault(
                         "HPC_AUTH_SERVICE",
-                        "http://127.0.0.1:8081"
+                        "https://127.0.0.1:8081"
                     )
             );
 

@@ -38,6 +38,23 @@ final class AuthClient
             $this->baseUrl .
             '/internal/auth/validate';
 
+        $caFile =
+            getenv(
+                'AUTH_TLS_CA_FILE'
+            );
+
+        if (
+            $caFile === false ||
+            trim($caFile) === ''
+        ) {
+            $caFile =
+                dirname(
+                    __DIR__,
+                    3
+                ) .
+                '/security/pki/upb_dev_ca.crt';
+        }
+
         $context =
             stream_context_create([
                 'http' => [
@@ -53,6 +70,20 @@ final class AuthClient
                     'header' =>
                         "Authorization: Bearer " .
                         $token . "\r\n",
+                ],
+
+                'ssl' => [
+                    'cafile' =>
+                        $caFile,
+
+                    'verify_peer' =>
+                        true,
+
+                    'verify_peer_name' =>
+                        true,
+
+                    'allow_self_signed' =>
+                        false,
                 ],
             ]);
 

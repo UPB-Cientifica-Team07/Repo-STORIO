@@ -1,6 +1,22 @@
 const axios = require("axios");
+const fs = require("fs");
+const https = require("https");
 
 const config = require("../config/config");
+
+const authHttpsAgent =
+  new https.Agent({
+    ca:
+      fs.readFileSync(
+        config.authTlsCaFile
+      ),
+
+    minVersion:
+      "TLSv1.2",
+
+    rejectUnauthorized:
+      true
+  });
 
 async function authMiddleware(req, res, next) {
   try {
@@ -46,7 +62,10 @@ async function authMiddleware(req, res, next) {
             Authorization:
               `Bearer ${token}`
           },
-          timeout: 3000
+          timeout: 3000,
+
+          httpsAgent:
+            authHttpsAgent
         }
       );
 
