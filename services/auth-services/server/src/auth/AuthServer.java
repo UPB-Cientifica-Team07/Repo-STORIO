@@ -12,12 +12,38 @@ import java.nio.charset.StandardCharsets;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.Map;
+
 public class AuthServer {
 
     private static final int RMI_PORT = 1099;
     private static final int HTTP_PORT = 8081;
 
     private static final String SERVICE_NAME = "AuthService";
+
+    private static final int LOGIN_MAX_ATTEMPTS =
+            loadPositiveInt(
+                    "AUTH_LOGIN_MAX_ATTEMPTS",
+                    5
+            );
+
+    private static final long LOGIN_WINDOW_MILLIS =
+            loadPositiveLong(
+                    "AUTH_LOGIN_WINDOW_SECONDS",
+                    300L
+            ) * 1000L;
+
+    private static final long LOGIN_BLOCK_MILLIS =
+            loadPositiveLong(
+                    "AUTH_LOGIN_BLOCK_SECONDS",
+                    300L
+            ) * 1000L;
+
+    private static final Map<String, LoginAttempt>
+            LOGIN_ATTEMPTS =
+            new HashMap<>();
 
     public static void main(String[] args) {
 
@@ -41,6 +67,24 @@ public class AuthServer {
 
             System.out.println(
                     " Bridge HTTP interno: " + HTTP_PORT
+            );
+
+            System.out.println(
+                    " Login rate limit: "
+                            + LOGIN_MAX_ATTEMPTS
+                            + " intentos"
+            );
+
+            System.out.println(
+                    " Ventana login: "
+                            + (LOGIN_WINDOW_MILLIS / 1000L)
+                            + " segundos"
+            );
+
+            System.out.println(
+                    " Bloqueo login: "
+                            + (LOGIN_BLOCK_MILLIS / 1000L)
+                            + " segundos"
             );
 
             System.out.println(
@@ -264,11 +308,95 @@ public class AuthServer {
                 return;
             }
 
+            String normalizedUsername =
+                    username
+                            .trim()
+                            .toLowerCase(
+                                    Locale.ROOT
+                            );
+
+            String remoteAddress =
+                    getRemoteAddress(
+                            exchange
+                    );
+
+            String rateLimitKey =
+                    normalizedUsername
+                            + "|"
+                            + remoteAddress;
+
+            long now =
+                    System.currentTimeMillis();
+
+            long retryAfterSeconds =
+                    getRetryAfterSeconds(
+                            rateLimitKey,
+                            now
+                    );
+
+            if (retryAfterSeconds > 0L) {
+
+                exchange
+                        .getResponseHeaders()
+                        .set(
+                                "Retry-After",
+                                Long.toString(
+                                        retryAfterSeconds
+                                )
+                        );
+
+                System.err.println(
+                        "Login bloqueado por rate limit"
+                                + " | Usuario: "
+                                + normalizedUsername
+                                + " | IP: "
+                                + remoteAddress
+                );
+
+                sendResponse(
+                        exchange,
+                        429,
+                        "false||||TOO_MANY_ATTEMPTS"
+                );
+
+                return;
+            }
+
             AuthResult result =
-                    authService.login(
+                    authService.loginHttp(
                             username,
                             password
                     );
+
+            if (result.isSuccess()) {
+
+                clearLoginFailures(
+                        rateLimitKey
+                );
+
+            } else if (
+                    "Credenciales inválidas"
+                            .equals(
+                                    result.getMessage()
+                            )
+            ) {
+
+                boolean blocked =
+                        registerLoginFailure(
+                                rateLimitKey,
+                                now
+                        );
+
+                System.err.println(
+                        "Login LDAP rechazado"
+                                + " | Usuario: "
+                                + normalizedUsername
+                                + " | IP: "
+                                + remoteAddress
+                                + " | Bloqueado: "
+                                + blocked
+                );
+            }
 
             /*
              * Formato:
@@ -441,6 +569,257 @@ public class AuthServer {
                     500,
                     "false|INTERNAL_ERROR"
             );
+        }
+    }
+
+    // =====================================
+    // LOGIN RATE LIMIT
+    // =====================================
+
+    private static synchronized long
+    getRetryAfterSeconds(
+            String key,
+            long now
+    ) {
+
+        LoginAttempt attempt =
+                LOGIN_ATTEMPTS.get(
+                        key
+                );
+
+        if (attempt == null) {
+            return 0L;
+        }
+
+        if (
+                attempt.blockedUntilMillis
+                        > now
+        ) {
+
+            long remainingMillis =
+                    attempt.blockedUntilMillis
+                            - now;
+
+            return Math.max(
+                    1L,
+                    (remainingMillis + 999L)
+                            / 1000L
+            );
+        }
+
+        if (
+                attempt.blockedUntilMillis
+                        > 0L
+        ) {
+
+            LOGIN_ATTEMPTS.remove(
+                    key
+            );
+
+            return 0L;
+        }
+
+        if (
+                now - attempt.windowStartedMillis
+                        >= LOGIN_WINDOW_MILLIS
+        ) {
+
+            LOGIN_ATTEMPTS.remove(
+                    key
+            );
+        }
+
+        return 0L;
+    }
+
+    private static synchronized boolean
+    registerLoginFailure(
+            String key,
+            long now
+    ) {
+
+        LoginAttempt attempt =
+                LOGIN_ATTEMPTS.get(
+                        key
+                );
+
+        if (
+                attempt == null ||
+                now - attempt.windowStartedMillis
+                        >= LOGIN_WINDOW_MILLIS
+        ) {
+
+            attempt =
+                    new LoginAttempt(
+                            now
+                    );
+
+            LOGIN_ATTEMPTS.put(
+                    key,
+                    attempt
+            );
+        }
+
+        attempt.failedAttempts++;
+
+        if (
+                attempt.failedAttempts
+                        >= LOGIN_MAX_ATTEMPTS
+        ) {
+
+            attempt.blockedUntilMillis =
+                    now
+                            + LOGIN_BLOCK_MILLIS;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private static synchronized void
+    clearLoginFailures(
+            String key
+    ) {
+
+        LOGIN_ATTEMPTS.remove(
+                key
+        );
+    }
+
+    private static String getRemoteAddress(
+            HttpExchange exchange
+    ) {
+
+        if (
+                exchange.getRemoteAddress() == null
+        ) {
+            return "unknown";
+        }
+
+        if (
+                exchange
+                        .getRemoteAddress()
+                        .getAddress()
+                        != null
+        ) {
+
+            return exchange
+                    .getRemoteAddress()
+                    .getAddress()
+                    .getHostAddress();
+        }
+
+        return exchange
+                .getRemoteAddress()
+                .getHostString();
+    }
+
+    private static int loadPositiveInt(
+            String key,
+            int defaultValue
+    ) {
+
+        String value =
+                System.getenv(
+                        key
+                );
+
+        if (
+                value == null ||
+                value.isBlank()
+        ) {
+            return defaultValue;
+        }
+
+        try {
+
+            int parsed =
+                    Integer.parseInt(
+                            value.trim()
+                    );
+
+            if (parsed <= 0) {
+                throw new NumberFormatException();
+            }
+
+            return parsed;
+
+        } catch (
+                NumberFormatException error
+        ) {
+
+            throw new IllegalArgumentException(
+                    key
+                            + " debe ser un entero positivo"
+            );
+        }
+    }
+
+    private static long loadPositiveLong(
+            String key,
+            long defaultValue
+    ) {
+
+        String value =
+                System.getenv(
+                        key
+                );
+
+        if (
+                value == null ||
+                value.isBlank()
+        ) {
+            return defaultValue;
+        }
+
+        try {
+
+            long parsed =
+                    Long.parseLong(
+                            value.trim()
+                    );
+
+            if (parsed <= 0L) {
+                throw new NumberFormatException();
+            }
+
+            return parsed;
+
+        } catch (
+                NumberFormatException error
+        ) {
+
+            throw new IllegalArgumentException(
+                    key
+                            + " debe ser un entero positivo"
+            );
+        }
+    }
+
+    private static final class LoginAttempt {
+
+        private final long
+                windowStartedMillis;
+
+        private int
+                failedAttempts;
+
+        private long
+                blockedUntilMillis;
+
+        private LoginAttempt(
+                long windowStartedMillis
+        ) {
+
+            this.windowStartedMillis =
+                    windowStartedMillis;
+
+            this.failedAttempts =
+                    0;
+
+            this.blockedUntilMillis =
+                    0L;
         }
     }
 

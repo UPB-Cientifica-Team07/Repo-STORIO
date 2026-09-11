@@ -18,7 +18,7 @@ Fecha de evaluación: 2026-09-10
 | R-03 | Servicios gRPC utilizan transporte plaintext | Alta | Alta | ALTO | Abierto |
 | R-04 | Credenciales PostgreSQL embebidas como valores por defecto | Alta | Alta | ALTO | Mitigado |
 | R-05 | Photo Service presenta vulnerabilidades conocidas en multer y qs | Alta | Alta | ALTO | Mitigado |
-| R-06 | Auth Service sin rate limiting o bloqueo de intentos fallidos | Alta | Alta | ALTO | Abierto |
+| R-06 | Auth Service sin rate limiting o bloqueo de intentos fallidos | Alta | Alta | ALTO | Mitigado |
 | R-07 | Monitoring Service sin autenticación/autorización confirmada | Alta | Alta | ALTO | Abierto |
 | R-08 | Android permite tráfico cleartext | Alta | Alta | ALTO | Abierto |
 | R-09 | Android almacena contraseña en SharedPreferences sin cifrado | Media | Alta | ALTO | Abierto |
@@ -48,7 +48,7 @@ Fecha de evaluación: 2026-09-10
 
 1. Dependencias vulnerables de Photo Service. ✅ Mitigado
 2. Eliminar credenciales embebidas. ✅ Mitigado
-3. Proteger Auth contra fuerza bruta.
+3. Proteger Auth contra fuerza bruta. ✅ Mitigado
 4. Añadir autenticación/autorización a Monitoring.
 5. Restringir interfaces y puertos internos.
 6. TLS/LDAPS/gRPC TLS.
@@ -84,5 +84,30 @@ Validación:
 - Con la variable correspondiente, los servicios conectan correctamente.
 - La búsqueda de `upb_dev_2026` dentro de `services/` devuelve cero resultados.
 - File Service, Sync Service, Photo Service, Streaming y HPC fueron probados en runtime.
+
+Estado: MITIGADO.
+
+
+### R-06 — Protección contra fuerza bruta
+
+Se implementó rate limiting para los dos canales de autenticación:
+
+- HTTP: control por usuario + dirección IP.
+- Java RMI: control por usuario.
+- Máximo normal: 5 intentos.
+- Ventana normal: 300 segundos.
+- Bloqueo normal: 300 segundos.
+- HTTP responde `429 Too Many Requests` durante bloqueo.
+- Se incluye `Retry-After`.
+- Un login exitoso limpia los intentos fallidos.
+- Las contraseñas no se registran en logs.
+
+Pruebas realizadas:
+
+- Tres intentos fallidos con configuración de prueba.
+- Bloqueo HTTP confirmado mediante código 429.
+- Contraseña correcta rechazada mientras el bloqueo estaba activo.
+- Login permitido después de terminar el bloqueo.
+- La misma secuencia fue validada directamente mediante Java RMI.
 
 Estado: MITIGADO.

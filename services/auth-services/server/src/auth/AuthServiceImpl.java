@@ -5,6 +5,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.naming.NamingException;
@@ -39,6 +40,18 @@ public class AuthServiceImpl
     private final LdapDirectoryClient
             directoryClient;
 
+    private final Map<String, LoginAttempt>
+            loginAttempts;
+
+    private final int
+            loginMaxAttempts;
+
+    private final long
+            loginWindowMillis;
+
+    private final long
+            loginBlockMillis;
+
     public AuthServiceImpl()
             throws RemoteException {
 
@@ -55,6 +68,33 @@ public class AuthServiceImpl
 
         directoryClient =
                 new LdapDirectoryClient();
+
+        loginAttempts =
+                new HashMap<>();
+
+        loginMaxAttempts =
+                loadPositiveInt(
+                        "AUTH_LOGIN_MAX_ATTEMPTS",
+                        5
+                );
+
+        loginWindowMillis =
+                Math.multiplyExact(
+                        loadPositiveLong(
+                                "AUTH_LOGIN_WINDOW_SECONDS",
+                                300L
+                        ),
+                        1000L
+                );
+
+        loginBlockMillis =
+                Math.multiplyExact(
+                        loadPositiveLong(
+                                "AUTH_LOGIN_BLOCK_SECONDS",
+                                300L
+                        ),
+                        1000L
+                );
 
         System.out.println(
                 "Auth Service configurado con OpenLDAP"
@@ -83,10 +123,28 @@ public class AuthServiceImpl
                         + (tokenTtlMillis / 1000L)
                         + " segundos"
         );
+
+        System.out.println(
+                " RMI login rate limit: "
+                        + loginMaxAttempts
+                        + " intentos"
+        );
+
+        System.out.println(
+                " RMI ventana login: "
+                        + (loginWindowMillis / 1000L)
+                        + " segundos"
+        );
+
+        System.out.println(
+                " RMI bloqueo login: "
+                        + (loginBlockMillis / 1000L)
+                        + " segundos"
+        );
     }
 
     // =====================================
-    // LOGIN
+    // LOGIN RMI
     // =====================================
 
     @Override
@@ -94,6 +152,47 @@ public class AuthServiceImpl
             String username,
             String password
     ) throws RemoteException {
+
+        return authenticate(
+                username,
+                password,
+                true
+        );
+    }
+
+    // =====================================
+    // LOGIN HTTP
+    // =====================================
+
+    public synchronized AuthResult loginHttp(
+            String username,
+            String password
+    ) throws RemoteException {
+
+        /*
+         * AuthServer aplica su propio limitador
+         * por usuario + IP.
+         *
+         * No aplicamos aquí nuevamente el
+         * limitador RMI para evitar contabilizar
+         * dos veces un mismo intento HTTP.
+         */
+        return authenticate(
+                username,
+                password,
+                false
+        );
+    }
+
+    // =====================================
+    // AUTENTICACIÓN COMÚN
+    // =====================================
+
+    private AuthResult authenticate(
+            String username,
+            String password,
+            boolean applyLoginRateLimit
+    ) {
 
         if (
                 username == null ||
@@ -125,6 +224,40 @@ public class AuthServiceImpl
             );
         }
 
+        String normalizedUsername =
+                username
+                        .trim()
+                        .toLowerCase(
+                                Locale.ROOT
+                        );
+
+        long now =
+                System.currentTimeMillis();
+
+        if (
+                applyLoginRateLimit &&
+                isLoginBlocked(
+                        normalizedUsername,
+                        now
+                )
+        ) {
+
+            System.err.println(
+                    "Login RMI bloqueado por rate limit"
+                            + " | Usuario: "
+                            + normalizedUsername
+            );
+
+            return new AuthResult(
+                    false,
+                    "Demasiados intentos. Intente más tarde.",
+                    "",
+                    "",
+                    "",
+                    ""
+            );
+        }
+
         try {
 
             LdapDirectoryClient.DirectoryUser
@@ -139,6 +272,23 @@ public class AuthServiceImpl
                     directoryUser == null
             ) {
 
+                if (applyLoginRateLimit) {
+
+                    boolean blocked =
+                            registerLoginFailure(
+                                    normalizedUsername,
+                                    now
+                            );
+
+                    System.err.println(
+                            "Login RMI LDAP rechazado"
+                                    + " | Usuario: "
+                                    + normalizedUsername
+                                    + " | Bloqueado: "
+                                    + blocked
+                    );
+                }
+
                 return new AuthResult(
                         false,
                         "Credenciales inválidas",
@@ -146,6 +296,13 @@ public class AuthServiceImpl
                         "",
                         "",
                         ""
+                );
+            }
+
+            if (applyLoginRateLimit) {
+
+                clearLoginFailures(
+                        normalizedUsername
                 );
             }
 
@@ -390,6 +547,193 @@ public class AuthServiceImpl
     }
 
     // =====================================
+    // RATE LIMIT RMI
+    // =====================================
+
+    private boolean isLoginBlocked(
+            String username,
+            long now
+    ) {
+
+        LoginAttempt attempt =
+                loginAttempts.get(
+                        username
+                );
+
+        if (attempt == null) {
+            return false;
+        }
+
+        if (
+                attempt.blockedUntilMillis
+                        > now
+        ) {
+            return true;
+        }
+
+        if (
+                attempt.blockedUntilMillis
+                        > 0L
+        ) {
+
+            loginAttempts.remove(
+                    username
+            );
+
+            return false;
+        }
+
+        if (
+                now - attempt.windowStartedMillis
+                        >= loginWindowMillis
+        ) {
+
+            loginAttempts.remove(
+                    username
+            );
+
+            return false;
+        }
+
+        return false;
+    }
+
+    private boolean registerLoginFailure(
+            String username,
+            long now
+    ) {
+
+        LoginAttempt attempt =
+                loginAttempts.get(
+                        username
+                );
+
+        if (
+                attempt == null ||
+                now - attempt.windowStartedMillis
+                        >= loginWindowMillis
+        ) {
+
+            attempt =
+                    new LoginAttempt(
+                            now
+                    );
+
+            loginAttempts.put(
+                    username,
+                    attempt
+            );
+        }
+
+        attempt.failedAttempts++;
+
+        if (
+                attempt.failedAttempts
+                        >= loginMaxAttempts
+        ) {
+
+            attempt.blockedUntilMillis =
+                    now
+                            + loginBlockMillis;
+
+            return true;
+        }
+
+        return false;
+    }
+
+    private void clearLoginFailures(
+            String username
+    ) {
+
+        loginAttempts.remove(
+                username
+        );
+    }
+
+    private static int loadPositiveInt(
+            String key,
+            int defaultValue
+    ) {
+
+        String value =
+                System.getenv(
+                        key
+                );
+
+        if (
+                value == null ||
+                value.isBlank()
+        ) {
+            return defaultValue;
+        }
+
+        try {
+
+            int parsed =
+                    Integer.parseInt(
+                            value.trim()
+                    );
+
+            if (parsed <= 0) {
+                throw new NumberFormatException();
+            }
+
+            return parsed;
+
+        } catch (
+                NumberFormatException error
+        ) {
+
+            throw new IllegalArgumentException(
+                    key
+                            + " debe ser un entero positivo"
+            );
+        }
+    }
+
+    private static long loadPositiveLong(
+            String key,
+            long defaultValue
+    ) {
+
+        String value =
+                System.getenv(
+                        key
+                );
+
+        if (
+                value == null ||
+                value.isBlank()
+        ) {
+            return defaultValue;
+        }
+
+        try {
+
+            long parsed =
+                    Long.parseLong(
+                            value.trim()
+                    );
+
+            if (parsed <= 0L) {
+                throw new NumberFormatException();
+            }
+
+            return parsed;
+
+        } catch (
+                NumberFormatException error
+        ) {
+
+            throw new IllegalArgumentException(
+                    key
+                            + " debe ser un entero positivo"
+            );
+        }
+    }
+
+    // =====================================
     // TOKEN / SESIONES
     // =====================================
 
@@ -473,6 +817,32 @@ public class AuthServiceImpl
         return sessions.remove(
                 token
         ) != null;
+    }
+
+    private static class LoginAttempt {
+
+        private final long
+                windowStartedMillis;
+
+        private int
+                failedAttempts;
+
+        private long
+                blockedUntilMillis;
+
+        private LoginAttempt(
+                long windowStartedMillis
+        ) {
+
+            this.windowStartedMillis =
+                    windowStartedMillis;
+
+            this.failedAttempts =
+                    0;
+
+            this.blockedUntilMillis =
+                    0L;
+        }
     }
 
     private static class Session {
