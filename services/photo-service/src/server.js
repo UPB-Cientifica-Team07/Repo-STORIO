@@ -26,6 +26,54 @@ const app =
   express();
 
 // =====================================
+// HTTP SECURITY
+// =====================================
+
+app.disable(
+  "x-powered-by"
+);
+
+app.use(
+  (req, res, next) => {
+
+    res.setHeader(
+      "X-Content-Type-Options",
+      "nosniff"
+    );
+
+    res.setHeader(
+      "X-Frame-Options",
+      "DENY"
+    );
+
+    res.setHeader(
+      "Referrer-Policy",
+      "no-referrer"
+    );
+
+    res.setHeader(
+      "Permissions-Policy",
+      "camera=(), microphone=(), geolocation=()"
+    );
+
+    res.setHeader(
+      "Content-Security-Policy",
+      "default-src 'self'; " +
+        "script-src 'self' 'unsafe-inline'; " +
+        "style-src 'self' 'unsafe-inline'; " +
+        "img-src 'self' data: blob:; " +
+        "connect-src 'self'; " +
+        "font-src 'self'; " +
+        "object-src 'none'; " +
+        "base-uri 'self'; " +
+        "frame-ancestors 'none'"
+    );
+
+    next();
+  }
+);
+
+// =====================================
 // MIDDLEWARE
 // =====================================
 

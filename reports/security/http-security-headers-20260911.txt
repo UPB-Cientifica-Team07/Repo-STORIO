@@ -1,0 +1,138 @@
+R-12 / R-13 - HTTP security headers y technology disclosure
+Fecha: 2026-09-11
+
+SERVICIOS EVALUADOS
+
+Web Client
+Puerto: 8080
+Tecnología: Node.js / Express
+
+Photo Service
+Puerto: 50052
+Tecnología: Node.js / Express
+
+Streaming Service
+Puerto: 8082
+Tecnología: PHP / SOAP
+
+RIESGOS ORIGINALES
+
+R-12:
+Web, Photo y Streaming no enviaban headers HTTP defensivos.
+
+R-13:
+Web y Photo revelaban:
+
+X-Powered-By: Express
+
+Streaming revelaba:
+
+X-Powered-By: PHP/8.4.24
+
+MITIGACIÓN EXPRESS
+
+Web y Photo utilizan:
+
+app.disable("x-powered-by")
+
+También aplican middleware global con:
+
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: no-referrer
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Content-Security-Policy
+
+La política CSP de Web permite únicamente recursos necesarios del mismo
+origen, data/blob para imágenes, y bloquea objetos y framing.
+
+MITIGACIÓN STREAMING
+
+router.php aplica globalmente:
+
+header_remove('X-Powered-By')
+
+y los headers:
+
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: no-referrer
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Content-Security-Policy: default-src 'none'; frame-ancestors 'none'; base-uri 'none'
+
+Streaming dispone además de un script de arranque reproducible:
+
+services/stream-service/scripts/start.sh
+
+que ejecuta PHP mediante:
+
+php -d expose_php=0 -S ...
+
+HSTS
+
+No se añade Strict-Transport-Security a estos listeners porque actualmente
+son endpoints HTTP internos. HSTS solo debe enviarse desde un endpoint
+HTTPS válido, por ejemplo la capa TLS/reverse proxy del despliegue final.
+
+VALIDACIÓN RUNTIME
+
+Web:
+
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: no-referrer
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Content-Security-Policy presente
+X-Powered-By ausente
+
+Photo:
+
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: no-referrer
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Content-Security-Policy presente
+X-Powered-By ausente
+
+Streaming:
+
+HTTP/1.1 200 OK
+X-Content-Type-Options: nosniff
+X-Frame-Options: DENY
+Referrer-Policy: no-referrer
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Content-Security-Policy presente
+X-Powered-By ausente
+
+VALIDACIÓN FUNCIONAL
+
+Photo /health:
+HTTP 200
+
+Streaming /health:
+HTTP 200
+
+Streaming WSDL:
+HTTP 200
+Tamaño validado: 9167 bytes
+
+SINTAXIS
+
+Web Node.js:
+node --check exitoso
+
+Photo Node.js:
+node --check exitoso
+
+Streaming PHP:
+php -l exitoso
+
+Streaming start.sh:
+bash -n exitoso
+
+RESULTADO
+
+R-12 MITIGADO
+R-13 MITIGADO

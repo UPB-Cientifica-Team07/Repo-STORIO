@@ -24,8 +24,8 @@ Fecha de evaluación: 2026-09-10
 | R-09 | Android almacena contraseña en SharedPreferences sin cifrado | Media | Alta | ALTO | Mitigado |
 | R-10 | LDAP permite enumeración anónima de estructura, usuarios y grupos | Media | Media | MEDIO | Mitigado |
 | R-11 | Servicios internos escuchan en todas las interfaces de red | Media | Alta | ALTO | Mitigado |
-| R-12 | Web, Photo y Streaming carecen de headers HTTP defensivos | Media | Media | MEDIO | Abierto |
-| R-13 | Express/PHP revelan tecnología y versión mediante headers | Media | Baja | BAJO | Abierto |
+| R-12 | Web, Photo y Streaming carecen de headers HTTP defensivos | Media | Media | MEDIO | Mitigado |
+| R-13 | Express/PHP revelan tecnología y versión mediante headers | Media | Baja | BAJO | Mitigado |
 | R-14 | Java RMI expuesto en puertos 1099 y 1100 | Media | Alta | ALTO | Mitigado |
 | R-15 | PostgreSQL restringido a loopback | Baja | Baja | BAJO | Mitigado |
 
@@ -410,3 +410,33 @@ validación posterior debido a que actualmente no se dispone de dispositivo
 Android físico y no se utiliza emulador.
 
 Estado: MITIGADO.
+
+### R-12 / R-13 — Endurecimiento HTTP y reducción de disclosure
+
+Web, Photo y Streaming carecían de headers HTTP defensivos. Además,
+Express y PHP exponían su tecnología mediante `X-Powered-By`.
+
+Web y Photo ahora:
+
+- deshabilitan `x-powered-by`;
+- envían `X-Content-Type-Options: nosniff`;
+- envían `X-Frame-Options: DENY`;
+- aplican `Referrer-Policy: no-referrer`;
+- restringen capacidades mediante `Permissions-Policy`;
+- aplican `Content-Security-Policy`.
+
+Streaming elimina `X-Powered-By`, configura los mismos controles
+defensivos y dispone de un arranque reproducible con `expose_php=0`.
+
+Las pruebas runtime confirmaron que los tres servicios responden con los
+headers defensivos y ya no presentan `X-Powered-By`.
+
+El WSDL, `/health` y los servicios HTTP continuaron operativos después
+del endurecimiento.
+
+HSTS no se configura en estos listeners porque actualmente operan mediante
+HTTP interno. Debe configurarse en la terminación HTTPS correspondiente
+durante el despliegue final.
+
+Estado R-12: MITIGADO.
+Estado R-13: MITIGADO.
