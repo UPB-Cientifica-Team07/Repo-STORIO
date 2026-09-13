@@ -34,7 +34,7 @@ La carpeta `bin/` no se versiona.
 Variables requeridas:
 
     export SYNC_SERVER="127.0.0.1:50055"
-    export SYNC_AUTH_URL="http://127.0.0.1:8081"
+    export SYNC_AUTH_URL="https://127.0.0.1:8081"
     export SYNC_USERNAME="usuario"
     export SYNC_PASSWORD="contraseña"
     export SYNC_DEVICE_ID="$(hostname)-linux"
@@ -77,3 +77,34 @@ Tipos de cambios soportados:
 - `FILE_CREATED`
 - `FILE_CHANGED`
 - `FILE_DELETED`
+
+## Sincronización programada
+
+Además del modo permanente basado en `fsnotify`, el cliente soporta
+ejecución puntual mediante:
+
+    export SYNC_ONCE=true
+
+En este modo el cliente:
+
+1. autentica al usuario;
+2. consume cambios pendientes;
+3. reconcilia servidor -> cliente;
+4. reconcilia cliente -> servidor;
+5. persiste estado, ACK y cursor;
+6. finaliza sin iniciar los watchers permanentes.
+
+Para Linux se incluyen:
+
+    clients/linux/systemd/upb-sync.service
+    clients/linux/systemd/upb-sync.timer
+    clients/linux/install-scheduled-sync.sh
+
+El timer ejecuta una primera sincronización dos minutos después de
+activarse y posteriormente cada 15 minutos.
+
+Las credenciales se almacenan localmente fuera del repositorio en:
+
+    ~/.config/upb-cientifica/sync.env
+
+El archivo debe conservar permisos 0600.

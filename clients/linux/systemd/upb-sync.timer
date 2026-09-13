@@ -1,0 +1,11 @@
+[Unit]
+Description=UPB-CIENTIFICA scheduled File Sync timer
+
+[Timer]
+OnActiveSec=2min
+OnUnitActiveSec=15min
+Persistent=true
+Unit=upb-sync.service
+
+[Install]
+WantedBy=timers.target

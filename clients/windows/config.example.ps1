@@ -15,3 +15,6 @@ $env:SYNC_DIRECTORY = Join-Path `
 
 # CA pública usada para validar Auth HTTPS
 $env:AUTH_TLS_CA_FILE = "security/pki/upb_dev_ca.crt"
+
+# CA pública para Sync gRPC TLS
+$env:SYNC_TLS_CA_FILE = "C:\\RUTA\\upb_dev_ca.crt"

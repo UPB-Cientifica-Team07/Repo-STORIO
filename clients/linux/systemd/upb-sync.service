@@ -1,0 +1,20 @@
+[Unit]
+Description=UPB-CIENTIFICA scheduled File Sync
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+
+EnvironmentFile=%h/.config/upb-cientifica/sync.env
+
+Environment=SYNC_ONCE=true
+
+ExecStart=%h/.local/bin/upb-sync-client
+
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+
+ReadWritePaths=%h/UPB-Cientifica

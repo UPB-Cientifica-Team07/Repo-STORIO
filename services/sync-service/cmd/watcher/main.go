@@ -384,6 +384,39 @@ func main() {
 	)
 
 	// =====================================
+	// MODO PROGRAMADO / ONE-SHOT
+	// =====================================
+	//
+	// Reutiliza la reconciliación completa y
+	// termina antes de iniciar los watchers.
+	//
+	// Pensado para:
+	//
+	// - systemd timer
+	// - cron
+	// - Windows Task Scheduler
+	//
+	// =====================================
+
+	syncOnce :=
+		strings.EqualFold(
+			strings.TrimSpace(
+				os.Getenv(
+					"SYNC_ONCE",
+				),
+			),
+			"true",
+		)
+
+	if syncOnce {
+
+		log.Println(
+			"SYNC_ONCE completado correctamente",
+		)
+
+		return
+	}
+	// =====================================
 	// WATCHER FS
 	// =====================================
 

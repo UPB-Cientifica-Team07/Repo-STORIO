@@ -66,7 +66,7 @@ Con Go instalado, abrir PowerShell desde la raíz del repositorio:
 Ejemplo PowerShell:
 
     $env:SYNC_SERVER = "192.168.1.100:50055"
-    $env:SYNC_AUTH_URL = "http://192.168.1.100:8081"
+    $env:SYNC_AUTH_URL = "https://192.168.1.100:8081"
 
     $env:SYNC_USERNAME = "usuario"
     $env:SYNC_PASSWORD = "contraseña"
@@ -102,3 +102,29 @@ Los cambios soportados son:
 Cada cambio recibido correctamente se confirma mediante ACK.
 Un cambio no confirmado permanece pendiente para el dispositivo
 y puede ser entregado nuevamente después de una reconexión.
+
+## Sincronización programada
+
+El cliente Windows utiliza el mismo motor de reconciliación que Linux.
+
+El modo de ejecución puntual se activa mediante:
+
+    $env:SYNC_ONCE = "true"
+
+En este modo el cliente realiza la reconciliación completa y termina
+sin mantener un watcher residente.
+
+Se incluyen:
+
+    clients/windows/run-scheduled-sync.ps1
+    clients/windows/install-scheduled-sync.ps1
+
+`install-scheduled-sync.ps1` registra una tarea de Windows Task Scheduler
+que ejecuta File Sync cada 15 minutos.
+
+El ejecutable y la configuración local se instalan bajo:
+
+    %LOCALAPPDATA%\UPB-Cientifica
+
+Las credenciales se mantienen exclusivamente en la configuración local
+y no deben agregarse al repositorio.
