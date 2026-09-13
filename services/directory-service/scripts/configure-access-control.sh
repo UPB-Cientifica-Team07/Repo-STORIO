@@ -12,7 +12,7 @@ MDB_DN="$(
         -H ldapi:/// \
         -b cn=config \
         -LLL \
-        '(&(objectClass=olcDatabaseConfig)(olcDatabase=*mdb))' \
+        '(objectClass=olcMdbConfig)' \
         dn |
     awk '/^dn: / {
         sub(/^dn: /, "")

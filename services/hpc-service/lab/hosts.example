@@ -1,0 +1,4 @@
+# Sustituir por IPs reales del laboratorio.
+192.168.10.101 slots=2
+192.168.10.102 slots=2
+192.168.10.103 slots=2

@@ -84,6 +84,38 @@ public class WorkerNode
                 .getRuntime()
                 .availableProcessors();
 
+        String maxProcessesOverride =
+            System.getenv(
+                "HPC_MPI_MAX_PROCESSES"
+            );
+
+        if (
+            maxProcessesOverride != null &&
+            !maxProcessesOverride.isBlank()
+        ) {
+
+            try {
+
+                maxProcesses =
+                    Integer.parseInt(
+                        maxProcessesOverride
+                    );
+
+            } catch (
+                NumberFormatException error
+            ) {
+
+                return new MpiJobResult(
+                    jobId,
+                    nodeId,
+                    false,
+                    -1,
+                    "HPC_MPI_MAX_PROCESSES inválido",
+                    0
+                );
+            }
+        }
+
         if (
             processes < 1 ||
             processes > maxProcesses
@@ -121,16 +153,87 @@ public class WorkerNode
                 );
             }
 
+            java.util.List<String> mpiCommand =
+                new java.util.ArrayList<>();
+
+            mpiCommand.add(
+                "mpirun"
+            );
+
+            String hostfile =
+                System.getenv(
+                    "HPC_MPI_HOSTFILE"
+                );
+
+            if (
+                hostfile != null &&
+                !hostfile.isBlank()
+            ) {
+
+                Path hostfilePath =
+                    Path.of(
+                        hostfile
+                    )
+                    .toAbsolutePath()
+                    .normalize();
+
+                if (
+                    !hostfilePath
+                        .toFile()
+                        .isFile()
+                ) {
+
+                    throw new Exception(
+                        "Hostfile MPI no encontrado: " +
+                        hostfilePath
+                    );
+                }
+
+                mpiCommand.add(
+                    "--hostfile"
+                );
+
+                mpiCommand.add(
+                    hostfilePath
+                        .toString()
+                );
+
+                mpiCommand.add(
+                    "--map-by"
+                );
+
+                mpiCommand.add(
+                    "slot"
+                );
+            }
+
+            mpiCommand.add(
+                "-np"
+            );
+
+            mpiCommand.add(
+                String.valueOf(
+                    processes
+                )
+            );
+
+            mpiCommand.add(
+                executable
+                    .toAbsolutePath()
+                    .toString()
+            );
+
+            System.out.println(
+                "[MPI] Comando: " +
+                String.join(
+                    " ",
+                    mpiCommand
+                )
+            );
+
             ProcessBuilder builder =
                 new ProcessBuilder(
-                    "mpirun",
-                    "-np",
-                    String.valueOf(
-                        processes
-                    ),
-                    executable
-                        .toAbsolutePath()
-                        .toString()
+                    mpiCommand
                 );
 
             builder

@@ -32,7 +32,7 @@ public class JobClient {
             ) {
 
                 throw new IllegalArgumentException(
-                    "Uso: JobClient <host> <port> <token> [processes]"
+                    "Uso: JobClient <host> <port> <token> [processes] [programName]"
                 );
             }
 

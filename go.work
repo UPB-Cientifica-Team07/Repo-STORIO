@@ -4,6 +4,7 @@ use (
 	./integration-client
 	./services/analysis-service
 	./services/file-service
+	./services/grid-service
 	./services/monitoring-service
 	./services/sync-service
 )

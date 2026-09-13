@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package grid;
+
+option go_package =
+    "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/generated;gridpb";
+
+service GridService {
+
+    rpc RegisterResource(
+        RegisterResourceRequest
+    ) returns (
+        ResourceResponse
+    );
+
+    rpc Heartbeat(
+        HeartbeatRequest
+    ) returns (
+        ResourceResponse
+    );
+
+    rpc GetResource(
+        GetResourceRequest
+    ) returns (
+        ResourceResponse
+    );
+
+    rpc ListResources(
+        ListResourcesRequest
+    ) returns (
+        ListResourcesResponse
+    );
+
+    rpc ListComputeResources(
+        ListComputeResourcesRequest
+    ) returns (
+        ListResourcesResponse
+    );
+
+    rpc Health(
+        HealthRequest
+    ) returns (
+        HealthResponse
+    );
+}
+
+message Resource {
+    string id = 1;
+    string resource_id = 2;
+    string name = 3;
+    string device_type = 4;
+    string ip = 5;
+    int32 cpu_cores = 6;
+    int64 memory_mb = 7;
+    bool mpi_capable = 8;
+    repeated string capabilities = 9;
+    string status = 10;
+    int64 last_heartbeat = 11;
+    int64 created_at = 12;
+    int64 updated_at = 13;
+}
+
+message RegisterResourceRequest {
+    string resource_id = 1;
+    string name = 2;
+    string device_type = 3;
+    string ip = 4;
+    int32 cpu_cores = 5;
+    int64 memory_mb = 6;
+    bool mpi_capable = 7;
+    repeated string capabilities = 8;
+}
+
+message HeartbeatRequest {
+    string resource_id = 1;
+    string status = 2;
+}
+
+message GetResourceRequest {
+    string resource_id = 1;
+}
+
+message ListResourcesRequest {
+    string device_type = 1;
+    string status = 2;
+}
+
+message ListComputeResourcesRequest {
+    bool only_available = 1;
+}
+
+message ResourceResponse {
+    Resource resource = 1;
+}
+
+message ListResourcesResponse {
+    repeated Resource resources = 1;
+}
+
+message HealthRequest {
+}
+
+message HealthResponse {
+    string status = 1;
+    int64 total_resources = 2;
+    int64 timestamp = 3;
+}
