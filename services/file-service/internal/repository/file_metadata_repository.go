@@ -218,7 +218,8 @@ SET
     tamano = $4,
     mime_type = $5,
     tipo_archivo = $6,
-    permisos_unix = $7
+    permisos_unix = $7,
+    fecha_modificacion = CURRENT_TIMESTAMP
 WHERE id_archivo = $1::uuid;
 `
 
