@@ -1,0 +1,150 @@
+UPB-CIENTIFICA
+GPG BACKUP - PRUEBA E2E
+Fecha: 2026-09-13
+
+============================================================
+1. OBJETIVO
+============================================================
+
+Validar el mecanismo de copias de seguridad mediante
+cifrado asimetrico GPG.
+
+La arquitectura utiliza:
+
+- clave publica almacenada en el repositorio;
+- clave privada almacenada fuera del repositorio;
+- RSA 4096 bits;
+- archivo temporal TAR.GZ;
+- cifrado GPG;
+- verificacion SHA-256;
+- restauracion controlada.
+
+============================================================
+2. CLAVE UTILIZADA
+============================================================
+
+Identidad:
+
+UPB-CIENTIFICA Backup <backup@upb-cientifica.local>
+
+Fingerprint:
+
+A18804163D2E57127DCAF3D3A76CA84E4151B182
+
+Tipo:
+
+RSA 4096
+
+La clave privada NO se encuentra dentro del repositorio.
+
+============================================================
+3. BACKUP
+============================================================
+
+Resultado:
+
+Backup exit code: 0
+
+Se genero correctamente un archivo:
+
+upb-backup-20260913-123931.tar.gz.gpg
+
+La inspeccion mediante GPG confirmo:
+
+pubkey enc packet
+encrypted data packet
+
+Key ID:
+
+A76CA84E4151B182
+
+No quedo almacenado el archivo TAR.GZ sin cifrar.
+
+Resultado:
+
+OK: no existe .tar.gz plaintext
+
+============================================================
+4. RESTAURACION
+============================================================
+
+GPG reconocio el backup como cifrado mediante:
+
+rsa4096
+Key ID A76CA84E4151B182
+
+Resultado:
+
+Restore exit code: 0
+
+La integridad del archivo comprimido fue validada mediante
+SHA-256 antes de la extraccion.
+
+Resultado:
+
+OK: integridad verificada
+
+============================================================
+5. VERIFICACION DEL CONTENIDO
+============================================================
+
+Se calcularon hashes SHA-256 independientes para los archivos
+antes del backup y despues de la restauracion.
+
+Resultado:
+
+OK: hashes original/restaurado identicos
+
+Adicionalmente se compararon recursivamente ambos directorios.
+
+Resultado:
+
+OK: contenido restaurado identico
+
+============================================================
+6. CONTROLES DE SEGURIDAD
+============================================================
+
+- cifrado asimetrico mediante GPG;
+- RSA 4096 bits;
+- clave publica separada de la privada;
+- clave privada fuera del repositorio;
+- archivo plaintext temporal eliminado;
+- verificacion SHA-256 antes de restaurar;
+- backups cifrados con permisos restringidos;
+- passphrase no almacenada en scripts;
+- passphrase no almacenada en Git.
+
+============================================================
+7. RESULTADO
+============================================================
+
+GPG BACKUP E2E: PASS
+
+Flujo validado:
+
+Shared Storage
+    |
+    v
+TAR.GZ temporal
+    |
+    v
+SHA-256
+    |
+    v
+GPG / clave publica
+    |
+    v
+.TAR.GZ.GPG
+    |
+    v
+GPG / clave privada
+    |
+    v
+SHA-256
+    |
+    v
+Restore
+    |
+    v
+Contenido identico

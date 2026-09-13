@@ -48,7 +48,7 @@ services/backup-service/keys/upb-backup-public.asc
 
 Fingerprint:
 
-17FD906D1542B32F6622341C28652D1F56237981
+A18804163D2E57127DCAF3D3A76CA84E4151B182
 
 Identidad:
 
