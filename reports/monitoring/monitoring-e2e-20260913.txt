@@ -1,0 +1,308 @@
+UPB-CIENTIFICA
+MONITORING SERVICE - VALIDACION E2E
+Fecha: 2026-09-13
+
+============================================================
+1. OBJETIVO
+============================================================
+
+Validar en ejecucion real el subsistema de monitoreo
+distribuido de UPB-CIENTIFICA.
+
+Flujo validado:
+
+Web Client
+    |
+    v
+Auth Service HTTPS
+    |
+    v
+OpenLDAP / LDAPS
+    |
+    v
+Bearer Token
+    |
+    v
+Monitoring Service gRPC
+    |
+    +--> Metricas
+    +--> Estado de servicios
+    +--> HPC
+    +--> Alertas
+    +--> Reglas de alerta
+
+============================================================
+2. SERVICIOS
+============================================================
+
+OpenLDAP:
+LDAPS :636
+
+Auth Service:
+HTTPS :8081
+RMI Registry :1099
+RMI Object :1101
+
+Monitoring Service:
+gRPC 127.0.0.1:50051
+
+Web Client:
+HTTP :8080
+
+============================================================
+3. PERSISTENCIA DE MONITORING
+============================================================
+
+Al iniciar Monitoring Service:
+
+Historico cargado: 3096 metricas
+Estados cargados: 3
+Reglas de alerta cargadas: 3
+Alertas cargadas: 292
+
+Watchdog:
+ACTIVO
+
+Intervalo:
+5 segundos
+
+Timeout heartbeat:
+15 segundos
+
+============================================================
+4. METRICAS
+============================================================
+
+Consulta realizada mediante:
+
+Web -> Monitoring gRPC
+
+Resultado:
+
+success: true
+metricsCount: 3096
+
+Las metricas almacenan informacion de:
+
+- CPU
+- memoria
+- almacenamiento
+- conexiones activas
+- solicitudes
+- timestamp
+- componente distribuido
+
+Resultado:
+
+METRICS: PASS
+
+============================================================
+5. HPC
+============================================================
+
+Resultado runtime:
+
+Total jobs: 12
+Pending jobs: 0
+Running jobs: 0
+Completed jobs: 12
+Failed jobs: 0
+Cancelled jobs: 0
+
+Average execution:
+3339.2679166666667 ms
+
+Nodos HPC:
+
+Total: 5
+Disponibles: 4
+Ocupados: 0
+Inactivos: 1
+
+Resultado:
+
+HPC MONITORING: PASS
+
+============================================================
+6. ALERTAS
+============================================================
+
+Alertas registradas:
+
+292
+
+Alertas activas durante la prueba:
+
+1
+
+Resultado:
+
+ALERT HISTORY: PASS
+
+============================================================
+7. REGLAS CONFIGURABLES
+============================================================
+
+Reglas existentes:
+
+3
+
+Las reglas pueden consultar:
+
+- metrica
+- operador
+- umbral
+- componente
+- estado enabled
+
+Resultado:
+
+CONFIGURABLE ALERT RULES: PASS
+
+============================================================
+8. AUTENTICACION
+============================================================
+
+Usuario de prueba:
+
+user-002
+Rol: USUARIO
+
+Login:
+PASS
+
+Bearer token:
+GENERADO
+
+Validacion token:
+PASS
+
+La comunicacion Auth se realizo mediante HTTPS con
+certificado validado contra la CA de UPB-CIENTIFICA.
+
+Resultado:
+
+AUTHENTICATION: PASS
+
+============================================================
+9. AUTORIZACION USUARIO
+============================================================
+
+Se intento crear una regla utilizando un usuario con rol
+USUARIO.
+
+Respuesta:
+
+success: false
+message: rol ADMIN requerido
+
+Posteriormente se verifico que la regla no existiera.
+
+Resultado:
+
+exists: false
+
+Resultado:
+
+USER AUTHORIZATION: PASS
+
+============================================================
+10. AUTORIZACION ADMIN
+============================================================
+
+Usuario:
+
+user-001
+Rol: ADMIN
+
+Se creo temporalmente:
+
+e2e-admin-rule
+
+Resultado create:
+
+success: true
+
+Verificacion posterior:
+
+exists: true
+
+Se elimino la misma regla.
+
+Resultado delete:
+
+success: true
+
+Verificacion posterior:
+
+exists: false
+
+El token ADMIN fue revocado al finalizar.
+
+Resultado:
+
+ADMIN AUTHORIZATION: PASS
+
+============================================================
+11. WEB DASHBOARD/API
+============================================================
+
+Web Client activo en:
+
+:8080
+
+Health:
+
+status: ACTIVE
+
+Endpoints validados:
+
+/api/monitoring/metrics
+/api/monitoring/hpc
+/api/monitoring/alerts
+/api/monitoring/rules
+
+Todos respondieron exitosamente utilizando un Bearer valido.
+
+Resultado:
+
+WEB MONITORING: PASS
+
+============================================================
+12. CONTROLES DE SEGURIDAD
+============================================================
+
+- OpenLDAP mediante LDAPS.
+- Auth mediante HTTPS.
+- CA propia validada.
+- RMI restringido a loopback.
+- Monitoring restringido a loopback.
+- Bearer token obligatorio para consultas.
+- Service token obligatorio para productores.
+- Mutaciones de reglas restringidas a ADMIN.
+- Tokens temporales revocados despues de las pruebas.
+- No se almacenaron contraseñas en Git.
+- No se almacenaron tokens en Git.
+
+============================================================
+13. RESULTADO FINAL
+============================================================
+
+MONITORING SERVICE E2E: PASS
+
+Componentes validados:
+
+CPU                         PASS
+Memoria                     PASS
+Storage                     PASS
+Historico                   PASS
+Disponibilidad              PASS
+HPC Jobs                    PASS
+Tiempo de ejecucion HPC     PASS
+Estado nodos HPC            PASS
+Alertas                     PASS
+Reglas configurables        PASS
+Web Dashboard/API           PASS
+Autenticacion               PASS
+Autorizacion USUARIO        PASS
+Autorizacion ADMIN          PASS
