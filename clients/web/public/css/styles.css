@@ -951,3 +951,75 @@ form button {
       flex-start;
   }
 }
+
+/* =====================================
+   MONITORING HISTORY
+   ===================================== */
+
+.monitoring-history-filters {
+  display:
+    grid;
+
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(
+        180px,
+        1fr
+      )
+    );
+
+  gap:
+    14px;
+
+  margin-bottom:
+    14px;
+}
+
+.monitoring-history-filters label {
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  gap:
+    6px;
+
+  font-size:
+    0.85rem;
+
+  color:
+    #68707a;
+}
+
+.monitoring-history-filters input {
+  padding:
+    10px;
+
+  border:
+    1px solid #dfe3e8;
+
+  border-radius:
+    8px;
+
+  font:
+    inherit;
+
+  background:
+    #ffffff;
+}
+
+.monitoring-history-actions {
+  display:
+    flex;
+
+  flex-wrap:
+    wrap;
+
+  gap:
+    10px;
+
+  margin-bottom:
+    14px;
+}

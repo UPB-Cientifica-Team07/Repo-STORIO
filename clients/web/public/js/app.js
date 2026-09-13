@@ -39,6 +39,9 @@ let session = {
   role: null
 };
 
+let monitoringRefreshTimer =
+  null;
+
 // =====================================
 // AUTH
 // =====================================
@@ -188,6 +191,8 @@ logoutButton.addEventListener(
         error.message
       );
     }
+
+    stopMonitoringAutoRefresh();
 
     sessionStorage.removeItem(
       "upbSession"
@@ -2571,6 +2576,8 @@ async function removePhotoFromAlbum(
 
 async function loadMonitoring() {
 
+  stopMonitoringAutoRefresh();
+
   contentView.innerHTML = `
     <div class="section-header">
 
@@ -2691,6 +2698,99 @@ async function loadMonitoring() {
         ></div>
       </section>
 
+      <section
+        class="monitoring-section"
+      >
+        <div class="section-header">
+
+          <div>
+            <h4>
+              Histórico y reportes
+            </h4>
+
+            <p>
+              Consultar métricas por
+              componente e intervalo.
+            </p>
+          </div>
+
+        </div>
+
+        <div
+          class="monitoring-history-filters"
+        >
+
+          <label>
+            Componente
+
+            <input
+              id="historyComponent"
+              type="text"
+              placeholder="Ej: Sync Service"
+            >
+          </label>
+
+          <label>
+            Desde
+
+            <input
+              id="historyFrom"
+              type="datetime-local"
+            >
+          </label>
+
+          <label>
+            Hasta
+
+            <input
+              id="historyTo"
+              type="datetime-local"
+            >
+          </label>
+
+          <label>
+            Límite
+
+            <input
+              id="historyLimit"
+              type="number"
+              min="1"
+              max="5000"
+              value="500"
+            >
+          </label>
+
+        </div>
+
+        <div
+          class="monitoring-history-actions"
+        >
+          <button
+            id="queryMonitoringHistory"
+          >
+            Consultar histórico
+          </button>
+
+          <button
+            id="exportMonitoringCsv"
+            type="button"
+          >
+            Exportar CSV
+          </button>
+        </div>
+
+        <p
+          id="monitoringHistoryMessage"
+          class="message"
+        ></p>
+
+        <div
+          id="monitoringHistory"
+          class="monitoring-table-wrapper"
+        ></div>
+
+      </section>
+
     </div>
   `;
 
@@ -2702,6 +2802,8 @@ async function loadMonitoring() {
       "click",
       loadMonitoring
     );
+
+  setupMonitoringHistory();
 
   const message =
     document.getElementById(
@@ -2946,10 +3048,287 @@ async function loadMonitoring() {
       "hidden"
     );
 
+    startMonitoringAutoRefresh();
+
   } catch (error) {
 
     message.textContent =
       error.message;
+  }
+}
+
+
+function stopMonitoringAutoRefresh() {
+
+  if (
+    monitoringRefreshTimer !==
+    null
+  ) {
+
+    clearInterval(
+      monitoringRefreshTimer
+    );
+
+    monitoringRefreshTimer =
+      null;
+  }
+}
+
+function startMonitoringAutoRefresh() {
+
+  stopMonitoringAutoRefresh();
+
+  monitoringRefreshTimer =
+    setInterval(
+      async () => {
+
+        const monitoringContent =
+          document.getElementById(
+            "monitoringContent"
+          );
+
+        if (
+          !monitoringContent
+        ) {
+
+          stopMonitoringAutoRefresh();
+
+          return;
+        }
+
+        await refreshMonitoringLiveData();
+
+      },
+      5000
+    );
+}
+
+async function refreshMonitoringLiveData() {
+
+  const message =
+    document.getElementById(
+      "monitoringMessage"
+    );
+
+  if (
+    !document.getElementById(
+      "monitoringContent"
+    )
+  ) {
+
+    stopMonitoringAutoRefresh();
+
+    return;
+  }
+
+  try {
+
+    const [
+      hpcResponse,
+      metricsResponse,
+      alertsResponse
+    ] =
+      await Promise.all([
+        apiFetch(
+          "/api/monitoring/hpc"
+        ),
+        apiFetch(
+          "/api/monitoring/metrics"
+        ),
+        apiFetch(
+          "/api/monitoring/alerts"
+        )
+      ]);
+
+    const hpcData =
+      await hpcResponse.json();
+
+    const metricsData =
+      await metricsResponse.json();
+
+    const alertsData =
+      await alertsResponse.json();
+
+    if (
+      !hpcResponse.ok ||
+      !hpcData.success
+    ) {
+
+      throw new Error(
+        hpcData.message ||
+        "Error consultando HPC"
+      );
+    }
+
+    if (
+      !metricsResponse.ok ||
+      !metricsData.success
+    ) {
+
+      throw new Error(
+        metricsData.message ||
+        "Error consultando métricas"
+      );
+    }
+
+    if (
+      !alertsResponse.ok ||
+      !alertsData.success
+    ) {
+
+      throw new Error(
+        alertsData.message ||
+        "Error consultando alertas"
+      );
+    }
+
+    const metrics =
+      metricsData.metrics ||
+      [];
+
+    const alerts =
+      alertsData.alerts ||
+      [];
+
+    const hpc =
+      hpcData.hpc ||
+      {};
+
+    const latest =
+      {};
+
+    for (
+      const metric of metrics
+    ) {
+
+      const name =
+        metric.componentName ||
+        "Desconocido";
+
+      const timestamp =
+        Number(
+          metric.timestamp ||
+          0
+        );
+
+      if (
+        !latest[name] ||
+        timestamp >
+          Number(
+            latest[name]
+              .timestamp ||
+            0
+          )
+      ) {
+
+        latest[name] =
+          metric;
+      }
+    }
+
+    const latestMetrics =
+      Object.values(
+        latest
+      );
+
+    const serviceStatuses =
+      await Promise.all(
+        latestMetrics.map(
+          async metric => {
+
+            try {
+
+              const response =
+                await apiFetch(
+                  `/api/monitoring/services/${
+                    encodeURIComponent(
+                      metric.componentName
+                    )
+                  }`
+                );
+
+              const data =
+                await response.json();
+
+              if (
+                !response.ok ||
+                !data.success
+              ) {
+
+                throw new Error(
+                  data.message ||
+                  "Estado no disponible"
+                );
+              }
+
+              return {
+                ...data.service,
+                metric
+              };
+
+            } catch (error) {
+
+              return {
+                componentId:
+                  metric.componentId,
+
+                componentName:
+                  metric.componentName,
+
+                status:
+                  "UNKNOWN",
+
+                message:
+                  error.message,
+
+                lastUpdated:
+                  metric.timestamp,
+
+                metric
+              };
+            }
+          }
+        )
+      );
+
+    renderMonitoringMetrics(
+      latestMetrics
+    );
+
+    renderHpcSummary(
+      hpc
+    );
+
+    renderServiceStatus(
+      serviceStatuses
+    );
+
+    renderActiveAlerts(
+      alerts
+    );
+
+    renderMetricsTable(
+      latestMetrics
+    );
+
+    if (message) {
+
+      message.textContent =
+        `Actualizado automáticamente: ${
+          new Date()
+            .toLocaleTimeString()
+        }`;
+    }
+
+  } catch (error) {
+
+    if (message) {
+
+      message.textContent =
+        `Error de actualización: ${
+          error.message
+        }`;
+    }
   }
 }
 
@@ -3627,6 +4006,396 @@ function renderActiveAlerts(
       .join("");
 }
 
+
+function monitoringHistoryQuery() {
+
+  const params =
+    new URLSearchParams();
+
+  const component =
+    document
+      .getElementById(
+        "historyComponent"
+      )
+      ?.value
+      ?.trim();
+
+  const fromValue =
+    document
+      .getElementById(
+        "historyFrom"
+      )
+      ?.value;
+
+  const toValue =
+    document
+      .getElementById(
+        "historyTo"
+      )
+      ?.value;
+
+  const limit =
+    document
+      .getElementById(
+        "historyLimit"
+      )
+      ?.value;
+
+  if (component) {
+
+    params.set(
+      "component",
+      component
+    );
+  }
+
+  if (fromValue) {
+
+    params.set(
+      "from",
+      String(
+        Math.floor(
+          new Date(
+            fromValue
+          ).getTime() /
+          1000
+        )
+      )
+    );
+  }
+
+  if (toValue) {
+
+    params.set(
+      "to",
+      String(
+        Math.floor(
+          new Date(
+            toValue
+          ).getTime() /
+          1000
+        )
+      )
+    );
+  }
+
+  if (limit) {
+
+    params.set(
+      "limit",
+      limit
+    );
+  }
+
+  return params;
+}
+
+function setupMonitoringHistory() {
+
+  const queryButton =
+    document.getElementById(
+      "queryMonitoringHistory"
+    );
+
+  const exportButton =
+    document.getElementById(
+      "exportMonitoringCsv"
+    );
+
+  if (
+    !queryButton ||
+    !exportButton
+  ) {
+
+    return;
+  }
+
+  queryButton
+    .addEventListener(
+      "click",
+      loadMonitoringHistory
+    );
+
+  exportButton
+    .addEventListener(
+      "click",
+      exportMonitoringHistoryCsv
+    );
+}
+
+async function loadMonitoringHistory() {
+
+  const message =
+    document.getElementById(
+      "monitoringHistoryMessage"
+    );
+
+  const container =
+    document.getElementById(
+      "monitoringHistory"
+    );
+
+  if (
+    !message ||
+    !container
+  ) {
+
+    return;
+  }
+
+  message.textContent =
+    "Consultando histórico...";
+
+  container.innerHTML = "";
+
+  try {
+
+    const params =
+      monitoringHistoryQuery();
+
+    const response =
+      await apiFetch(
+        `/api/monitoring/history?${
+          params.toString()
+        }`
+      );
+
+    const data =
+      await response.json();
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
+      throw new Error(
+        data.message ||
+        "No fue posible consultar el histórico"
+      );
+    }
+
+    const metrics =
+      data.metrics || [];
+
+    message.textContent =
+      `${metrics.length} métricas encontradas`;
+
+    renderMonitoringHistoryTable(
+      metrics
+    );
+
+  } catch (error) {
+
+    message.textContent =
+      error.message;
+
+    container.innerHTML = "";
+  }
+}
+
+async function exportMonitoringHistoryCsv() {
+
+  const message =
+    document.getElementById(
+      "monitoringHistoryMessage"
+    );
+
+  try {
+
+    const params =
+      monitoringHistoryQuery();
+
+    const response =
+      await apiFetch(
+        `/api/monitoring/report.csv?${
+          params.toString()
+        }`
+      );
+
+    if (!response.ok) {
+
+      const data =
+        await response.json();
+
+      throw new Error(
+        data.message ||
+        "No fue posible generar el CSV"
+      );
+    }
+
+    const blob =
+      await response.blob();
+
+    const url =
+      URL.createObjectURL(
+        blob
+      );
+
+    const link =
+      document.createElement(
+        "a"
+      );
+
+    const disposition =
+      response.headers.get(
+        "Content-Disposition"
+      ) || "";
+
+    const match =
+      disposition.match(
+        /filename="([^"]+)"/
+      );
+
+    link.href =
+      url;
+
+    link.download =
+      match
+        ? match[1]
+        : "monitoring-report.csv";
+
+    document.body
+      .appendChild(
+        link
+      );
+
+    link.click();
+
+    link.remove();
+
+    URL.revokeObjectURL(
+      url
+    );
+
+    if (message) {
+
+      message.textContent =
+        "Reporte CSV generado.";
+    }
+
+  } catch (error) {
+
+    if (message) {
+
+      message.textContent =
+        error.message;
+    }
+  }
+}
+
+function renderMonitoringHistoryTable(
+  metrics
+) {
+
+  const container =
+    document.getElementById(
+      "monitoringHistory"
+    );
+
+  if (!container) {
+
+    return;
+  }
+
+  if (
+    metrics.length === 0
+  ) {
+
+    container.innerHTML =
+      "<p>No hay métricas para los filtros seleccionados.</p>";
+
+    return;
+  }
+
+  container.innerHTML = `
+    <table
+      class="monitoring-table"
+    >
+      <thead>
+        <tr>
+          <th>Fecha</th>
+          <th>Servicio</th>
+          <th>CPU</th>
+          <th>RAM</th>
+          <th>Storage</th>
+          <th>Conexiones</th>
+          <th>Requests</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        ${
+          metrics
+            .map(
+              metric => `
+                <tr>
+                  <td>
+                    ${formatTimestamp(
+                      metric.timestamp
+                    )}
+                  </td>
+
+                  <td>
+                    ${escapeHtml(
+                      metric.componentName ||
+                      ""
+                    )}
+                  </td>
+
+                  <td>
+                    ${
+                      Number(
+                        metric.cpuUsage ||
+                        0
+                      ).toFixed(2)
+                    } %
+                  </td>
+
+                  <td>
+                    ${
+                      Number(
+                        metric.memoryUsage ||
+                        0
+                      ).toFixed(2)
+                    }
+                  </td>
+
+                  <td>
+                    ${formatBytes(
+                      Number(
+                        metric.storageUsage ||
+                        0
+                      )
+                    )}
+                  </td>
+
+                  <td>
+                    ${escapeHtml(
+                      String(
+                        metric.activeConnections ||
+                        0
+                      )
+                    )}
+                  </td>
+
+                  <td>
+                    ${escapeHtml(
+                      String(
+                        metric.totalRequests ||
+                        0
+                      )
+                    )}
+                  </td>
+                </tr>
+              `
+            )
+            .join("")
+        }
+      </tbody>
+    </table>
+  `;
+}
+
 function renderMetricsTable(
   metrics
 ) {
@@ -3963,6 +4732,8 @@ document
 
           const module =
             button.dataset.module;
+
+          stopMonitoringAutoRefresh();
 
           if (
             module ===

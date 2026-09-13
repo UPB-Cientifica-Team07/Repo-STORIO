@@ -2842,6 +2842,371 @@ app.get(
   }
 );
 
+
+// -------------------------------------
+// HISTORICAL METRICS HELPERS
+// -------------------------------------
+
+function filterHistoricalMetrics(
+  metrics,
+  query
+) {
+
+  const component =
+    String(
+      query.component || ""
+    )
+      .trim()
+      .toLowerCase();
+
+  const from =
+    Number(
+      query.from || 0
+    );
+
+  const to =
+    Number(
+      query.to || 0
+    );
+
+  const requestedLimit =
+    Number(
+      query.limit || 500
+    );
+
+  const limit =
+    Number.isFinite(
+      requestedLimit
+    )
+      ? Math.min(
+          Math.max(
+            Math.trunc(
+              requestedLimit
+            ),
+            1
+          ),
+          5000
+        )
+      : 500;
+
+  return (
+    Array.isArray(metrics)
+      ? metrics
+      : []
+  )
+    .filter(
+      metric => {
+
+        const timestamp =
+          Number(
+            metric.timestamp || 0
+          );
+
+        if (
+          component &&
+          String(
+            metric.componentName ||
+            ""
+          )
+            .trim()
+            .toLowerCase() !==
+            component
+        ) {
+
+          return false;
+        }
+
+        if (
+          from > 0 &&
+          timestamp < from
+        ) {
+
+          return false;
+        }
+
+        if (
+          to > 0 &&
+          timestamp > to
+        ) {
+
+          return false;
+        }
+
+        return true;
+      }
+    )
+    .sort(
+      (a, b) =>
+        Number(
+          b.timestamp || 0
+        ) -
+        Number(
+          a.timestamp || 0
+        )
+    )
+    .slice(
+      0,
+      limit
+    );
+}
+
+function csvEscape(
+  value
+) {
+
+  const stringValue =
+    String(
+      value ?? ""
+    );
+
+  if (
+    /[",\n\r]/.test(
+      stringValue
+    )
+  ) {
+
+    return (
+      '"' +
+      stringValue
+        .replace(
+          /"/g,
+          '""'
+        ) +
+      '"'
+    );
+  }
+
+  return stringValue;
+}
+
+// -------------------------------------
+// HISTORICAL METRICS
+// -------------------------------------
+
+app.get(
+  "/api/monitoring/history",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const response =
+        await monitoringClient
+          .getMetrics(
+            token
+          );
+
+      const metrics =
+        filterHistoricalMetrics(
+          response.metrics || [],
+          req.query
+        );
+
+      return res.json({
+        success: true,
+
+        count:
+          metrics.length,
+
+        filters: {
+          component:
+            req.query.component ||
+            "",
+
+          from:
+            Number(
+              req.query.from ||
+              0
+            ),
+
+          to:
+            Number(
+              req.query.to ||
+              0
+            ),
+
+          limit:
+            Math.min(
+              Math.max(
+                Number(
+                  req.query.limit ||
+                  500
+                ) || 500,
+                1
+              ),
+              5000
+            )
+        },
+
+        metrics
+      });
+
+    } catch (error) {
+
+      console.error(
+        "MONITORING HISTORY ERROR:",
+        error
+      );
+
+      return res
+        .status(
+          error.code === 7
+            ? 403
+            : error.code === 16
+              ? 401
+              : 502
+        )
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error consultando histórico"
+        });
+    }
+  }
+);
+
+// -------------------------------------
+// CSV REPORT
+// -------------------------------------
+
+app.get(
+  "/api/monitoring/report.csv",
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(req);
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+            message:
+              "Token requerido"
+          });
+      }
+
+      const response =
+        await monitoringClient
+          .getMetrics(
+            token
+          );
+
+      const metrics =
+        filterHistoricalMetrics(
+          response.metrics || [],
+          {
+            ...req.query,
+
+            limit:
+              req.query.limit ||
+              5000
+          }
+        );
+
+      const header = [
+        "timestamp",
+        "component_id",
+        "component_name",
+        "cpu_usage",
+        "memory_usage",
+        "storage_usage",
+        "active_connections",
+        "total_requests"
+      ];
+
+      const rows =
+        metrics.map(
+          metric => [
+            metric.timestamp,
+            metric.componentId,
+            metric.componentName,
+            metric.cpuUsage,
+            metric.memoryUsage,
+            metric.storageUsage,
+            metric.activeConnections,
+            metric.totalRequests
+          ]
+            .map(
+              csvEscape
+            )
+            .join(",")
+        );
+
+      const csv =
+        [
+          header.join(","),
+          ...rows
+        ]
+          .join("\n") +
+        "\n";
+
+      const filename =
+        `monitoring-report-${
+          new Date()
+            .toISOString()
+            .replace(
+              /[:.]/g,
+              "-"
+            )
+        }.csv`;
+
+      res.setHeader(
+        "Content-Type",
+        "text/csv; charset=utf-8"
+      );
+
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${filename}"`
+      );
+
+      return res.send(
+        csv
+      );
+
+    } catch (error) {
+
+      console.error(
+        "MONITORING CSV ERROR:",
+        error
+      );
+
+      return res
+        .status(
+          error.code === 7
+            ? 403
+            : error.code === 16
+              ? 401
+              : 502
+        )
+        .json({
+          success: false,
+          message:
+            error.details ||
+            "Error generando reporte CSV"
+        });
+    }
+  }
+);
+
 // -------------------------------------
 // SERVICE STATUS
 // -------------------------------------
