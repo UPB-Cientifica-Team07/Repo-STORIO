@@ -1,0 +1,4 @@
+health=ACTIVE|nodes=2|timestamp=2026-09-29T21:33:11.649338769Z
+nodes=2
+node_id=hpc-worker02|hostname=hpc-worker02|ip=10.152.172.143|cpu=2|memory_mb=850|status=DISPONIBLE
+node_id=hpc-worker01|hostname=hpc-worker01|ip=10.152.172.142|cpu=2|memory_mb=850|status=DISPONIBLE

@@ -1,0 +1,41 @@
+===== 10.152.172.142 =====
+HOSTNAME=hpc-worker01
+NODE_ID=hpc-worker01
+WORKER_IP=10.152.172.142
+CPU_CORES=2
+WORKER_RMI_PORT=12001
+HPC_MPI_MAX_PROCESSES=4
+HPC_MPI_LAUNCHER=mpirun.mpich
+HPC_MPI_FLAVOR=mpich
+HPC_MPI_INTERFACE=enp0s3
+HPC_MPI_HOSTFILE=/home/info/upb-hpc/mpich-hosts
+
+--- MPI VERSION ---
+HYDRA build details:
+    Version:                                 4.3.2
+    Release Date:                            Mon Oct  6 11:14:20 AM CDT 2025
+
+--- HOSTFILE ---
+10.152.172.142:2
+10.152.172.143:2
+
+===== 10.152.172.143 =====
+HOSTNAME=hpc-worker02
+NODE_ID=hpc-worker02
+WORKER_IP=10.152.172.143
+CPU_CORES=2
+WORKER_RMI_PORT=12002
+HPC_MPI_MAX_PROCESSES=4
+HPC_MPI_LAUNCHER=mpirun.mpich
+HPC_MPI_FLAVOR=mpich
+HPC_MPI_INTERFACE=enp0s3
+HPC_MPI_HOSTFILE=/home/info/upb-hpc/mpich-hosts
+
+--- MPI VERSION ---
+HYDRA build details:
+    Version:                                 4.3.2
+    Release Date:                            Mon Oct  6 11:14:20 AM CDT 2025
+
+--- HOSTFILE ---
+10.152.172.142:2
+10.152.172.143:2

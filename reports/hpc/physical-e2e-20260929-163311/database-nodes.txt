@@ -1,0 +1,5 @@
+   hostname   |       ip       | cpu | memoria_mb |   estado   |  ubicacion
+--------------+----------------+-----+------------+------------+-------------
+ hpc-worker01 | 10.152.172.142 |   2 |        850 | DISPONIBLE | HPC Cluster
+ hpc-worker02 | 10.152.172.143 |   2 |        850 | DISPONIBLE | HPC Cluster
+(2 filas)

@@ -156,8 +156,36 @@ public class WorkerNode
             java.util.List<String> mpiCommand =
                 new java.util.ArrayList<>();
 
+            String mpiLauncher =
+                System.getenv()
+                    .getOrDefault(
+                        "HPC_MPI_LAUNCHER",
+                        "mpirun"
+                    )
+                    .trim();
+
+            String mpiFlavor =
+                System.getenv()
+                    .getOrDefault(
+                        "HPC_MPI_FLAVOR",
+                        "openmpi"
+                    )
+                    .trim();
+
+            String mpiInterface =
+                System.getenv(
+                    "HPC_MPI_INTERFACE"
+                );
+
+            if (mpiLauncher.isBlank()) {
+
+                throw new Exception(
+                    "HPC_MPI_LAUNCHER vacío"
+                );
+            }
+
             mpiCommand.add(
-                "mpirun"
+                mpiLauncher
             );
 
             String hostfile =
@@ -165,12 +193,14 @@ public class WorkerNode
                     "HPC_MPI_HOSTFILE"
                 );
 
+            Path hostfilePath = null;
+
             if (
                 hostfile != null &&
                 !hostfile.isBlank()
             ) {
 
-                Path hostfilePath =
+                hostfilePath =
                     Path.of(
                         hostfile
                     )
@@ -188,22 +218,79 @@ public class WorkerNode
                         hostfilePath
                     );
                 }
+            }
+
+            if (
+                "mpich".equalsIgnoreCase(
+                    mpiFlavor
+                )
+            ) {
 
                 mpiCommand.add(
-                    "--hostfile"
+                    "-launcher"
                 );
 
                 mpiCommand.add(
-                    hostfilePath
-                        .toString()
+                    "ssh"
                 );
 
-                mpiCommand.add(
-                    "--map-by"
-                );
+                if (
+                    mpiInterface != null &&
+                    !mpiInterface.isBlank()
+                ) {
 
-                mpiCommand.add(
-                    "slot"
+                    mpiCommand.add(
+                        "-iface"
+                    );
+
+                    mpiCommand.add(
+                        mpiInterface.trim()
+                    );
+                }
+
+                if (hostfilePath != null) {
+
+                    mpiCommand.add(
+                        "-f"
+                    );
+
+                    mpiCommand.add(
+                        hostfilePath
+                            .toString()
+                    );
+                }
+
+            } else if (
+                "openmpi".equalsIgnoreCase(
+                    mpiFlavor
+                )
+            ) {
+
+                if (hostfilePath != null) {
+
+                    mpiCommand.add(
+                        "--hostfile"
+                    );
+
+                    mpiCommand.add(
+                        hostfilePath
+                            .toString()
+                    );
+
+                    mpiCommand.add(
+                        "--map-by"
+                    );
+
+                    mpiCommand.add(
+                        "slot"
+                    );
+                }
+
+            } else {
+
+                throw new Exception(
+                    "HPC_MPI_FLAVOR no soportado: " +
+                    mpiFlavor
                 );
             }
 

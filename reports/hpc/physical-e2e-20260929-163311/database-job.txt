@@ -1,0 +1,4 @@
+                id_job                | directorio_id | usuario |  rol  |   launcher   | lenguaje |   estado   |           inicio           |            fin             |  recursos   |       descripcion
+--------------------------------------+---------------+---------+-------+--------------+----------+------------+----------------------------+----------------------------+-------------+--------------------------
+ 2da9d222-144c-4fe1-a92a-7b0b404950ba | user-001      | samuel  | ADMIN | hpc-worker02 | C_MPI    | FINALIZADO | 2026-09-29 16:33:12.962585 | 2026-09-29 16:33:15.927752 | processes=4 | Ejecución MPI: hello_mpi
+(1 fila)

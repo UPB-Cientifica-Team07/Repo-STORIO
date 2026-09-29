@@ -101,3 +101,7 @@ services/directory-service/ldif/*.local.ldif
 
 # Local TLS/PKI private material
 /security/pki/runtime/
+
+# Grid generated binaries
+services/grid-service/bin/
+reports/hpc/lab-*/

@@ -45,6 +45,30 @@ public class HpcScheduler {
         int processes
     ) {
 
+        if (
+            processes <= 0
+        ) {
+            return null;
+        }
+
+        /*
+         * El hostfile MPI representa el cluster completo.
+         *
+         * WorkerNode actúa como launcher de MPICH, por lo que
+         * la capacidad requerida por el job debe compararse
+         * contra la suma de CPU de los nodos vivos y no contra
+         * la CPU del launcher individual.
+         *
+         * El cluster usa un hostfile compartido. Mientras exista
+         * un job reservado no permitimos otro lanzamiento MPI
+         * concurrente sobre el mismo conjunto de nodos.
+         */
+        if (
+            !busyNodes.isEmpty()
+        ) {
+            return null;
+        }
+
         Instant now =
             Instant.now();
 
@@ -53,6 +77,9 @@ public class HpcScheduler {
 
         int bestCpu =
             Integer.MAX_VALUE;
+
+        int availableCpu =
+            0;
 
         for (
             Map.Entry<String, NodeInfo> entry
@@ -98,12 +125,8 @@ public class HpcScheduler {
                 continue;
             }
 
-            if (
-                node.getCpuCores()
-                    < processes
-            ) {
-                continue;
-            }
+            availableCpu +=
+                node.getCpuCores();
 
             /*
              * Best-fit:
@@ -128,12 +151,18 @@ public class HpcScheduler {
         }
 
         if (
-            bestNodeId != null
+            bestNodeId != null &&
+            availableCpu >= processes
         ) {
 
             busyNodes.add(
                 bestNodeId
             );
+
+        } else {
+
+            bestNodeId =
+                null;
         }
 
         return bestNodeId;

@@ -1,0 +1,14 @@
+Enviando job: 2da9d222-144c-4fe1-a92a-7b0b404950ba
+===================================
+ RESULTADO HPC
+ Job: 2da9d222-144c-4fe1-a92a-7b0b404950ba
+ Nodo: hpc-worker02
+ Success: true
+ Exit code: 0
+ Duración: 2930 ms
+-----------------------------------
+Proceso 1 de 4 ejecutándose en hpc-worker01
+Proceso 0 de 4 ejecutándose en hpc-worker01
+Proceso 2 de 4 ejecutándose en hpc-worker02
+Proceso 3 de 4 ejecutándose en hpc-worker02
+===================================
