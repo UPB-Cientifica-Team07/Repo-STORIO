@@ -16,7 +16,10 @@ public interface ClusterCoordinator
     ) throws RemoteException;
 
     boolean heartbeat(
-        String nodeId
+        String nodeId,
+        double cpuUsage,
+        double memoryUsage,
+        long storageUsage
     ) throws RemoteException;
 
     List<NodeInfo> listNodes()

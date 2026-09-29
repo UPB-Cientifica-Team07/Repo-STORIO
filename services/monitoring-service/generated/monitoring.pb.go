@@ -657,6 +657,7 @@ type NodeResponse struct {
 	LastUpdated   int64                  `protobuf:"varint,8,opt,name=last_updated,json=lastUpdated,proto3" json:"last_updated,omitempty"`
 	Ip            string                 `protobuf:"bytes,9,opt,name=ip,proto3" json:"ip,omitempty"`
 	Location      string                 `protobuf:"bytes,10,opt,name=location,proto3" json:"location,omitempty"`
+	StorageUsage  int64                  `protobuf:"varint,11,opt,name=storage_usage,json=storageUsage,proto3" json:"storage_usage,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -759,6 +760,13 @@ func (x *NodeResponse) GetLocation() string {
 		return x.Location
 	}
 	return ""
+}
+
+func (x *NodeResponse) GetStorageUsage() int64 {
+	if x != nil {
+		return x.StorageUsage
+	}
+	return 0
 }
 
 type AlertRule struct {
@@ -1782,7 +1790,7 @@ const file_monitoring_proto_rawDesc = "" +
 	"\amessage\x18\x04 \x01(\tR\amessage\x12!\n" +
 	"\flast_updated\x18\x05 \x01(\x03R\vlastUpdated\"&\n" +
 	"\vNodeRequest\x12\x17\n" +
-	"\anode_id\x18\x01 \x01(\tR\x06nodeId\"\x9f\x02\n" +
+	"\anode_id\x18\x01 \x01(\tR\x06nodeId\"\xc4\x02\n" +
 	"\fNodeResponse\x12\x17\n" +
 	"\anode_id\x18\x01 \x01(\tR\x06nodeId\x12\x1a\n" +
 	"\bhostname\x18\x02 \x01(\tR\bhostname\x12\x16\n" +
@@ -1794,7 +1802,8 @@ const file_monitoring_proto_rawDesc = "" +
 	"\flast_updated\x18\b \x01(\x03R\vlastUpdated\x12\x0e\n" +
 	"\x02ip\x18\t \x01(\tR\x02ip\x12\x1a\n" +
 	"\blocation\x18\n" +
-	" \x01(\tR\blocation\"\xc2\x01\n" +
+	" \x01(\tR\blocation\x12#\n" +
+	"\rstorage_usage\x18\v \x01(\x03R\fstorageUsage\"\xc2\x01\n" +
 	"\tAlertRule\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x16\n" +

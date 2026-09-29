@@ -264,7 +264,10 @@ public class ClusterCoordinatorImpl
 
     @Override
     public boolean heartbeat(
-        String nodeId
+        String nodeId,
+        double cpuUsage,
+        double memoryUsage,
+        long storageUsage
     ) throws RemoteException {
 
         if (
@@ -287,19 +290,31 @@ public class ClusterCoordinatorImpl
             );
 
         if (
-            databaseNodeId != null &&
-            !busyNodes.contains(
-                nodeId
-            )
+            databaseNodeId != null
         ) {
 
             try {
 
                 nodeRepository
-                    .updateStatus(
+                    .updateTelemetry(
                         databaseNodeId,
-                        "DISPONIBLE"
+                        cpuUsage,
+                        memoryUsage,
+                        storageUsage
                     );
+
+                if (
+                    !busyNodes.contains(
+                        nodeId
+                    )
+                ) {
+
+                    nodeRepository
+                        .updateStatus(
+                            databaseNodeId,
+                            "DISPONIBLE"
+                        );
+                }
 
             } catch (Exception error) {
 

@@ -21,16 +21,24 @@ public class NodeRepository {
                 memoria_mb,
                 estado,
                 ip,
-                ubicacion
+                ubicacion,
+                last_heartbeat
             )
-            VALUES (?, ?, ?, ?, ?, ?)
+            VALUES (
+                ?, ?, ?, ?, ?, ?,
+                CURRENT_TIMESTAMP
+            )
             ON CONFLICT (hostname)
             DO UPDATE SET
                 cpu = EXCLUDED.cpu,
                 memoria_mb = EXCLUDED.memoria_mb,
                 estado = EXCLUDED.estado,
                 ip = EXCLUDED.ip,
-                ubicacion = EXCLUDED.ubicacion
+                ubicacion = EXCLUDED.ubicacion,
+                cpu_usage = 0,
+                memory_usage = 0,
+                storage_usage = 0,
+                last_heartbeat = CURRENT_TIMESTAMP
             RETURNING id_nodo
             """;
 
@@ -112,6 +120,57 @@ public class NodeRepository {
                     sql
                 )
         ) {
+
+            statement.executeUpdate();
+        }
+    }
+
+    public void updateTelemetry(
+        UUID nodeId,
+        double cpuUsage,
+        double memoryUsage,
+        long storageUsage
+    ) throws SQLException {
+
+        String sql = """
+            UPDATE nodo_hpc
+            SET
+                cpu_usage = ?,
+                memory_usage = ?,
+                storage_usage = ?,
+                last_heartbeat = CURRENT_TIMESTAMP
+            WHERE id_nodo = ?
+            """;
+
+        try (
+            Connection connection =
+                Database.getConnection();
+
+            PreparedStatement statement =
+                connection.prepareStatement(
+                    sql
+                )
+        ) {
+
+            statement.setDouble(
+                1,
+                cpuUsage
+            );
+
+            statement.setDouble(
+                2,
+                memoryUsage
+            );
+
+            statement.setLong(
+                3,
+                storageUsage
+            );
+
+            statement.setObject(
+                4,
+                nodeId
+            );
 
             statement.executeUpdate();
         }

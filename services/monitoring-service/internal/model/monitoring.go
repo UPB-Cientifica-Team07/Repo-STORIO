@@ -70,16 +70,17 @@ type Alert struct {
 // =====================================
 
 type HpcNode struct {
-	NodeID      string
-	Hostname    string
-	Status      string
-	CPUCores    int32
-	MemoryMB    int64
-	IP          string
-	Location    string
-	CPUUsage    float64
-	MemoryUsage float64
-	LastUpdated time.Time
+	NodeID       string
+	Hostname     string
+	Status       string
+	CPUCores     int32
+	MemoryMB     int64
+	IP           string
+	Location     string
+	CPUUsage     float64
+	MemoryUsage  float64
+	StorageUsage int64
+	LastUpdated  time.Time
 }
 
 // =====================================

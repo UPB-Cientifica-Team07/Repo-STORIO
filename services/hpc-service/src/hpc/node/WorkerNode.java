@@ -8,7 +8,10 @@ import hpc.common.NodeInfo;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.lang.management.ManagementFactory;
 import java.net.InetAddress;
+import java.nio.file.FileStore;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -51,6 +54,142 @@ public class WorkerNode
 
         this.mpiDirectory =
             mpiDirectory;
+    }
+
+    private static double clampPercent(
+        double value
+    ) {
+
+        if (
+            Double.isNaN(value) ||
+            Double.isInfinite(value)
+        ) {
+            return 0;
+        }
+
+        return Math.max(
+            0,
+            Math.min(
+                100,
+                value
+            )
+        );
+    }
+
+    private static double readCpuUsage() {
+
+        com.sun.management.OperatingSystemMXBean
+            operatingSystem =
+                ManagementFactory
+                    .getPlatformMXBean(
+                        com.sun.management
+                            .OperatingSystemMXBean.class
+                    );
+
+        if (operatingSystem == null) {
+            return 0;
+        }
+
+        double cpuLoad =
+            operatingSystem
+                .getCpuLoad();
+
+        if (cpuLoad < 0) {
+            return 0;
+        }
+
+        return clampPercent(
+            cpuLoad * 100
+        );
+    }
+
+    private static double readMemoryUsage() {
+
+        com.sun.management.OperatingSystemMXBean
+            operatingSystem =
+                ManagementFactory
+                    .getPlatformMXBean(
+                        com.sun.management
+                            .OperatingSystemMXBean.class
+                    );
+
+        if (operatingSystem == null) {
+            return 0;
+        }
+
+        long totalMemory =
+            operatingSystem
+                .getTotalMemorySize();
+
+        long freeMemory =
+            operatingSystem
+                .getFreeMemorySize();
+
+        if (totalMemory <= 0) {
+            return 0;
+        }
+
+        long usedMemory =
+            Math.max(
+                0,
+                totalMemory - freeMemory
+            );
+
+        return clampPercent(
+            (
+                usedMemory *
+                100.0
+            ) /
+            totalMemory
+        );
+    }
+
+    private static long readStorageUsage() {
+
+        try {
+
+            Path storagePath =
+                Path.of(
+                    System.getenv()
+                        .getOrDefault(
+                            "HPC_STORAGE_PATH",
+                            "/"
+                        )
+                )
+                .toAbsolutePath()
+                .normalize();
+
+            FileStore fileStore =
+                Files.getFileStore(
+                    storagePath
+                );
+
+            long totalSpace =
+                fileStore
+                    .getTotalSpace();
+
+            long usableSpace =
+                fileStore
+                    .getUsableSpace();
+
+            if (totalSpace <= 0) {
+                return 0;
+            }
+
+            return Math.max(
+                0,
+                totalSpace - usableSpace
+            );
+
+        } catch (Exception error) {
+
+            System.err.println(
+                "[TELEMETRY] No se pudo leer almacenamiento: " +
+                error.getMessage()
+            );
+
+            return 0;
+        }
     }
 
     @Override
@@ -632,8 +771,20 @@ public class WorkerNode
                     5000
                 );
 
+                double cpuUsage =
+                    readCpuUsage();
+
+                double memoryUsage =
+                    readMemoryUsage();
+
+                long storageUsage =
+                    readStorageUsage();
+
                 coordinator.heartbeat(
-                    nodeId
+                    nodeId,
+                    cpuUsage,
+                    memoryUsage,
+                    storageUsage
                 );
             }
 

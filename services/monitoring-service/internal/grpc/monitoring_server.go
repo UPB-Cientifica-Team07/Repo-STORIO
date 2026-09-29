@@ -362,7 +362,8 @@ func (s *MonitoringServer) GetNodeStatus(
 
 		MemoryUsage: node.MemoryUsage,
 
-		LastUpdated: lastUpdated,
+		StorageUsage: node.StorageUsage,
+		LastUpdated:  lastUpdated,
 
 		Ip: node.IP,
 

@@ -156,21 +156,26 @@ func (r *HpcRepository) GetNode(
 	}
 
 	query := `
-		SELECT
-			id_nodo::text,
-			hostname,
-			estado,
-			cpu,
-			memoria_mb,
-			COALESCE(ip, ''),
-			COALESCE(ubicacion, '')
-		FROM nodo_hpc
-		WHERE id_nodo::text = $1
-		   OR hostname = $1
-		LIMIT 1
-	`
+                SELECT
+                        id_nodo::text,
+                        hostname,
+                        estado,
+                        cpu,
+                        memoria_mb,
+                        COALESCE(ip, ''),
+                        COALESCE(ubicacion, ''),
+                        cpu_usage,
+                        memory_usage,
+                        storage_usage,
+                        last_heartbeat
+                FROM nodo_hpc
+                WHERE id_nodo::text = $1
+                   OR hostname = $1
+                LIMIT 1
+        `
 
 	var node model.HpcNode
+	var lastHeartbeat sql.NullTime
 
 	err :=
 		r.db.QueryRow(
@@ -184,6 +189,10 @@ func (r *HpcRepository) GetNode(
 			&node.MemoryMB,
 			&node.IP,
 			&node.Location,
+			&node.CPUUsage,
+			&node.MemoryUsage,
+			&node.StorageUsage,
+			&lastHeartbeat,
 		)
 
 	if err == sql.ErrNoRows {
@@ -199,18 +208,12 @@ func (r *HpcRepository) GetNode(
 			)
 	}
 
-	/*
-		CPUUsage y MemoryUsage todavía no existen
-		como telemetría dinámica en nodo_hpc.
-		No se inventan valores.
-	*/
-	node.CPUUsage = 0
-	node.MemoryUsage = 0
-	/*
-		La tabla nodo_hpc actualmente no conserva
-		un timestamp de último heartbeat.
-		LastUpdated permanece en su valor cero.
-	*/
+	if lastHeartbeat.Valid {
+
+		node.LastUpdated =
+			lastHeartbeat.Time
+	}
+
 	return &node, nil
 }
 

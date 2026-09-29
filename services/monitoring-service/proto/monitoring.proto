@@ -175,6 +175,8 @@ message NodeResponse {
 
     string ip = 9;
     string location = 10;
+
+    int64 storage_usage = 11;
 }
 
 // =====================================
