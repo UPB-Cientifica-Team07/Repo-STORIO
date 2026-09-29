@@ -166,6 +166,13 @@ func main() {
 		resourceTimeout,
 	)
 
+	go service.RunHpcResourceBridge(
+		watchdogContext,
+		resourceRepository,
+		watchdogInterval,
+		resourceTimeout,
+	)
+
 	serverErrors :=
 		make(
 			chan error,

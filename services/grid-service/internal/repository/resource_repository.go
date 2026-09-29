@@ -373,6 +373,99 @@ func (r *ResourceRepository) Count() (
 	return total, nil
 }
 
+func (r *ResourceRepository) SyncHpcResources(
+	cutoff time.Time,
+) (int64, error) {
+
+	result, err :=
+		r.db.Exec(
+			`
+				INSERT INTO grid_resource (
+					resource_id,
+					nombre,
+					tipo,
+					ip,
+					cpu_cores,
+					memoria_mb,
+					mpi_capable,
+					capabilities,
+					estado,
+					last_heartbeat,
+					updated_at
+				)
+				SELECT
+					'hpc:' || hostname,
+					hostname,
+					'COMPUTE',
+					ip,
+					cpu,
+					memoria_mb,
+					TRUE,
+					'[
+						"HPC",
+						"MPI",
+						"MPICH",
+						"C_MPI"
+					]'::jsonb,
+					CASE
+						WHEN
+							last_heartbeat < $1
+							OR estado = 'INACTIVO'
+						THEN 'INACTIVE'
+
+						WHEN estado = 'OCUPADO'
+						THEN 'BUSY'
+
+						WHEN estado = 'DISPONIBLE'
+						THEN 'AVAILABLE'
+
+						ELSE 'INACTIVE'
+					END,
+					last_heartbeat,
+					CURRENT_TIMESTAMP
+				FROM nodo_hpc
+				WHERE
+					last_heartbeat IS NOT NULL
+					AND ip IS NOT NULL
+					AND BTRIM(ip) <> ''
+				ON CONFLICT (resource_id)
+				DO UPDATE SET
+					nombre = EXCLUDED.nombre,
+					tipo = EXCLUDED.tipo,
+					ip = EXCLUDED.ip,
+					cpu_cores = EXCLUDED.cpu_cores,
+					memoria_mb = EXCLUDED.memoria_mb,
+					mpi_capable = EXCLUDED.mpi_capable,
+					capabilities = EXCLUDED.capabilities,
+					estado = EXCLUDED.estado,
+					last_heartbeat = EXCLUDED.last_heartbeat,
+					updated_at = CURRENT_TIMESTAMP
+			`,
+			cutoff,
+		)
+
+	if err != nil {
+		return 0,
+			fmt.Errorf(
+				"error sincronizando recursos HPC en Grid: %w",
+				err,
+			)
+	}
+
+	rowsAffected, err :=
+		result.RowsAffected()
+
+	if err != nil {
+		return 0,
+			fmt.Errorf(
+				"error obteniendo recursos HPC sincronizados: %w",
+				err,
+			)
+	}
+
+	return rowsAffected, nil
+}
+
 type scanner interface {
 	Scan(dest ...any) error
 }
