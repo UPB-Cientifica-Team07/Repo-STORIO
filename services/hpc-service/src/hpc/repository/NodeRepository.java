@@ -94,6 +94,29 @@ public class NodeRepository {
         }
     }
 
+    public void markAllInactive()
+        throws SQLException {
+
+        String sql = """
+            UPDATE nodo_hpc
+            SET estado = 'INACTIVO'
+            WHERE estado <> 'INACTIVO'
+            """;
+
+        try (
+            Connection connection =
+                Database.getConnection();
+
+            PreparedStatement statement =
+                connection.prepareStatement(
+                    sql
+                )
+        ) {
+
+            statement.executeUpdate();
+        }
+    }
+
     public void updateStatus(
         UUID nodeId,
         String status

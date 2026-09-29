@@ -103,6 +103,32 @@ public class ClusterCoordinatorImpl
             serverSocketFactory
         );
 
+        /*
+         * Un Coordinator recién iniciado no conserva
+         * el estado RMI de ejecuciones anteriores.
+         *
+         * Por tanto ningún nodo persistido puede
+         * considerarse disponible hasta registrarse
+         * nuevamente contra esta instancia.
+         */
+        try {
+
+            nodeRepository
+                .markAllInactive();
+
+            System.out.println(
+                "[DB] Nodos HPC persistidos marcados INACTIVO"
+            );
+
+        } catch (Exception error) {
+
+            throw new RemoteException(
+                "No fue posible inicializar el estado persistido " +
+                "de los nodos HPC",
+                error
+            );
+        }
+
         nodeSupervisor
             .scheduleAtFixedRate(
                 this::checkInactiveNodes,
