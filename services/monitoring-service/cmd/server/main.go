@@ -19,12 +19,15 @@ import (
 )
 
 const (
-	port = "127.0.0.1:50051"
-
 	watchdogInterval = 5 * time.Second
 )
 
 func main() {
+
+	port := os.Getenv("MONITORING_BIND_ADDRESS")
+	if port == "" {
+		port = "127.0.0.1:50051"
+	}
 
 	log.Println("===================================")
 	log.Println(" MONITORING SERVICE")
