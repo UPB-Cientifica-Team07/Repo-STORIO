@@ -26,17 +26,11 @@ export POSTGRES_DB="${POSTGRES_DB:-upb_cientifica}"
 export GRID_BIND_ADDRESS="${GRID_BIND_ADDRESS:-127.0.0.1:50056}"
 export GRID_AUTH_SERVICE="${GRID_AUTH_SERVICE:-https://127.0.0.1:8081}"
 
-export AUTH_TLS_CA_FILE="${
-  AUTH_TLS_CA_FILE:-security/pki/upb_dev_ca.crt
-}"
+export AUTH_TLS_CA_FILE="${AUTH_TLS_CA_FILE:-security/pki/upb_dev_ca.crt}"
 
-export GRID_WATCHDOG_INTERVAL="${
-  GRID_WATCHDOG_INTERVAL:-5s
-}"
+export GRID_WATCHDOG_INTERVAL="${GRID_WATCHDOG_INTERVAL:-5s}"
 
-export GRID_RESOURCE_TIMEOUT="${
-  GRID_RESOURCE_TIMEOUT:-15s
-}"
+export GRID_RESOURCE_TIMEOUT="${GRID_RESOURCE_TIMEOUT:-15s}"
 
 exec go run \
   ./services/grid-service/cmd/server
