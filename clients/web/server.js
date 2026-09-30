@@ -13,6 +13,9 @@ const monitoringClient =
     "./src/monitoringClient"
   );
 
+const gridClient =
+  require("./src/gridClient");
+
 const app = express();
 
 // =====================================
@@ -110,6 +113,44 @@ const upload =
         20 * 1024 * 1024
     }
   });
+
+const scientificUpload =
+  multer({
+    storage:
+      multer.memoryStorage(),
+
+    limits: {
+      fileSize:
+        2 * 1024 * 1024,
+
+      files:
+        2,
+
+      fields:
+        4
+    }
+  });
+
+const scientificUploadFields =
+  scientificUpload.fields(
+    [
+      {
+        name:
+          "source",
+
+        maxCount:
+          1
+      },
+
+      {
+        name:
+          "dataset",
+
+        maxCount:
+          1
+      }
+    ]
+  );
 
 app.use(
   express.json()
@@ -3740,6 +3781,288 @@ app.get(
 // =====================================
 // STATIC FILES
 // =====================================
+
+
+// =====================================
+// SCIENTIFIC HPC API - HTTP -> GRID
+// =====================================
+
+app.post(
+  "/api/hpc/scientific",
+
+  (
+    req,
+    res,
+    next
+  ) => {
+
+    scientificUploadFields(
+      req,
+      res,
+      error => {
+
+        if (error) {
+
+          return res
+            .status(400)
+            .json({
+              success: false,
+
+              message:
+                error.code ===
+                "LIMIT_FILE_SIZE"
+                  ? "Los archivos científicos exceden el tamaño permitido"
+                  : (
+                    error.message ||
+                    "Carga científica inválida"
+                  )
+            });
+        }
+
+        next();
+      }
+    );
+  },
+
+  async (req, res) => {
+
+    try {
+
+      const token =
+        tokenOnly(
+          req
+        );
+
+      if (!token) {
+
+        return res
+          .status(401)
+          .json({
+            success: false,
+
+            message:
+              "Token requerido"
+          });
+      }
+
+      const source =
+        req.files?.source?.[0];
+
+      const dataset =
+        req.files?.dataset?.[0];
+
+      if (!source) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "source.c es obligatorio"
+          });
+      }
+
+      if (!dataset) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "dataset es obligatorio"
+          });
+      }
+
+      if (
+        !String(
+          source.originalname ||
+          ""
+        )
+          .toLowerCase()
+          .endsWith(
+            ".c"
+          )
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "El código fuente debe ser un archivo .c"
+          });
+      }
+
+      if (
+        !source.buffer ||
+        source.buffer.length === 0
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "source.c está vacío"
+          });
+      }
+
+      if (
+        source.buffer.length >
+        512 * 1024
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "source.c excede 512 KiB"
+          });
+      }
+
+      if (
+        !dataset.buffer ||
+        dataset.buffer.length === 0
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "dataset está vacío"
+          });
+      }
+
+      if (
+        dataset.buffer.length >
+        2 * 1024 * 1024
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "dataset excede 2 MiB"
+          });
+      }
+
+      const processes =
+        Number.parseInt(
+          String(
+            req.body?.processes ||
+            ""
+          ),
+          10
+        );
+
+      if (
+        !Number.isInteger(
+          processes
+        ) ||
+        processes < 1 ||
+        processes > 4
+      ) {
+
+        return res
+          .status(400)
+          .json({
+            success: false,
+
+            message:
+              "processes debe estar entre 1 y 4"
+          });
+      }
+
+      const response =
+        await gridClient
+          .submitScientificJob(
+            token,
+            {
+              sourceCode:
+                source.buffer,
+
+              dataset:
+                dataset.buffer,
+
+              processes
+            }
+          );
+
+      return res.json({
+        success: true,
+
+        job: {
+          jobId:
+            response.jobId,
+
+          success:
+            response.success,
+
+          exitCode:
+            response.exitCode,
+
+          launcherNode:
+            response.launcherNode,
+
+          durationMs:
+            response.durationMs,
+
+          output:
+            response.output,
+
+          sourceSha256:
+            response.sourceSha256,
+
+          datasetSha256:
+            response.datasetSha256
+        }
+      });
+
+    } catch (error) {
+
+      console.error(
+        "GRID SCIENTIFIC ERROR:",
+        error
+      );
+
+      const statusCode =
+        error.code === 3
+          ? 400
+          : error.code === 7
+            ? 403
+            : error.code === 9
+              ? 409
+              : error.code === 14
+                ? 503
+                : error.code === 16
+                  ? 401
+                  : 502;
+
+      return res
+        .status(
+          statusCode
+        )
+        .json({
+          success: false,
+
+          message:
+            error.details ||
+            error.message ||
+            "Error ejecutando trabajo científico"
+        });
+    }
+  }
+);
 
 app.use(
   express.static(

@@ -1023,3 +1023,120 @@ form button {
   margin-bottom:
     14px;
 }
+
+
+/* =====================================
+   SCIENTIFIC HPC
+   ===================================== */
+
+.scientific-panel {
+  margin-top: 20px;
+}
+
+.scientific-form {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(210px, 1fr)
+    );
+  gap: 16px;
+  align-items: end;
+  margin-bottom: 16px;
+}
+
+.scientific-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+
+.scientific-form label small {
+  opacity: 0.75;
+}
+
+.scientific-form input,
+.scientific-form select {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.scientific-form button {
+  min-height: 42px;
+}
+
+.scientific-form button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.scientific-result {
+  margin-top: 20px;
+}
+
+.scientific-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.scientific-result-header h4,
+.scientific-result-header p {
+  margin-top: 0;
+}
+
+.scientific-hashes {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.scientific-hashes > div {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.scientific-hashes code,
+.scientific-break {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.scientific-output-panel {
+  margin-top: 20px;
+}
+
+.scientific-output {
+  max-height: 420px;
+  overflow: auto;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 16px;
+  border: 1px solid rgba(127, 127, 127, 0.35);
+  border-radius: 8px;
+  background: rgba(127, 127, 127, 0.08);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-family:
+    ui-monospace,
+    SFMono-Regular,
+    Menlo,
+    Monaco,
+    Consolas,
+    "Liberation Mono",
+    monospace;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+@media (
+  max-width: 700px
+) {
+
+  .scientific-result-header {
+    flex-direction: column;
+  }
+}

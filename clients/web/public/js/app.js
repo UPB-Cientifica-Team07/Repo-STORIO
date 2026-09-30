@@ -2571,6 +2571,553 @@ async function removePhotoFromAlbum(
 
 
 // =====================================
+// SCIENTIFIC HPC
+// =====================================
+
+async function loadScientific() {
+
+  stopMonitoringAutoRefresh();
+
+  contentView.innerHTML = `
+    <div class="section-header">
+
+      <div>
+        <h3>
+          Cómputo científico distribuido
+        </h3>
+
+        <p>
+          Envíe código MPI escrito en C y su
+          dataset para ejecutarlo sobre el
+          clúster HPC.
+        </p>
+      </div>
+
+    </div>
+
+    <section class="scientific-panel">
+
+      <form
+        id="scientificJobForm"
+        class="scientific-form"
+      >
+
+        <label>
+          Código fuente MPI C
+
+          <input
+            id="scientificSource"
+            name="source"
+            type="file"
+            accept=".c,text/x-c,text/plain"
+            required
+          >
+
+          <small>
+            Máximo 512 KiB.
+          </small>
+        </label>
+
+        <label>
+          Dataset
+
+          <input
+            id="scientificDataset"
+            name="dataset"
+            type="file"
+            required
+          >
+
+          <small>
+            Máximo 2 MiB.
+          </small>
+        </label>
+
+        <label>
+          Procesos MPI
+
+          <select
+            id="scientificProcesses"
+            name="processes"
+            required
+          >
+            <option value="1">
+              1 proceso
+            </option>
+
+            <option value="2">
+              2 procesos
+            </option>
+
+            <option value="3">
+              3 procesos
+            </option>
+
+            <option
+              value="4"
+              selected
+            >
+              4 procesos
+            </option>
+          </select>
+
+          <small>
+            Máximo permitido por el laboratorio: 4.
+          </small>
+        </label>
+
+        <button
+          id="scientificSubmitButton"
+          type="submit"
+        >
+          Ejecutar en el clúster
+        </button>
+
+      </form>
+
+      <p
+        id="scientificMessage"
+        class="message"
+      >
+        Seleccione el código fuente y el dataset.
+      </p>
+
+      <section
+        id="scientificResult"
+        class="scientific-result"
+        hidden
+      ></section>
+
+    </section>
+  `;
+
+  document
+    .getElementById(
+      "scientificJobForm"
+    )
+    .addEventListener(
+      "submit",
+      submitScientificJob
+    );
+}
+
+
+async function submitScientificJob(
+  event
+) {
+
+  event.preventDefault();
+
+  const sourceInput =
+    document.getElementById(
+      "scientificSource"
+    );
+
+  const datasetInput =
+    document.getElementById(
+      "scientificDataset"
+    );
+
+  const processesInput =
+    document.getElementById(
+      "scientificProcesses"
+    );
+
+  const submitButton =
+    document.getElementById(
+      "scientificSubmitButton"
+    );
+
+  const message =
+    document.getElementById(
+      "scientificMessage"
+    );
+
+  const result =
+    document.getElementById(
+      "scientificResult"
+    );
+
+  const source =
+    sourceInput.files[0];
+
+  const dataset =
+    datasetInput.files[0];
+
+  const processes =
+    Number.parseInt(
+      processesInput.value,
+      10
+    );
+
+  if (!source) {
+
+    message.textContent =
+      "Seleccione un archivo source.c.";
+
+    return;
+  }
+
+  if (
+    !source.name
+      .toLowerCase()
+      .endsWith(
+        ".c"
+      )
+  ) {
+
+    message.textContent =
+      "El código fuente debe tener extensión .c.";
+
+    return;
+  }
+
+  if (
+    source.size === 0
+  ) {
+
+    message.textContent =
+      "El archivo source.c está vacío.";
+
+    return;
+  }
+
+  if (
+    source.size >
+    512 * 1024
+  ) {
+
+    message.textContent =
+      "source.c excede el límite de 512 KiB.";
+
+    return;
+  }
+
+  if (!dataset) {
+
+    message.textContent =
+      "Seleccione un dataset.";
+
+    return;
+  }
+
+  if (
+    dataset.size === 0
+  ) {
+
+    message.textContent =
+      "El dataset está vacío.";
+
+    return;
+  }
+
+  if (
+    dataset.size >
+    2 * 1024 * 1024
+  ) {
+
+    message.textContent =
+      "El dataset excede el límite de 2 MiB.";
+
+    return;
+  }
+
+  if (
+    !Number.isInteger(
+      processes
+    ) ||
+    processes < 1 ||
+    processes > 4
+  ) {
+
+    message.textContent =
+      "Los procesos MPI deben estar entre 1 y 4.";
+
+    return;
+  }
+
+  const formData =
+    new FormData();
+
+  formData.append(
+    "source",
+    source
+  );
+
+  formData.append(
+    "dataset",
+    dataset
+  );
+
+  formData.append(
+    "processes",
+    String(
+      processes
+    )
+  );
+
+  submitButton.disabled =
+    true;
+
+  submitButton.textContent =
+    "Ejecutando...";
+
+  message.textContent =
+    "Enviando trabajo al Grid y esperando resultado MPI...";
+
+  result.hidden =
+    true;
+
+  result.innerHTML =
+    "";
+
+  try {
+
+    const response =
+      await apiFetch(
+        "/api/hpc/scientific",
+        {
+          method:
+            "POST",
+
+          body:
+            formData
+        }
+      );
+
+    let data;
+
+    try {
+
+      data =
+        await response.json();
+
+    } catch {
+
+      throw new Error(
+        "La Web recibió una respuesta inválida del backend científico"
+      );
+    }
+
+    if (
+      !response.ok ||
+      !data.success
+    ) {
+
+      throw new Error(
+        data.message ||
+        "No fue posible ejecutar el trabajo científico"
+      );
+    }
+
+    renderScientificResult(
+      data.job ||
+      {}
+    );
+
+    if (
+      data.job?.success === true
+    ) {
+
+      message.textContent =
+        "Trabajo científico finalizado correctamente.";
+
+    } else {
+
+      message.textContent =
+        "El trabajo científico terminó con error. Revise la salida MPI.";
+    }
+
+  } catch (error) {
+
+    message.textContent =
+      error.message;
+
+    result.hidden =
+      true;
+
+  } finally {
+
+    submitButton.disabled =
+      false;
+
+    submitButton.textContent =
+      "Ejecutar en el clúster";
+  }
+}
+
+
+function renderScientificResult(
+  job
+) {
+
+  const result =
+    document.getElementById(
+      "scientificResult"
+    );
+
+  if (!result) {
+    return;
+  }
+
+  const success =
+    job.success === true;
+
+  const output =
+    job.output ||
+    "El trabajo no produjo salida estándar.";
+
+  const duration =
+    job.durationMs === undefined ||
+    job.durationMs === null ||
+    job.durationMs === ""
+      ? "-"
+      : job.durationMs;
+
+  result.className =
+    success
+      ? "scientific-result scientific-success"
+      : "scientific-result scientific-failure";
+
+  result.innerHTML = `
+    <div class="scientific-result-header">
+
+      <div>
+        <h4>
+          Resultado del trabajo MPI
+        </h4>
+
+        <p>
+          ${
+            success
+              ? "Ejecución finalizada correctamente."
+              : "La ejecución reportó un error."
+          }
+        </p>
+      </div>
+
+      <span
+        class="status-badge ${
+          success
+            ? "status-up"
+            : "status-down"
+        }"
+      >
+        ${
+          success
+            ? "FINALIZADO"
+            : "ERROR"
+        }
+      </span>
+
+    </div>
+
+    <div class="monitoring-grid">
+
+      <article class="monitor-card">
+        <small>
+          Job ID
+        </small>
+
+        <strong class="scientific-break">
+          ${escapeHtml(
+            job.jobId ||
+            "-"
+          )}
+        </strong>
+      </article>
+
+      <article class="monitor-card">
+        <small>
+          Launcher
+        </small>
+
+        <strong>
+          ${escapeHtml(
+            job.launcherNode ||
+            "-"
+          )}
+        </strong>
+      </article>
+
+      <article class="monitor-card">
+        <small>
+          Exit code
+        </small>
+
+        <strong>
+          ${escapeHtml(
+            job.exitCode ??
+            "-"
+          )}
+        </strong>
+      </article>
+
+      <article class="monitor-card">
+        <small>
+          Duración
+        </small>
+
+        <strong>
+          ${escapeHtml(
+            duration
+          )} ms
+        </strong>
+      </article>
+
+    </div>
+
+    <div class="scientific-hashes">
+
+      <div>
+        <small>
+          SHA-256 source.c
+        </small>
+
+        <code>
+          ${escapeHtml(
+            job.sourceSha256 ||
+            "-"
+          )}
+        </code>
+      </div>
+
+      <div>
+        <small>
+          SHA-256 dataset
+        </small>
+
+        <code>
+          ${escapeHtml(
+            job.datasetSha256 ||
+            "-"
+          )}
+        </code>
+      </div>
+
+    </div>
+
+    <div class="scientific-output-panel">
+
+      <h4>
+        Salida MPI
+      </h4>
+
+      <pre
+        class="scientific-output"
+      >${escapeHtml(
+        output
+      )}</pre>
+
+    </div>
+  `;
+
+  result.hidden =
+    false;
+}
+
+
+// =====================================
 // MONITORING
 // =====================================
 
@@ -4771,6 +5318,17 @@ document
           ) {
 
             loadVideos();
+
+            return;
+          }
+
+
+          if (
+            module ===
+            "scientific"
+          ) {
+
+            loadScientific();
 
             return;
           }
