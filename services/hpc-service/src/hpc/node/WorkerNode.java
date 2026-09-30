@@ -202,7 +202,13 @@ public class WorkerNode
         long start =
             System.currentTimeMillis();
 
+        boolean scientificJob =
+            "scientific_job".equals(
+                programName
+            );
+
         if (
+            !scientificJob &&
             !ALLOWED_PROGRAMS.contains(
                 programName
             )
@@ -271,12 +277,112 @@ public class WorkerNode
             );
         }
 
-        Path executable =
-            mpiDirectory
-                .resolve(
-                    programName
+        Path workspace =
+            null;
+
+        Path dataset =
+            null;
+
+        Path executable;
+
+        if (scientificJob) {
+
+            try {
+
+                UUID.fromString(
+                    jobId
+                );
+
+            } catch (
+                IllegalArgumentException error
+            ) {
+
+                return new MpiJobResult(
+                    jobId,
+                    nodeId,
+                    false,
+                    -1,
+                    "jobId científico inválido",
+                    0
+                );
+            }
+
+            String jobRootValue =
+                System.getenv()
+                    .getOrDefault(
+                        "HPC_JOB_ROOT",
+                        System.getProperty(
+                            "user.home"
+                        ) +
+                        "/upb-hpc/jobs"
+                    )
+                    .trim();
+
+            if (jobRootValue.isBlank()) {
+
+                return new MpiJobResult(
+                    jobId,
+                    nodeId,
+                    false,
+                    -1,
+                    "HPC_JOB_ROOT vacío",
+                    0
+                );
+            }
+
+            Path jobRoot =
+                Path.of(
+                    jobRootValue
                 )
+                .toAbsolutePath()
                 .normalize();
+
+            workspace =
+                jobRoot
+                    .resolve(
+                        jobId
+                    )
+                    .normalize();
+
+            if (
+                !workspace.startsWith(
+                    jobRoot
+                )
+            ) {
+
+                return new MpiJobResult(
+                    jobId,
+                    nodeId,
+                    false,
+                    -1,
+                    "Workspace científico inválido",
+                    0
+                );
+            }
+
+            executable =
+                workspace
+                    .resolve(
+                        "program"
+                    )
+                    .normalize();
+
+            dataset =
+                workspace
+                    .resolve(
+                        "dataset"
+                    )
+                    .normalize();
+
+        } else {
+
+            executable =
+                mpiDirectory
+                    .resolve(
+                        programName
+                    )
+                    .normalize();
+        }
 
         try {
 
@@ -289,6 +395,35 @@ public class WorkerNode
                 throw new Exception(
                     "Ejecutable MPI no encontrado: " +
                     executable
+                );
+            }
+
+            if (
+                scientificJob &&
+                !executable
+                    .toFile()
+                    .canExecute()
+            ) {
+
+                throw new Exception(
+                    "Ejecutable científico sin permiso de ejecución: " +
+                    executable
+                );
+            }
+
+            if (
+                scientificJob &&
+                (
+                    dataset == null ||
+                    !dataset
+                        .toFile()
+                        .isFile()
+                )
+            ) {
+
+                throw new Exception(
+                    "Dataset científico no encontrado: " +
+                    dataset
                 );
             }
 
@@ -322,6 +457,28 @@ public class WorkerNode
                     "HPC_MPI_LAUNCHER vacío"
                 );
             }
+
+            /*
+             * El comando timeout envuelve mpirun.
+             *
+             * Esto hace efectivo el límite incluso
+             * mientras stdout continúa abierto.
+             */
+            mpiCommand.add(
+                "timeout"
+            );
+
+            mpiCommand.add(
+                "--signal=TERM"
+            );
+
+            mpiCommand.add(
+                "--kill-after=5s"
+            );
+
+            mpiCommand.add(
+                "60s"
+            );
 
             mpiCommand.add(
                 mpiLauncher
@@ -449,6 +606,15 @@ public class WorkerNode
                     .toString()
             );
 
+            if (scientificJob) {
+
+                mpiCommand.add(
+                    dataset
+                        .toAbsolutePath()
+                        .toString()
+                );
+            }
+
             System.out.println(
                 "[MPI] Comando: " +
                 String.join(
@@ -461,6 +627,26 @@ public class WorkerNode
                 new ProcessBuilder(
                     mpiCommand
                 );
+
+            if (
+                scientificJob &&
+                workspace != null &&
+                dataset != null
+            ) {
+
+                builder.directory(
+                    workspace.toFile()
+                );
+
+                builder
+                    .environment()
+                    .put(
+                        "UPB_DATASET_PATH",
+                        dataset
+                            .toAbsolutePath()
+                            .toString()
+                    );
+            }
 
             builder
                 .redirectErrorStream(
