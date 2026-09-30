@@ -5,6 +5,7 @@ import "context"
 type Identity struct {
 	UserID string
 	Role   string
+	Token  string
 }
 
 type identityKey struct{}

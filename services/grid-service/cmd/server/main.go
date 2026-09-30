@@ -15,6 +15,7 @@ import (
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/internal/database"
 	gridgrpc "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/internal/grpc"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/internal/repository"
+	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/internal/scientific"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/internal/service"
 
 	"google.golang.org/grpc"
@@ -115,6 +116,17 @@ func main() {
 			resourceRepository,
 		)
 
+	scientificExecutor, err :=
+		scientific.NewExecutorFromEnv()
+
+	if err != nil {
+
+		log.Fatalf(
+			"ejecutor científico Grid inválido: %v",
+			err,
+		)
+	}
+
 	authClient :=
 		auth.NewClient(
 			authService,
@@ -148,6 +160,7 @@ func main() {
 		grpcServer,
 		gridgrpc.NewGridServer(
 			gridService,
+			scientificExecutor,
 		),
 	)
 

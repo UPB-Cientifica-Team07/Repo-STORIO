@@ -5,7 +5,9 @@ import (
 	"time"
 
 	gridpb "github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/generated"
+	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/internal/auth"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/internal/model"
+	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/internal/scientific"
 	"github.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/internal/service"
 
 	"google.golang.org/grpc/codes"
@@ -15,15 +17,18 @@ import (
 type GridServer struct {
 	gridpb.UnimplementedGridServiceServer
 
-	service *service.GridService
+	service    *service.GridService
+	scientific *scientific.Executor
 }
 
 func NewGridServer(
 	service *service.GridService,
+	scientificExecutor *scientific.Executor,
 ) *GridServer {
 
 	return &GridServer{
-		service: service,
+		service:    service,
+		scientific: scientificExecutor,
 	}
 }
 
@@ -161,6 +166,89 @@ func (s *GridServer) ListComputeResources(
 		Resources: toProtoResources(
 			resources,
 		),
+	}, nil
+}
+
+func (s *GridServer) SubmitScientificJob(
+	ctx context.Context,
+	req *gridpb.SubmitScientificJobRequest,
+) (*gridpb.SubmitScientificJobResponse, error) {
+
+	identity, ok :=
+		auth.IdentityFromContext(
+			ctx,
+		)
+
+	if !ok ||
+		identity.UserID == "" ||
+		identity.Token == "" {
+
+		return nil,
+			status.Error(
+				codes.Unauthenticated,
+				"identidad autenticada requerida",
+			)
+	}
+
+	if req == nil {
+
+		return nil,
+			status.Error(
+				codes.InvalidArgument,
+				"solicitud científica requerida",
+			)
+	}
+
+	if err :=
+		scientific.ValidateRequest(
+			req.GetSourceCode(),
+			req.GetDataset(),
+			req.GetProcesses(),
+		); err != nil {
+
+		return nil,
+			status.Error(
+				codes.InvalidArgument,
+				err.Error(),
+			)
+	}
+
+	if s.scientific == nil {
+
+		return nil,
+			status.Error(
+				codes.Unavailable,
+				"ejecutor científico no configurado",
+			)
+	}
+
+	result, err :=
+		s.scientific.Submit(
+			ctx,
+			identity.Token,
+			req.GetSourceCode(),
+			req.GetDataset(),
+			req.GetProcesses(),
+		)
+
+	if err != nil {
+
+		return nil,
+			status.Error(
+				codes.FailedPrecondition,
+				err.Error(),
+			)
+	}
+
+	return &gridpb.SubmitScientificJobResponse{
+		JobId:         result.JobID,
+		Success:       result.Success,
+		ExitCode:      result.ExitCode,
+		LauncherNode:  result.LauncherNode,
+		DurationMs:    result.DurationMs,
+		Output:        result.Output,
+		SourceSha256:  result.SourceSHA256,
+		DatasetSha256: result.DatasetSHA256,
 	}, nil
 }
 

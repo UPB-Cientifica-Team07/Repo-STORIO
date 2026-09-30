@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        v3.21.12
-// source: proto/grid.proto
+// source: grid.proto
 
 package gridpb
 
@@ -42,7 +42,7 @@ type Resource struct {
 
 func (x *Resource) Reset() {
 	*x = Resource{}
-	mi := &file_proto_grid_proto_msgTypes[0]
+	mi := &file_grid_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -54,7 +54,7 @@ func (x *Resource) String() string {
 func (*Resource) ProtoMessage() {}
 
 func (x *Resource) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_grid_proto_msgTypes[0]
+	mi := &file_grid_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -67,7 +67,7 @@ func (x *Resource) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Resource.ProtoReflect.Descriptor instead.
 func (*Resource) Descriptor() ([]byte, []int) {
-	return file_proto_grid_proto_rawDescGZIP(), []int{0}
+	return file_grid_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *Resource) GetId() string {
@@ -177,7 +177,7 @@ type RegisterResourceRequest struct {
 
 func (x *RegisterResourceRequest) Reset() {
 	*x = RegisterResourceRequest{}
-	mi := &file_proto_grid_proto_msgTypes[1]
+	mi := &file_grid_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -189,7 +189,7 @@ func (x *RegisterResourceRequest) String() string {
 func (*RegisterResourceRequest) ProtoMessage() {}
 
 func (x *RegisterResourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_grid_proto_msgTypes[1]
+	mi := &file_grid_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -202,7 +202,7 @@ func (x *RegisterResourceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterResourceRequest.ProtoReflect.Descriptor instead.
 func (*RegisterResourceRequest) Descriptor() ([]byte, []int) {
-	return file_proto_grid_proto_rawDescGZIP(), []int{1}
+	return file_grid_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *RegisterResourceRequest) GetResourceId() string {
@@ -271,7 +271,7 @@ type HeartbeatRequest struct {
 
 func (x *HeartbeatRequest) Reset() {
 	*x = HeartbeatRequest{}
-	mi := &file_proto_grid_proto_msgTypes[2]
+	mi := &file_grid_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -283,7 +283,7 @@ func (x *HeartbeatRequest) String() string {
 func (*HeartbeatRequest) ProtoMessage() {}
 
 func (x *HeartbeatRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_grid_proto_msgTypes[2]
+	mi := &file_grid_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -296,7 +296,7 @@ func (x *HeartbeatRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HeartbeatRequest.ProtoReflect.Descriptor instead.
 func (*HeartbeatRequest) Descriptor() ([]byte, []int) {
-	return file_proto_grid_proto_rawDescGZIP(), []int{2}
+	return file_grid_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *HeartbeatRequest) GetResourceId() string {
@@ -322,7 +322,7 @@ type GetResourceRequest struct {
 
 func (x *GetResourceRequest) Reset() {
 	*x = GetResourceRequest{}
-	mi := &file_proto_grid_proto_msgTypes[3]
+	mi := &file_grid_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -334,7 +334,7 @@ func (x *GetResourceRequest) String() string {
 func (*GetResourceRequest) ProtoMessage() {}
 
 func (x *GetResourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_grid_proto_msgTypes[3]
+	mi := &file_grid_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -347,7 +347,7 @@ func (x *GetResourceRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetResourceRequest.ProtoReflect.Descriptor instead.
 func (*GetResourceRequest) Descriptor() ([]byte, []int) {
-	return file_proto_grid_proto_rawDescGZIP(), []int{3}
+	return file_grid_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetResourceRequest) GetResourceId() string {
@@ -367,7 +367,7 @@ type ListResourcesRequest struct {
 
 func (x *ListResourcesRequest) Reset() {
 	*x = ListResourcesRequest{}
-	mi := &file_proto_grid_proto_msgTypes[4]
+	mi := &file_grid_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -379,7 +379,7 @@ func (x *ListResourcesRequest) String() string {
 func (*ListResourcesRequest) ProtoMessage() {}
 
 func (x *ListResourcesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_grid_proto_msgTypes[4]
+	mi := &file_grid_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -392,7 +392,7 @@ func (x *ListResourcesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListResourcesRequest.ProtoReflect.Descriptor instead.
 func (*ListResourcesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_grid_proto_rawDescGZIP(), []int{4}
+	return file_grid_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListResourcesRequest) GetDeviceType() string {
@@ -418,7 +418,7 @@ type ListComputeResourcesRequest struct {
 
 func (x *ListComputeResourcesRequest) Reset() {
 	*x = ListComputeResourcesRequest{}
-	mi := &file_proto_grid_proto_msgTypes[5]
+	mi := &file_grid_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -430,7 +430,7 @@ func (x *ListComputeResourcesRequest) String() string {
 func (*ListComputeResourcesRequest) ProtoMessage() {}
 
 func (x *ListComputeResourcesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_grid_proto_msgTypes[5]
+	mi := &file_grid_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -443,7 +443,7 @@ func (x *ListComputeResourcesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListComputeResourcesRequest.ProtoReflect.Descriptor instead.
 func (*ListComputeResourcesRequest) Descriptor() ([]byte, []int) {
-	return file_proto_grid_proto_rawDescGZIP(), []int{5}
+	return file_grid_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListComputeResourcesRequest) GetOnlyAvailable() bool {
@@ -462,7 +462,7 @@ type ResourceResponse struct {
 
 func (x *ResourceResponse) Reset() {
 	*x = ResourceResponse{}
-	mi := &file_proto_grid_proto_msgTypes[6]
+	mi := &file_grid_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -474,7 +474,7 @@ func (x *ResourceResponse) String() string {
 func (*ResourceResponse) ProtoMessage() {}
 
 func (x *ResourceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_grid_proto_msgTypes[6]
+	mi := &file_grid_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -487,7 +487,7 @@ func (x *ResourceResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResourceResponse.ProtoReflect.Descriptor instead.
 func (*ResourceResponse) Descriptor() ([]byte, []int) {
-	return file_proto_grid_proto_rawDescGZIP(), []int{6}
+	return file_grid_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ResourceResponse) GetResource() *Resource {
@@ -506,7 +506,7 @@ type ListResourcesResponse struct {
 
 func (x *ListResourcesResponse) Reset() {
 	*x = ListResourcesResponse{}
-	mi := &file_proto_grid_proto_msgTypes[7]
+	mi := &file_grid_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -518,7 +518,7 @@ func (x *ListResourcesResponse) String() string {
 func (*ListResourcesResponse) ProtoMessage() {}
 
 func (x *ListResourcesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_grid_proto_msgTypes[7]
+	mi := &file_grid_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -531,7 +531,7 @@ func (x *ListResourcesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListResourcesResponse.ProtoReflect.Descriptor instead.
 func (*ListResourcesResponse) Descriptor() ([]byte, []int) {
-	return file_proto_grid_proto_rawDescGZIP(), []int{7}
+	return file_grid_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ListResourcesResponse) GetResources() []*Resource {
@@ -539,6 +539,166 @@ func (x *ListResourcesResponse) GetResources() []*Resource {
 		return x.Resources
 	}
 	return nil
+}
+
+type SubmitScientificJobRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SourceCode    []byte                 `protobuf:"bytes,1,opt,name=source_code,json=sourceCode,proto3" json:"source_code,omitempty"`
+	Dataset       []byte                 `protobuf:"bytes,2,opt,name=dataset,proto3" json:"dataset,omitempty"`
+	Processes     int32                  `protobuf:"varint,3,opt,name=processes,proto3" json:"processes,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubmitScientificJobRequest) Reset() {
+	*x = SubmitScientificJobRequest{}
+	mi := &file_grid_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmitScientificJobRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmitScientificJobRequest) ProtoMessage() {}
+
+func (x *SubmitScientificJobRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_grid_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubmitScientificJobRequest.ProtoReflect.Descriptor instead.
+func (*SubmitScientificJobRequest) Descriptor() ([]byte, []int) {
+	return file_grid_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *SubmitScientificJobRequest) GetSourceCode() []byte {
+	if x != nil {
+		return x.SourceCode
+	}
+	return nil
+}
+
+func (x *SubmitScientificJobRequest) GetDataset() []byte {
+	if x != nil {
+		return x.Dataset
+	}
+	return nil
+}
+
+func (x *SubmitScientificJobRequest) GetProcesses() int32 {
+	if x != nil {
+		return x.Processes
+	}
+	return 0
+}
+
+type SubmitScientificJobResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	JobId         string                 `protobuf:"bytes,1,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	Success       bool                   `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	ExitCode      int32                  `protobuf:"varint,3,opt,name=exit_code,json=exitCode,proto3" json:"exit_code,omitempty"`
+	LauncherNode  string                 `protobuf:"bytes,4,opt,name=launcher_node,json=launcherNode,proto3" json:"launcher_node,omitempty"`
+	DurationMs    int64                  `protobuf:"varint,5,opt,name=duration_ms,json=durationMs,proto3" json:"duration_ms,omitempty"`
+	Output        string                 `protobuf:"bytes,6,opt,name=output,proto3" json:"output,omitempty"`
+	SourceSha256  string                 `protobuf:"bytes,7,opt,name=source_sha256,json=sourceSha256,proto3" json:"source_sha256,omitempty"`
+	DatasetSha256 string                 `protobuf:"bytes,8,opt,name=dataset_sha256,json=datasetSha256,proto3" json:"dataset_sha256,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SubmitScientificJobResponse) Reset() {
+	*x = SubmitScientificJobResponse{}
+	mi := &file_grid_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SubmitScientificJobResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SubmitScientificJobResponse) ProtoMessage() {}
+
+func (x *SubmitScientificJobResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_grid_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SubmitScientificJobResponse.ProtoReflect.Descriptor instead.
+func (*SubmitScientificJobResponse) Descriptor() ([]byte, []int) {
+	return file_grid_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *SubmitScientificJobResponse) GetJobId() string {
+	if x != nil {
+		return x.JobId
+	}
+	return ""
+}
+
+func (x *SubmitScientificJobResponse) GetSuccess() bool {
+	if x != nil {
+		return x.Success
+	}
+	return false
+}
+
+func (x *SubmitScientificJobResponse) GetExitCode() int32 {
+	if x != nil {
+		return x.ExitCode
+	}
+	return 0
+}
+
+func (x *SubmitScientificJobResponse) GetLauncherNode() string {
+	if x != nil {
+		return x.LauncherNode
+	}
+	return ""
+}
+
+func (x *SubmitScientificJobResponse) GetDurationMs() int64 {
+	if x != nil {
+		return x.DurationMs
+	}
+	return 0
+}
+
+func (x *SubmitScientificJobResponse) GetOutput() string {
+	if x != nil {
+		return x.Output
+	}
+	return ""
+}
+
+func (x *SubmitScientificJobResponse) GetSourceSha256() string {
+	if x != nil {
+		return x.SourceSha256
+	}
+	return ""
+}
+
+func (x *SubmitScientificJobResponse) GetDatasetSha256() string {
+	if x != nil {
+		return x.DatasetSha256
+	}
+	return ""
 }
 
 type HealthRequest struct {
@@ -549,7 +709,7 @@ type HealthRequest struct {
 
 func (x *HealthRequest) Reset() {
 	*x = HealthRequest{}
-	mi := &file_proto_grid_proto_msgTypes[8]
+	mi := &file_grid_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -561,7 +721,7 @@ func (x *HealthRequest) String() string {
 func (*HealthRequest) ProtoMessage() {}
 
 func (x *HealthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_grid_proto_msgTypes[8]
+	mi := &file_grid_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -574,7 +734,7 @@ func (x *HealthRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HealthRequest.ProtoReflect.Descriptor instead.
 func (*HealthRequest) Descriptor() ([]byte, []int) {
-	return file_proto_grid_proto_rawDescGZIP(), []int{8}
+	return file_grid_proto_rawDescGZIP(), []int{10}
 }
 
 type HealthResponse struct {
@@ -588,7 +748,7 @@ type HealthResponse struct {
 
 func (x *HealthResponse) Reset() {
 	*x = HealthResponse{}
-	mi := &file_proto_grid_proto_msgTypes[9]
+	mi := &file_grid_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -600,7 +760,7 @@ func (x *HealthResponse) String() string {
 func (*HealthResponse) ProtoMessage() {}
 
 func (x *HealthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_grid_proto_msgTypes[9]
+	mi := &file_grid_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -613,7 +773,7 @@ func (x *HealthResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HealthResponse.ProtoReflect.Descriptor instead.
 func (*HealthResponse) Descriptor() ([]byte, []int) {
-	return file_proto_grid_proto_rawDescGZIP(), []int{9}
+	return file_grid_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *HealthResponse) GetStatus() string {
@@ -637,11 +797,12 @@ func (x *HealthResponse) GetTimestamp() int64 {
 	return 0
 }
 
-var File_proto_grid_proto protoreflect.FileDescriptor
+var File_grid_proto protoreflect.FileDescriptor
 
-const file_proto_grid_proto_rawDesc = "" +
+const file_grid_proto_rawDesc = "" +
 	"\n" +
-	"\x10proto/grid.proto\x12\x04grid\"\xfc\x02\n" +
+	"\n" +
+	"grid.proto\x12\x04grid\"\xfc\x02\n" +
 	"\bResource\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vresource_id\x18\x02 \x01(\tR\n" +
@@ -690,34 +851,50 @@ const file_proto_grid_proto_rawDesc = "" +
 	"\x10ResourceResponse\x12*\n" +
 	"\bresource\x18\x01 \x01(\v2\x0e.grid.ResourceR\bresource\"E\n" +
 	"\x15ListResourcesResponse\x12,\n" +
-	"\tresources\x18\x01 \x03(\v2\x0e.grid.ResourceR\tresources\"\x0f\n" +
+	"\tresources\x18\x01 \x03(\v2\x0e.grid.ResourceR\tresources\"u\n" +
+	"\x1aSubmitScientificJobRequest\x12\x1f\n" +
+	"\vsource_code\x18\x01 \x01(\fR\n" +
+	"sourceCode\x12\x18\n" +
+	"\adataset\x18\x02 \x01(\fR\adataset\x12\x1c\n" +
+	"\tprocesses\x18\x03 \x01(\x05R\tprocesses\"\x95\x02\n" +
+	"\x1bSubmitScientificJobResponse\x12\x15\n" +
+	"\x06job_id\x18\x01 \x01(\tR\x05jobId\x12\x18\n" +
+	"\asuccess\x18\x02 \x01(\bR\asuccess\x12\x1b\n" +
+	"\texit_code\x18\x03 \x01(\x05R\bexitCode\x12#\n" +
+	"\rlauncher_node\x18\x04 \x01(\tR\flauncherNode\x12\x1f\n" +
+	"\vduration_ms\x18\x05 \x01(\x03R\n" +
+	"durationMs\x12\x16\n" +
+	"\x06output\x18\x06 \x01(\tR\x06output\x12#\n" +
+	"\rsource_sha256\x18\a \x01(\tR\fsourceSha256\x12%\n" +
+	"\x0edataset_sha256\x18\b \x01(\tR\rdatasetSha256\"\x0f\n" +
 	"\rHealthRequest\"o\n" +
 	"\x0eHealthResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\tR\x06status\x12'\n" +
 	"\x0ftotal_resources\x18\x02 \x01(\x03R\x0etotalResources\x12\x1c\n" +
-	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp2\xad\x03\n" +
+	"\ttimestamp\x18\x03 \x01(\x03R\ttimestamp2\x89\x04\n" +
 	"\vGridService\x12I\n" +
 	"\x10RegisterResource\x12\x1d.grid.RegisterResourceRequest\x1a\x16.grid.ResourceResponse\x12;\n" +
 	"\tHeartbeat\x12\x16.grid.HeartbeatRequest\x1a\x16.grid.ResourceResponse\x12?\n" +
 	"\vGetResource\x12\x18.grid.GetResourceRequest\x1a\x16.grid.ResourceResponse\x12H\n" +
 	"\rListResources\x12\x1a.grid.ListResourcesRequest\x1a\x1b.grid.ListResourcesResponse\x12V\n" +
-	"\x14ListComputeResources\x12!.grid.ListComputeResourcesRequest\x1a\x1b.grid.ListResourcesResponse\x123\n" +
+	"\x14ListComputeResources\x12!.grid.ListComputeResourcesRequest\x1a\x1b.grid.ListResourcesResponse\x12Z\n" +
+	"\x13SubmitScientificJob\x12 .grid.SubmitScientificJobRequest\x1a!.grid.SubmitScientificJobResponse\x123\n" +
 	"\x06Health\x12\x13.grid.HealthRequest\x1a\x14.grid.HealthResponseBUZSgithub.com/UPB-Cientifica-Team07/Repo-STORIO/services/grid-service/generated;gridpbb\x06proto3"
 
 var (
-	file_proto_grid_proto_rawDescOnce sync.Once
-	file_proto_grid_proto_rawDescData []byte
+	file_grid_proto_rawDescOnce sync.Once
+	file_grid_proto_rawDescData []byte
 )
 
-func file_proto_grid_proto_rawDescGZIP() []byte {
-	file_proto_grid_proto_rawDescOnce.Do(func() {
-		file_proto_grid_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_proto_grid_proto_rawDesc), len(file_proto_grid_proto_rawDesc)))
+func file_grid_proto_rawDescGZIP() []byte {
+	file_grid_proto_rawDescOnce.Do(func() {
+		file_grid_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_grid_proto_rawDesc), len(file_grid_proto_rawDesc)))
 	})
-	return file_proto_grid_proto_rawDescData
+	return file_grid_proto_rawDescData
 }
 
-var file_proto_grid_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
-var file_proto_grid_proto_goTypes = []any{
+var file_grid_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_grid_proto_goTypes = []any{
 	(*Resource)(nil),                    // 0: grid.Resource
 	(*RegisterResourceRequest)(nil),     // 1: grid.RegisterResourceRequest
 	(*HeartbeatRequest)(nil),            // 2: grid.HeartbeatRequest
@@ -726,51 +903,55 @@ var file_proto_grid_proto_goTypes = []any{
 	(*ListComputeResourcesRequest)(nil), // 5: grid.ListComputeResourcesRequest
 	(*ResourceResponse)(nil),            // 6: grid.ResourceResponse
 	(*ListResourcesResponse)(nil),       // 7: grid.ListResourcesResponse
-	(*HealthRequest)(nil),               // 8: grid.HealthRequest
-	(*HealthResponse)(nil),              // 9: grid.HealthResponse
+	(*SubmitScientificJobRequest)(nil),  // 8: grid.SubmitScientificJobRequest
+	(*SubmitScientificJobResponse)(nil), // 9: grid.SubmitScientificJobResponse
+	(*HealthRequest)(nil),               // 10: grid.HealthRequest
+	(*HealthResponse)(nil),              // 11: grid.HealthResponse
 }
-var file_proto_grid_proto_depIdxs = []int32{
-	0, // 0: grid.ResourceResponse.resource:type_name -> grid.Resource
-	0, // 1: grid.ListResourcesResponse.resources:type_name -> grid.Resource
-	1, // 2: grid.GridService.RegisterResource:input_type -> grid.RegisterResourceRequest
-	2, // 3: grid.GridService.Heartbeat:input_type -> grid.HeartbeatRequest
-	3, // 4: grid.GridService.GetResource:input_type -> grid.GetResourceRequest
-	4, // 5: grid.GridService.ListResources:input_type -> grid.ListResourcesRequest
-	5, // 6: grid.GridService.ListComputeResources:input_type -> grid.ListComputeResourcesRequest
-	8, // 7: grid.GridService.Health:input_type -> grid.HealthRequest
-	6, // 8: grid.GridService.RegisterResource:output_type -> grid.ResourceResponse
-	6, // 9: grid.GridService.Heartbeat:output_type -> grid.ResourceResponse
-	6, // 10: grid.GridService.GetResource:output_type -> grid.ResourceResponse
-	7, // 11: grid.GridService.ListResources:output_type -> grid.ListResourcesResponse
-	7, // 12: grid.GridService.ListComputeResources:output_type -> grid.ListResourcesResponse
-	9, // 13: grid.GridService.Health:output_type -> grid.HealthResponse
-	8, // [8:14] is the sub-list for method output_type
-	2, // [2:8] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+var file_grid_proto_depIdxs = []int32{
+	0,  // 0: grid.ResourceResponse.resource:type_name -> grid.Resource
+	0,  // 1: grid.ListResourcesResponse.resources:type_name -> grid.Resource
+	1,  // 2: grid.GridService.RegisterResource:input_type -> grid.RegisterResourceRequest
+	2,  // 3: grid.GridService.Heartbeat:input_type -> grid.HeartbeatRequest
+	3,  // 4: grid.GridService.GetResource:input_type -> grid.GetResourceRequest
+	4,  // 5: grid.GridService.ListResources:input_type -> grid.ListResourcesRequest
+	5,  // 6: grid.GridService.ListComputeResources:input_type -> grid.ListComputeResourcesRequest
+	8,  // 7: grid.GridService.SubmitScientificJob:input_type -> grid.SubmitScientificJobRequest
+	10, // 8: grid.GridService.Health:input_type -> grid.HealthRequest
+	6,  // 9: grid.GridService.RegisterResource:output_type -> grid.ResourceResponse
+	6,  // 10: grid.GridService.Heartbeat:output_type -> grid.ResourceResponse
+	6,  // 11: grid.GridService.GetResource:output_type -> grid.ResourceResponse
+	7,  // 12: grid.GridService.ListResources:output_type -> grid.ListResourcesResponse
+	7,  // 13: grid.GridService.ListComputeResources:output_type -> grid.ListResourcesResponse
+	9,  // 14: grid.GridService.SubmitScientificJob:output_type -> grid.SubmitScientificJobResponse
+	11, // 15: grid.GridService.Health:output_type -> grid.HealthResponse
+	9,  // [9:16] is the sub-list for method output_type
+	2,  // [2:9] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_proto_grid_proto_init() }
-func file_proto_grid_proto_init() {
-	if File_proto_grid_proto != nil {
+func init() { file_grid_proto_init() }
+func file_grid_proto_init() {
+	if File_grid_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_grid_proto_rawDesc), len(file_proto_grid_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_grid_proto_rawDesc), len(file_grid_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   10,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_proto_grid_proto_goTypes,
-		DependencyIndexes: file_proto_grid_proto_depIdxs,
-		MessageInfos:      file_proto_grid_proto_msgTypes,
+		GoTypes:           file_grid_proto_goTypes,
+		DependencyIndexes: file_grid_proto_depIdxs,
+		MessageInfos:      file_grid_proto_msgTypes,
 	}.Build()
-	File_proto_grid_proto = out.File
-	file_proto_grid_proto_goTypes = nil
-	file_proto_grid_proto_depIdxs = nil
+	File_grid_proto = out.File
+	file_grid_proto_goTypes = nil
+	file_grid_proto_depIdxs = nil
 }

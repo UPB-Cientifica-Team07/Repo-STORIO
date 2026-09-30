@@ -111,6 +111,7 @@ func UnaryServerInterceptor(
 				Identity{
 					UserID: result.UserID,
 					Role:   result.Role,
+					Token:  token,
 				},
 			)
 

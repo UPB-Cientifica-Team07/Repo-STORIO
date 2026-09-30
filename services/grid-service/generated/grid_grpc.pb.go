@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             v3.21.12
-// source: proto/grid.proto
+// source: grid.proto
 
 package gridpb
 
@@ -24,6 +24,7 @@ const (
 	GridService_GetResource_FullMethodName          = "/grid.GridService/GetResource"
 	GridService_ListResources_FullMethodName        = "/grid.GridService/ListResources"
 	GridService_ListComputeResources_FullMethodName = "/grid.GridService/ListComputeResources"
+	GridService_SubmitScientificJob_FullMethodName  = "/grid.GridService/SubmitScientificJob"
 	GridService_Health_FullMethodName               = "/grid.GridService/Health"
 )
 
@@ -36,6 +37,7 @@ type GridServiceClient interface {
 	GetResource(ctx context.Context, in *GetResourceRequest, opts ...grpc.CallOption) (*ResourceResponse, error)
 	ListResources(ctx context.Context, in *ListResourcesRequest, opts ...grpc.CallOption) (*ListResourcesResponse, error)
 	ListComputeResources(ctx context.Context, in *ListComputeResourcesRequest, opts ...grpc.CallOption) (*ListResourcesResponse, error)
+	SubmitScientificJob(ctx context.Context, in *SubmitScientificJobRequest, opts ...grpc.CallOption) (*SubmitScientificJobResponse, error)
 	Health(ctx context.Context, in *HealthRequest, opts ...grpc.CallOption) (*HealthResponse, error)
 }
 
@@ -97,6 +99,16 @@ func (c *gridServiceClient) ListComputeResources(ctx context.Context, in *ListCo
 	return out, nil
 }
 
+func (c *gridServiceClient) SubmitScientificJob(ctx context.Context, in *SubmitScientificJobRequest, opts ...grpc.CallOption) (*SubmitScientificJobResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SubmitScientificJobResponse)
+	err := c.cc.Invoke(ctx, GridService_SubmitScientificJob_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *gridServiceClient) Health(ctx context.Context, in *HealthRequest, opts ...grpc.CallOption) (*HealthResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(HealthResponse)
@@ -116,6 +128,7 @@ type GridServiceServer interface {
 	GetResource(context.Context, *GetResourceRequest) (*ResourceResponse, error)
 	ListResources(context.Context, *ListResourcesRequest) (*ListResourcesResponse, error)
 	ListComputeResources(context.Context, *ListComputeResourcesRequest) (*ListResourcesResponse, error)
+	SubmitScientificJob(context.Context, *SubmitScientificJobRequest) (*SubmitScientificJobResponse, error)
 	Health(context.Context, *HealthRequest) (*HealthResponse, error)
 	mustEmbedUnimplementedGridServiceServer()
 }
@@ -141,6 +154,9 @@ func (UnimplementedGridServiceServer) ListResources(context.Context, *ListResour
 }
 func (UnimplementedGridServiceServer) ListComputeResources(context.Context, *ListComputeResourcesRequest) (*ListResourcesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListComputeResources not implemented")
+}
+func (UnimplementedGridServiceServer) SubmitScientificJob(context.Context, *SubmitScientificJobRequest) (*SubmitScientificJobResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SubmitScientificJob not implemented")
 }
 func (UnimplementedGridServiceServer) Health(context.Context, *HealthRequest) (*HealthResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Health not implemented")
@@ -256,6 +272,24 @@ func _GridService_ListComputeResources_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GridService_SubmitScientificJob_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubmitScientificJobRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GridServiceServer).SubmitScientificJob(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GridService_SubmitScientificJob_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GridServiceServer).SubmitScientificJob(ctx, req.(*SubmitScientificJobRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _GridService_Health_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(HealthRequest)
 	if err := dec(in); err != nil {
@@ -302,10 +336,14 @@ var GridService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GridService_ListComputeResources_Handler,
 		},
 		{
+			MethodName: "SubmitScientificJob",
+			Handler:    _GridService_SubmitScientificJob_Handler,
+		},
+		{
 			MethodName: "Health",
 			Handler:    _GridService_Health_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "proto/grid.proto",
+	Metadata: "grid.proto",
 }

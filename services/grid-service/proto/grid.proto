@@ -37,6 +37,12 @@ service GridService {
         ListResourcesResponse
     );
 
+    rpc SubmitScientificJob(
+        SubmitScientificJobRequest
+    ) returns (
+        SubmitScientificJobResponse
+    );
+
     rpc Health(
         HealthRequest
     ) returns (
@@ -95,6 +101,23 @@ message ResourceResponse {
 
 message ListResourcesResponse {
     repeated Resource resources = 1;
+}
+
+message SubmitScientificJobRequest {
+    bytes source_code = 1;
+    bytes dataset = 2;
+    int32 processes = 3;
+}
+
+message SubmitScientificJobResponse {
+    string job_id = 1;
+    bool success = 2;
+    int32 exit_code = 3;
+    string launcher_node = 4;
+    int64 duration_ms = 5;
+    string output = 6;
+    string source_sha256 = 7;
+    string dataset_sha256 = 8;
 }
 
 message HealthRequest {
