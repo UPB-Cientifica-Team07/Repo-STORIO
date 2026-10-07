@@ -32,7 +32,7 @@ Este documento no define todavía:
 - Un planificador avanzado de trabajos.
 - Priorización automática.
 - Balanceo dinámico avanzado.
-- Contenedores por trabajo.
+- Directorios de trabajo aislados por job.
 - Ejecución en múltiples clusters geográficamente distribuidos.
 - Recuperación automática ante fallos de nodos.
 - Cuotas avanzadas de recursos.

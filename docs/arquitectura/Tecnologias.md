@@ -34,5 +34,5 @@
 |---|---|
 | Git | Control de versiones |
 | GitHub | Repositorio y colaboración |
-| Docker | Contenedorización y despliegue |
+| systemd / procesos nativos | Despliegue directo de servicios sobre Linux |
 | PlantUML | Diagramas y documentación |

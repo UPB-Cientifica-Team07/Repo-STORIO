@@ -50,7 +50,7 @@ Ejemplos:
 
 feat: agregar autenticacion de usuarios
 
-docs: agregar diagrama de contenedores
+docs: agregar diagrama de despliegue
 
 fix: corregir conexion con base de datos
 
