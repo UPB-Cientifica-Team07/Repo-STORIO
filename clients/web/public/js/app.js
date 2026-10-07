@@ -3180,6 +3180,30 @@ async function loadMonitoring() {
       <section
         class="monitoring-section"
       >
+        <div class="section-header">
+
+          <div>
+            <h4>
+              Nodos HPC
+            </h4>
+
+            <p>
+              Telemetría de los workers MPI
+              actualizada automáticamente.
+            </p>
+          </div>
+
+        </div>
+
+        <div
+          id="hpcNodes"
+          class="hpc-node-grid"
+        ></div>
+      </section>
+
+      <section
+        class="monitoring-section"
+      >
         <h4>
           Servicios
         </h4>
@@ -3458,6 +3482,9 @@ async function loadMonitoring() {
       hpcData.hpc ||
       {};
 
+    const hpcNodes =
+      await fetchHpcNodeStatuses();
+
     const latest =
       {};
 
@@ -3501,6 +3528,10 @@ async function loadMonitoring() {
 
     renderHpcSummary(
       hpc
+    );
+
+    renderHpcNodes(
+      hpcNodes
     );
 
     const serviceStatuses =
@@ -3741,6 +3772,9 @@ async function refreshMonitoringLiveData() {
       hpcData.hpc ||
       {};
 
+    const hpcNodes =
+      await fetchHpcNodeStatuses();
+
     const latest =
       {};
 
@@ -3844,6 +3878,10 @@ async function refreshMonitoringLiveData() {
 
     renderHpcSummary(
       hpc
+    );
+
+    renderHpcNodes(
+      hpcNodes
     );
 
     renderServiceStatus(
@@ -3969,6 +4007,422 @@ function renderMonitoringMetrics(
     )}
   `;
 }
+
+async function fetchHpcNodeStatuses() {
+
+  const nodeIds = [
+    "hpc-worker01",
+    "hpc-worker02"
+  ];
+
+  return Promise.all(
+    nodeIds.map(
+      async nodeId => {
+
+        try {
+
+          const response =
+            await apiFetch(
+              `/api/monitoring/nodes/${
+                encodeURIComponent(
+                  nodeId
+                )
+              }`
+            );
+
+          const data =
+            await response.json();
+
+          if (
+            !response.ok ||
+            !data.success
+          ) {
+
+            throw new Error(
+              data.message ||
+              "Estado del nodo no disponible"
+            );
+          }
+
+          return {
+            ...(
+              data.node ||
+              {}
+            ),
+
+            requestedNodeId:
+              nodeId,
+
+            querySuccess:
+              true
+          };
+
+        } catch (error) {
+
+          return {
+            requestedNodeId:
+              nodeId,
+
+            hostname:
+              nodeId,
+
+            status:
+              "UNAVAILABLE",
+
+            querySuccess:
+              false,
+
+            error:
+              error.message ||
+              "No fue posible consultar el nodo"
+          };
+        }
+      }
+    )
+  );
+}
+
+
+function renderHpcNodes(
+  nodes
+) {
+
+  const container =
+    document.getElementById(
+      "hpcNodes"
+    );
+
+  if (!container) {
+    return;
+  }
+
+  if (
+    !Array.isArray(
+      nodes
+    ) ||
+    nodes.length === 0
+  ) {
+
+    container.innerHTML =
+      "<p>No hay nodos HPC configurados.</p>";
+
+    return;
+  }
+
+  container.innerHTML =
+    nodes
+      .map(
+        node => {
+
+          const reportedStatus =
+            String(
+              node.status ||
+              "UNKNOWN"
+            ).toUpperCase();
+
+          const lastUpdatedSeconds =
+            Number(
+              node.lastUpdated ||
+              0
+            );
+
+          const nowSeconds =
+            Math.floor(
+              Date.now() /
+              1000
+            );
+
+          const heartbeatAgeSeconds =
+            (
+              Number.isFinite(
+                lastUpdatedSeconds
+              ) &&
+              lastUpdatedSeconds > 0
+            )
+              ? Math.max(
+                  0,
+                  nowSeconds -
+                  lastUpdatedSeconds
+                )
+              : null;
+
+          const heartbeatStale =
+            node.querySuccess !== false &&
+            (
+              heartbeatAgeSeconds === null ||
+              heartbeatAgeSeconds > 30
+            );
+
+          const status =
+            heartbeatStale
+              ? "STALE"
+              : reportedStatus;
+
+          let statusClass =
+            "status-unknown";
+
+          if (
+            status === "DISPONIBLE" ||
+            status === "AVAILABLE"
+          ) {
+
+            statusClass =
+              "status-up";
+
+          } else if (
+            status === "INACTIVO" ||
+            status === "INACTIVE"
+          ) {
+
+            statusClass =
+              "status-inactive";
+
+          } else if (
+            status === "STALE" ||
+            status === "UNAVAILABLE" ||
+            status === "ERROR"
+          ) {
+
+            statusClass =
+              "status-down";
+          }
+
+          const cpuUsage =
+            Number(
+              node.cpuUsage ||
+              0
+            );
+
+          const memoryUsage =
+            Number(
+              node.memoryUsage ||
+              0
+            );
+
+          const cpuCores =
+            Number(
+              node.cpuCores ||
+              0
+            );
+
+          const memoryMb =
+            Number(
+              node.memory ||
+              0
+            );
+
+          const storageUsage =
+            Number(
+              node.storageUsage ||
+              0
+            );
+
+          let lastUpdated =
+            "-";
+
+          if (
+            Number.isFinite(
+              lastUpdatedSeconds
+            ) &&
+            lastUpdatedSeconds > 0
+          ) {
+
+            lastUpdated =
+              new Date(
+                lastUpdatedSeconds *
+                1000
+              )
+                .toLocaleString(
+                  "es-CO"
+                );
+          }
+
+          const hostname =
+            node.hostname ||
+            node.requestedNodeId ||
+            "Nodo HPC";
+
+          const errorMessage =
+            node.querySuccess === false
+              ? `
+                <p class="hpc-node-error">
+                  ${escapeHtml(
+                    node.error ||
+                    "Nodo no disponible"
+                  )}
+                </p>
+              `
+              : "";
+
+          const heartbeatMessage =
+            heartbeatStale
+              ? `
+                <p class="hpc-node-error">
+                  Sin heartbeat reciente.
+                  Último dato hace
+                  ${escapeHtml(
+                    heartbeatAgeSeconds === null
+                      ? "tiempo desconocido"
+                      : (
+                        heartbeatAgeSeconds >= 60
+                          ? (
+                            Math.floor(
+                              heartbeatAgeSeconds /
+                              60
+                            ) +
+                            " min"
+                          )
+                          : (
+                            heartbeatAgeSeconds +
+                            " s"
+                          )
+                      )
+                  )}.
+                </p>
+              `
+              : "";
+
+          return `
+            <article class="hpc-node-card">
+
+              <div class="hpc-node-header">
+
+                <div>
+                  <h5>
+                    ${escapeHtml(
+                      hostname
+                    )}
+                  </h5>
+
+                  <small>
+                    ${escapeHtml(
+                      node.ip ||
+                      "-"
+                    )}
+                  </small>
+                </div>
+
+                <span
+                  class="status-badge ${statusClass}"
+                >
+                  ${escapeHtml(
+                    status
+                  )}
+                </span>
+
+              </div>
+
+              <div class="hpc-node-metrics">
+
+                <div class="hpc-node-metric">
+                  <small>
+                    CPU
+                  </small>
+
+                  <strong>
+                    ${escapeHtml(
+                      cpuUsage.toFixed(
+                        2
+                      )
+                    )} %
+                  </strong>
+                </div>
+
+                <div class="hpc-node-metric">
+                  <small>
+                    CPU cores
+                  </small>
+
+                  <strong>
+                    ${escapeHtml(
+                      cpuCores
+                    )}
+                  </strong>
+                </div>
+
+                <div class="hpc-node-metric">
+                  <small>
+                    Memoria
+                  </small>
+
+                  <strong>
+                    ${escapeHtml(
+                      memoryUsage.toFixed(
+                        2
+                      )
+                    )} %
+                  </strong>
+
+                  <span>
+                    ${escapeHtml(
+                      memoryMb
+                    )} MiB
+                  </span>
+                </div>
+
+                <div class="hpc-node-metric">
+                  <small>
+                    Almacenamiento
+                  </small>
+
+                  <strong>
+                    ${escapeHtml(
+                      formatBytes(
+                        storageUsage
+                      )
+                    )}
+                  </strong>
+                </div>
+
+              </div>
+
+              <div class="hpc-node-meta">
+
+                <span>
+                  <strong>
+                    Ubicación:
+                  </strong>
+
+                  ${escapeHtml(
+                    node.location ||
+                    "-"
+                  )}
+                </span>
+
+                <span>
+                  <strong>
+                    Actualizado:
+                  </strong>
+
+                  ${escapeHtml(
+                    lastUpdated
+                  )}
+                </span>
+
+                <span class="hpc-node-id">
+                  <strong>
+                    Node ID:
+                  </strong>
+
+                  ${escapeHtml(
+                    node.nodeId ||
+                    "-"
+                  )}
+                </span>
+
+              </div>
+
+              ${heartbeatMessage}
+
+              ${errorMessage}
+
+            </article>
+          `;
+        }
+      )
+      .join("");
+}
+
 
 function renderHpcSummary(
   hpc
