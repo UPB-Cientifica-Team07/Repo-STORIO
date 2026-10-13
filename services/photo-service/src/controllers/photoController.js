@@ -1,6 +1,9 @@
 const photoService =
   require("../services/photoService");
 
+const photoShareService =
+  require("../services/photoShareService");
+
 function parseTags(
   value
 ) {
@@ -183,12 +186,14 @@ async function getPhoto(
         });
     }
 
-    if (
-      photo.ownerId !==
-        req.user.userId &&
-      req.user.role !==
-        "ADMIN"
-    ) {
+    const canRead =
+      await photoShareService
+        .canReadPhoto(
+          photo,
+          req.user
+        );
+
+    if (!canRead) {
 
       return res
         .status(403)
@@ -247,12 +252,14 @@ async function getPhotoContent(
         });
     }
 
-    if (
-      photo.ownerId !==
-        req.user.userId &&
-      req.user.role !==
-        "ADMIN"
-    ) {
+    const canRead =
+      await photoShareService
+        .canReadPhoto(
+          photo,
+          req.user
+        );
+
+    if (!canRead) {
 
       return res
         .status(403)

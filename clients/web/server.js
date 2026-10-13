@@ -430,6 +430,563 @@ app.get(
   }
 );
 
+// =====================================
+// R13 PHOTO SHARING WEB PROXY
+// =====================================
+
+function photoSharingError(
+  res,
+  error,
+  fallback
+) {
+
+  const status =
+    error.response?.status ||
+    502;
+
+  return res
+    .status(status)
+    .json(
+      error.response?.data || {
+        success: false,
+        message:
+          fallback
+      }
+    );
+}
+
+async function proxyAuthenticatedPhotoJson(
+  req,
+  res,
+  {
+    method,
+    upstreamPath,
+    data
+  }
+) {
+
+  const authorization =
+    getBearerToken(req);
+
+  if (!authorization) {
+
+    return res
+      .status(401)
+      .json({
+        success: false,
+        message:
+          "Token requerido"
+      });
+  }
+
+  try {
+
+    const response =
+      await axios({
+        method,
+
+        url:
+          `${PHOTO_SERVICE}${upstreamPath}`,
+
+        headers: {
+          Authorization:
+            authorization
+        },
+
+        data,
+
+        timeout:
+          10000
+      });
+
+    return res
+      .status(
+        response.status
+      )
+      .json(
+        response.data
+      );
+
+  } catch (error) {
+
+    return photoSharingError(
+      res,
+      error,
+      "Error comunicándose con Photo Service"
+    );
+  }
+}
+
+// -------------------------------------
+// SHARED WITH ME
+// -------------------------------------
+
+app.get(
+  "/api/photos/shared-with-me",
+  async (req, res) => {
+
+    return proxyAuthenticatedPhotoJson(
+      req,
+      res,
+      {
+        method:
+          "GET",
+
+        upstreamPath:
+          "/photos/shared-with-me"
+      }
+    );
+  }
+);
+
+// -------------------------------------
+// INTERNAL PHOTO SHARES
+// -------------------------------------
+
+app.get(
+  "/api/photos/:id/shares",
+  async (req, res) => {
+
+    return proxyAuthenticatedPhotoJson(
+      req,
+      res,
+      {
+        method:
+          "GET",
+
+        upstreamPath:
+          `/photos/${encodeURIComponent(
+            req.params.id
+          )}/shares`
+      }
+    );
+  }
+);
+
+app.post(
+  "/api/photos/:id/share",
+  async (req, res) => {
+
+    return proxyAuthenticatedPhotoJson(
+      req,
+      res,
+      {
+        method:
+          "POST",
+
+        upstreamPath:
+          `/photos/${encodeURIComponent(
+            req.params.id
+          )}/share`,
+
+        data:
+          req.body
+      }
+    );
+  }
+);
+
+app.delete(
+  "/api/photos/:id/share/:targetUserId",
+  async (req, res) => {
+
+    return proxyAuthenticatedPhotoJson(
+      req,
+      res,
+      {
+        method:
+          "DELETE",
+
+        upstreamPath:
+          `/photos/${encodeURIComponent(
+            req.params.id
+          )}/share/${encodeURIComponent(
+            req.params.targetUserId
+          )}`
+      }
+    );
+  }
+);
+
+// -------------------------------------
+// EXTERNAL PHOTO SHARES
+// -------------------------------------
+
+app.get(
+  "/api/photos/:id/external-shares",
+  async (req, res) => {
+
+    return proxyAuthenticatedPhotoJson(
+      req,
+      res,
+      {
+        method:
+          "GET",
+
+        upstreamPath:
+          `/photos/${encodeURIComponent(
+            req.params.id
+          )}/external-shares`
+      }
+    );
+  }
+);
+
+app.post(
+  "/api/photos/:id/external-shares",
+  async (req, res) => {
+
+    return proxyAuthenticatedPhotoJson(
+      req,
+      res,
+      {
+        method:
+          "POST",
+
+        upstreamPath:
+          `/photos/${encodeURIComponent(
+            req.params.id
+          )}/external-shares`,
+
+        data:
+          req.body
+      }
+    );
+  }
+);
+
+app.delete(
+  "/api/photos/:id/external-shares/:shareId",
+  async (req, res) => {
+
+    return proxyAuthenticatedPhotoJson(
+      req,
+      res,
+      {
+        method:
+          "DELETE",
+
+        upstreamPath:
+          `/photos/${encodeURIComponent(
+            req.params.id
+          )}/external-shares/${encodeURIComponent(
+            req.params.shareId
+          )}`
+      }
+    );
+  }
+);
+
+// -------------------------------------
+// PUBLIC PHOTO API
+// No Authorization header required.
+// -------------------------------------
+
+app.get(
+  "/api/public/photos/:token",
+  async (req, res) => {
+
+    try {
+
+      const response =
+        await axios.get(
+          `${PHOTO_SERVICE}/photos/public/${encodeURIComponent(
+            req.params.token
+          )}`,
+          {
+            timeout:
+              10000
+          }
+        );
+
+      return res
+        .status(
+          response.status
+        )
+        .json(
+          response.data
+        );
+
+    } catch (error) {
+
+      return photoSharingError(
+        res,
+        error,
+        "Enlace público no disponible"
+      );
+    }
+  }
+);
+
+app.get(
+  "/api/public/photos/:token/content",
+  async (req, res) => {
+
+    try {
+
+      const response =
+        await axios.get(
+          `${PHOTO_SERVICE}/photos/public/${encodeURIComponent(
+            req.params.token
+          )}/content`,
+          {
+            responseType:
+              "arraybuffer",
+
+            timeout:
+              15000
+          }
+        );
+
+      res.setHeader(
+        "Content-Type",
+        response.headers[
+          "content-type"
+        ] ||
+        "application/octet-stream"
+      );
+
+      if (
+        response.headers[
+          "content-length"
+        ]
+      ) {
+
+        res.setHeader(
+          "Content-Length",
+          response.headers[
+            "content-length"
+          ]
+        );
+      }
+
+      res.setHeader(
+        "Cache-Control",
+        "private, no-store"
+      );
+
+      return res
+        .status(
+          response.status
+        )
+        .send(
+          Buffer.from(
+            response.data
+          )
+        );
+
+    } catch (error) {
+
+      const status =
+        error.response?.status ||
+        502;
+
+      return res
+        .status(status)
+        .json(
+          error.response?.data || {
+            success: false,
+            message:
+              "Contenido público no disponible"
+          }
+        );
+    }
+  }
+);
+
+function escapePublicPhotoHtml(
+  value
+) {
+
+  return String(
+    value ?? ""
+  )
+    .replaceAll(
+      "&",
+      "&amp;"
+    )
+    .replaceAll(
+      "<",
+      "&lt;"
+    )
+    .replaceAll(
+      ">",
+      "&gt;"
+    )
+    .replaceAll(
+      '"',
+      "&quot;"
+    )
+    .replaceAll(
+      "'",
+      "&#39;"
+    );
+}
+
+// -------------------------------------
+// PUBLIC BROWSER PAGE
+// -------------------------------------
+
+app.get(
+  "/shared/photos/:token",
+  async (req, res) => {
+
+    const token =
+      String(
+        req.params.token ||
+        ""
+      );
+
+    try {
+
+      const response =
+        await axios.get(
+          `${PHOTO_SERVICE}/photos/public/${encodeURIComponent(
+            token
+          )}`,
+          {
+            timeout:
+              10000
+          }
+        );
+
+      const photo =
+        response.data?.photo ||
+        {};
+
+      const name =
+        escapePublicPhotoHtml(
+          photo.name ||
+          "Fotografía compartida"
+        );
+
+      const mimeType =
+        escapePublicPhotoHtml(
+          photo.mimeType ||
+          "imagen"
+        );
+
+      const expiresAt =
+        escapePublicPhotoHtml(
+          photo.expiresAt ||
+          ""
+        );
+
+      const contentPath =
+        `/api/public/photos/${encodeURIComponent(
+          token
+        )}/content`;
+
+      return res
+        .status(200)
+        .type("html")
+        .send(
+`<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+  <title>${name} | UPB-CIENTÍFICA</title>
+  <link
+    rel="stylesheet"
+    href="/css/styles.css"
+  >
+</head>
+<body class="public-share-body">
+  <main class="public-share-page">
+    <article class="public-share-card">
+      <div class="public-share-heading">
+        <span class="public-share-badge">
+          UPB-CIENTÍFICA
+        </span>
+
+        <h1>${name}</h1>
+
+        <p>
+          Fotografía compartida mediante enlace externo
+          de solo lectura.
+        </p>
+      </div>
+
+      <div class="public-share-image">
+        <img
+          src="${contentPath}"
+          alt="${name}"
+        >
+      </div>
+
+      <dl class="public-share-metadata">
+        <div>
+          <dt>Tipo</dt>
+          <dd>${mimeType}</dd>
+        </div>
+
+        <div>
+          <dt>Expira</dt>
+          <dd>${expiresAt}</dd>
+        </div>
+      </dl>
+    </article>
+  </main>
+</body>
+</html>`
+        );
+
+    } catch (error) {
+
+      const status =
+        error.response?.status ||
+        502;
+
+      const message =
+        escapePublicPhotoHtml(
+          error.response?.data
+            ?.message ||
+          "Enlace público no disponible"
+        );
+
+      return res
+        .status(status)
+        .type("html")
+        .send(
+`<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
+  <title>Enlace no disponible | UPB-CIENTÍFICA</title>
+  <link
+    rel="stylesheet"
+    href="/css/styles.css"
+  >
+</head>
+<body class="public-share-body">
+  <main class="public-share-page">
+    <article class="public-share-card public-share-error">
+      <div class="public-share-heading">
+        <span class="public-share-badge">
+          UPB-CIENTÍFICA
+        </span>
+
+        <h1>Enlace no disponible</h1>
+
+        <p>${message}</p>
+      </div>
+    </article>
+  </main>
+</body>
+</html>`
+        );
+    }
+  }
+);
+
 // -------------------------------------
 // GET PHOTO METADATA
 // -------------------------------------

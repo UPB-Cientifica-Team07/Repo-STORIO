@@ -365,9 +365,154 @@ function deleteFile(
   );
 }
 
+
+// =====================================
+// SHARE
+// =====================================
+
+function shareFile({
+  token,
+  fileId,
+  targetUserId,
+  canRead = true,
+  canWrite = false,
+  canShare = false
+}) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      let metadata;
+
+      try {
+
+        metadata =
+          createAuthMetadata(
+            token
+          );
+
+      } catch (error) {
+
+        return reject(
+          error
+        );
+      }
+
+      client.ShareFile(
+        {
+          fileId,
+          targetUserId,
+          canRead,
+          canWrite,
+          canShare
+        },
+
+        metadata,
+
+        (error, response) => {
+
+          if (error) {
+
+            return reject(
+              error
+            );
+          }
+
+          if (
+            !response ||
+            !response.success
+          ) {
+
+            return reject(
+              new Error(
+                response?.message ||
+                "File Service rechazó la compartición"
+              )
+            );
+          }
+
+          resolve(
+            response
+          );
+        }
+      );
+    }
+  );
+}
+
+// =====================================
+// REVOKE SHARE
+// =====================================
+
+function revokeFileAccess({
+  token,
+  fileId,
+  targetUserId
+}) {
+
+  return new Promise(
+    (resolve, reject) => {
+
+      let metadata;
+
+      try {
+
+        metadata =
+          createAuthMetadata(
+            token
+          );
+
+      } catch (error) {
+
+        return reject(
+          error
+        );
+      }
+
+      client.RevokeFileAccess(
+        {
+          fileId,
+          targetUserId
+        },
+
+        metadata,
+
+        (error, response) => {
+
+          if (error) {
+
+            return reject(
+              error
+            );
+          }
+
+          if (
+            !response ||
+            !response.success
+          ) {
+
+            return reject(
+              new Error(
+                response?.message ||
+                "File Service rechazó la revocación"
+              )
+            );
+          }
+
+          resolve(
+            response
+          );
+        }
+      );
+    }
+  );
+}
+
 module.exports = {
   uploadFile,
   restoreFile,
   getFile,
-  deleteFile
+  deleteFile,
+  shareFile,
+  revokeFileAccess
 };

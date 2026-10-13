@@ -239,71 +239,227 @@ async function apiFetch(
 // PHOTOS
 // =====================================
 
-async function loadPhotos() {
+let photoViewMode =
+  "owned";
+
+function createPhotoButton(
+  label,
+  onClick,
+  className = ""
+) {
+
+  const button =
+    document.createElement(
+      "button"
+    );
+
+  button.type =
+    "button";
+
+  button.textContent =
+    label;
+
+  if (className) {
+    button.className =
+      className;
+  }
+
+  button.addEventListener(
+    "click",
+    onClick
+  );
+
+  return button;
+}
+
+async function readJsonResponse(
+  response,
+  fallback
+) {
+
+  let data;
+
+  try {
+
+    data =
+      await response.json();
+
+  } catch (error) {
+
+    throw new Error(
+      fallback
+    );
+  }
+
+  if (
+    !response.ok ||
+    !data.success
+  ) {
+
+    throw new Error(
+      data.message ||
+      fallback
+    );
+  }
+
+  return data;
+}
+
+async function loadPhotos(
+  mode = photoViewMode
+) {
+
+  photoViewMode =
+    mode === "shared"
+      ? "shared"
+      : "owned";
 
   contentView.innerHTML = `
     <div class="section-header">
 
       <div>
         <h3>
-          Mis fotos
+          Fotografías
         </h3>
 
         <p>
-          Imágenes almacenadas en el Home.
+          Busca, clasifica y comparte imágenes
+          de UPB-CIENTÍFICA.
         </p>
       </div>
 
-      <button
-        id="refreshPhotos"
-      >
-        Actualizar
-      </button>
+      <div class="photo-view-switch">
+
+        <button
+          id="ownedPhotosButton"
+          type="button"
+          class="${
+            photoViewMode === "owned"
+              ? "active"
+              : ""
+          }"
+        >
+          Mis fotos
+        </button>
+
+        <button
+          id="sharedPhotosButton"
+          type="button"
+          class="${
+            photoViewMode === "shared"
+              ? "active"
+              : ""
+          }"
+        >
+          Compartidas conmigo
+        </button>
+
+        <button
+          id="refreshPhotos"
+          type="button"
+        >
+          Actualizar
+        </button>
+
+      </div>
 
     </div>
 
-    <form
-      id="uploadPhotoForm"
-      class="upload-form"
-    >
+    ${
+      photoViewMode === "owned"
+        ? `
+          <form
+            id="photoSearchForm"
+            class="photo-search-form"
+          >
 
-      <label>
-        Seleccionar imagen
+            <label>
+              Nombre
 
-        <input
-          id="photoFile"
-          name="file"
-          type="file"
-          accept="image/*"
-          required
-        >
-      </label>
+              <input
+                id="photoSearchName"
+                type="search"
+                placeholder="nombre de la imagen"
+              >
+            </label>
 
-      <label>
-        Tags
+            <label>
+              Tag
 
-        <input
-          id="photoTags"
-          type="text"
-          placeholder="ejemplo: proyecto, laboratorio"
-        >
-      </label>
+              <input
+                id="photoSearchTag"
+                type="search"
+                placeholder="proyecto, laboratorio..."
+              >
+            </label>
 
-      <button
-        type="submit"
-      >
-        Subir imagen
-      </button>
+            <button
+              type="submit"
+            >
+              Buscar
+            </button>
 
-    </form>
+            <button
+              id="clearPhotoSearch"
+              type="button"
+            >
+              Limpiar
+            </button>
 
-    <p
-      id="uploadPhotoMessage"
-      class="message"
-    ></p>
+          </form>
+
+          <form
+            id="uploadPhotoForm"
+            class="upload-form"
+          >
+
+            <label>
+              Seleccionar imagen
+
+              <input
+                id="photoFile"
+                name="file"
+                type="file"
+                accept="image/*"
+                required
+              >
+            </label>
+
+            <label>
+              Tags
+
+              <input
+                id="photoTags"
+                type="text"
+                placeholder="ejemplo: proyecto, laboratorio"
+              >
+            </label>
+
+            <button
+              type="submit"
+            >
+              Subir fotografía
+            </button>
+
+          </form>
+        `
+        : `
+          <div class="shared-photo-info">
+            <strong>
+              Fotografías compartidas contigo
+            </strong>
+
+            <span>
+              Esta vista muestra ACL de lectura
+              concedidas por otros usuarios.
+            </span>
+          </div>
+        `
+    }
 
     <p
       id="photosMessage"
+      class="module-message"
     >
       Cargando fotografías...
     </p>
@@ -316,21 +472,94 @@ async function loadPhotos() {
 
   document
     .getElementById(
-      "refreshPhotos"
+      "ownedPhotosButton"
     )
     .addEventListener(
       "click",
-      loadPhotos
+      () => loadPhotos(
+        "owned"
+      )
     );
 
   document
     .getElementById(
-      "uploadPhotoForm"
+      "sharedPhotosButton"
     )
     .addEventListener(
-      "submit",
-      uploadPhoto
+      "click",
+      () => loadPhotos(
+        "shared"
+      )
     );
+
+  document
+    .getElementById(
+      "refreshPhotos"
+    )
+    .addEventListener(
+      "click",
+      refreshPhotoGrid
+    );
+
+  if (
+    photoViewMode ===
+    "owned"
+  ) {
+
+    document
+      .getElementById(
+        "uploadPhotoForm"
+      )
+      .addEventListener(
+        "submit",
+        uploadPhoto
+      );
+
+    document
+      .getElementById(
+        "photoSearchForm"
+      )
+      .addEventListener(
+        "submit",
+        event => {
+
+          event.preventDefault();
+
+          refreshPhotoGrid();
+        }
+      );
+
+    document
+      .getElementById(
+        "clearPhotoSearch"
+      )
+      .addEventListener(
+        "click",
+        () => {
+
+          document
+            .getElementById(
+              "photoSearchName"
+            )
+            .value =
+              "";
+
+          document
+            .getElementById(
+              "photoSearchTag"
+            )
+            .value =
+              "";
+
+          refreshPhotoGrid();
+        }
+      );
+  }
+
+  await refreshPhotoGrid();
+}
+
+async function refreshPhotoGrid() {
 
   const message =
     document.getElementById(
@@ -342,26 +571,82 @@ async function loadPhotos() {
       "photoGrid"
     );
 
+  if (
+    !message ||
+    !grid
+  ) {
+    return;
+  }
+
+  message.textContent =
+    "Cargando fotografías...";
+
+  grid.innerHTML =
+    "";
+
   try {
+
+    let endpoint;
+
+    if (
+      photoViewMode ===
+      "shared"
+    ) {
+
+      endpoint =
+        "/api/photos/shared-with-me";
+
+    } else {
+
+      const params =
+        new URLSearchParams();
+
+      const name =
+        document
+          .getElementById(
+            "photoSearchName"
+          )
+          ?.value
+          ?.trim();
+
+      const tag =
+        document
+          .getElementById(
+            "photoSearchTag"
+          )
+          ?.value
+          ?.trim();
+
+      if (name) {
+        params.set(
+          "name",
+          name
+        );
+      }
+
+      if (tag) {
+        params.set(
+          "tag",
+          tag
+        );
+      }
+
+      endpoint =
+        params.toString()
+          ? `/api/photos?${params.toString()}`
+          : "/api/photos";
+    }
 
     const response =
       await apiFetch(
-        "/api/photos"
+        endpoint
       );
 
     const data =
-      await response.json();
-
-    if (
-      !response.ok ||
-      !data.success
-    ) {
-
-      throw new Error(
-        data.message ||
+      await readJsonResponse(
+        response,
         "No fue posible cargar las fotografías"
       );
-    }
 
     const photos =
       data.photos ||
@@ -372,7 +657,10 @@ async function loadPhotos() {
     ) {
 
       message.textContent =
-        "No hay fotografías almacenadas.";
+        photoViewMode ===
+        "shared"
+          ? "No tienes fotografías compartidas."
+          : "No hay fotografías que coincidan con la consulta.";
 
       return;
     }
@@ -381,131 +669,16 @@ async function loadPhotos() {
       `${photos.length} fotografía(s) encontrada(s).`;
 
     for (
-      const photo of photos
+      const photo
+      of photos
     ) {
 
-      const card =
-        document.createElement(
-          "article"
-        );
-
-      card.className =
-        "photo-card";
-
-      const preview =
-        document.createElement(
-          "div"
-        );
-
-      preview.className =
-        "photo-preview";
-
-      const image =
-        document.createElement(
-          "img"
-        );
-
-      image.alt =
-        photo.name ||
-        "Fotografía";
-
-      image.loading =
-        "lazy";
-
-      preview.appendChild(
-        image
-      );
-
-      const info =
-        document.createElement(
-          "div"
-        );
-
-      info.className =
-        "photo-info";
-
-      const tags =
-        Array.isArray(
-          photo.tags
-        )
-          ? photo.tags
-          : [];
-
-      info.innerHTML = `
-        <strong>
-          ${escapeHtml(
-            photo.name ||
-            "Sin nombre"
-          )}
-        </strong>
-
-        <small>
-          ${escapeHtml(
-            photo.format ||
-            photo.mimeType ||
-            ""
-          )}
-        </small>
-
-        <small>
-          ${formatBytes(
-            Number(
-              photo.size ||
-              0
-            )
-          )}
-        </small>
-
-        <div class="tags">
-          ${
-            tags
-              .map(
-                tag =>
-                  `<span>${escapeHtml(tag)}</span>`
-              )
-              .join("")
-          }
-        </div>
-
-        <button
-          class="delete-photo-button"
-          data-photo-id="${escapeHtml(photo.id)}"
-          data-photo-name="${escapeHtml(photo.name || "Sin nombre")}"
-        >
-          Eliminar
-        </button>
-      `;
-
-      card.appendChild(
-        preview
-      );
-
-      card.appendChild(
-        info
-      );
-
       grid.appendChild(
-        card
-      );
-
-      const deleteButton =
-        card.querySelector(
-          ".delete-photo-button"
-        );
-
-      deleteButton.addEventListener(
-        "click",
-        () => {
-          deletePhoto(
-            photo.id,
-            photo.name
-          );
-        }
-      );
-
-      loadProtectedImage(
-        image,
-        photo.id
+        await createPhotoCard(
+          photo,
+          photoViewMode ===
+            "shared"
+        )
       );
     }
 
@@ -516,46 +689,340 @@ async function loadPhotos() {
   }
 }
 
-async function deletePhoto(
-  photoId,
-  photoName
+async function createPhotoCard(
+  photo,
+  shared
 ) {
 
-  const confirmed =
-    window.confirm(
-      `¿Eliminar la imagen "${photoName}"?`
+  const card =
+    document.createElement(
+      "article"
     );
 
-  if (!confirmed) {
-    return;
+  card.className =
+    "photo-card";
+
+  const preview =
+    document.createElement(
+      "div"
+    );
+
+  preview.className =
+    "photo-preview";
+
+  const image =
+    document.createElement(
+      "img"
+    );
+
+  image.alt =
+    photo.name ||
+    "Fotografía";
+
+  image.loading =
+    "lazy";
+
+  preview.appendChild(
+    image
+  );
+
+  card.appendChild(
+    preview
+  );
+
+  const info =
+    document.createElement(
+      "div"
+    );
+
+  info.className =
+    "photo-info";
+
+  const title =
+    document.createElement(
+      "strong"
+    );
+
+  title.textContent =
+    photo.name ||
+    "Sin nombre";
+
+  info.appendChild(
+    title
+  );
+
+  const metadata =
+    document.createElement(
+      "small"
+    );
+
+  metadata.textContent =
+    [
+      photo.mimeType ||
+        photo.format ||
+        "imagen",
+
+      Number(
+        photo.size || 0
+      ) > 0
+        ? formatBytes(
+            Number(
+              photo.size
+            )
+          )
+        : null
+    ]
+      .filter(Boolean)
+      .join(" · ");
+
+  info.appendChild(
+    metadata
+  );
+
+  if (
+    shared &&
+    photo.ownerUsername
+  ) {
+
+    const owner =
+      document.createElement(
+        "small"
+      );
+
+    owner.className =
+      "shared-photo-owner";
+
+    owner.textContent =
+      `Compartida por: ${photo.ownerUsername}`;
+
+    info.appendChild(
+      owner
+    );
   }
+
+  const tags =
+    Array.isArray(
+      photo.tags
+    )
+      ? photo.tags
+      : [];
+
+  if (
+    tags.length > 0
+  ) {
+
+    const tagContainer =
+      document.createElement(
+        "div"
+      );
+
+    tagContainer.className =
+      "tags";
+
+    for (
+      const tag
+      of tags
+    ) {
+
+      const tagElement =
+        document.createElement(
+          "span"
+        );
+
+      tagElement.textContent =
+        tag;
+
+      tagContainer.appendChild(
+        tagElement
+      );
+    }
+
+    info.appendChild(
+      tagContainer
+    );
+  }
+
+  const actions =
+    document.createElement(
+      "div"
+    );
+
+  actions.className =
+    "photo-actions";
+
+  actions.appendChild(
+    createPhotoButton(
+      "Ver",
+      () => openPhoto(
+        photo.id,
+        photo.name
+      )
+    )
+  );
+
+  const canManage =
+    !shared &&
+    (
+      photo.ownerId ===
+        session.userId ||
+      session.role ===
+        "ADMIN"
+    );
+
+  if (canManage) {
+
+    actions.appendChild(
+      createPhotoButton(
+        "Compartir",
+        () => togglePhotoSharing(
+          photo,
+          card
+        )
+      )
+    );
+
+    actions.appendChild(
+      createPhotoButton(
+        "Eliminar",
+        () => deletePhoto(
+          photo.id,
+          photo.name
+        ),
+        "danger-button"
+      )
+    );
+  }
+
+  info.appendChild(
+    actions
+  );
+
+  card.appendChild(
+    info
+  );
 
   try {
 
     const response =
       await apiFetch(
-        `/api/photos/${photoId}`,
-        {
-          method:
-            "DELETE"
-        }
+        `/api/photos/${encodeURIComponent(
+          photo.id
+        )}/content`
       );
 
-    const data =
-      await response.json();
+    if (response.ok) {
 
-    if (
-      !response.ok ||
-      !data.success
-    ) {
+      const blob =
+        await response.blob();
 
-      throw new Error(
-        data.message ||
-        "No fue posible eliminar la imagen"
+      const objectUrl =
+        URL.createObjectURL(
+          blob
+        );
+
+      image.src =
+        objectUrl;
+
+      image.addEventListener(
+        "load",
+        () => {
+
+          setTimeout(
+            () => URL.revokeObjectURL(
+              objectUrl
+            ),
+            1000
+          );
+        },
+        {
+          once: true
+        }
       );
     }
 
-    await loadPhotos();
+  } catch (error) {
+
+    console.error(
+      "PHOTO PREVIEW ERROR:",
+      error.message
+    );
+  }
+
+  return card;
+}
+
+async function openPhoto(
+  photoId,
+  photoName
+) {
+
+  try {
+
+    const response =
+      await apiFetch(
+        `/api/photos/${encodeURIComponent(
+          photoId
+        )}/content`
+      );
+
+    if (!response.ok) {
+
+      let message =
+        "No fue posible abrir la fotografía";
+
+      try {
+
+        const data =
+          await response.json();
+
+        message =
+          data.message ||
+          message;
+
+      } catch (error) {
+      }
+
+      throw new Error(
+        message
+      );
+    }
+
+    const blob =
+      await response.blob();
+
+    const objectUrl =
+      URL.createObjectURL(
+        blob
+      );
+
+    const newWindow =
+      window.open(
+        objectUrl,
+        "_blank",
+        "noopener,noreferrer"
+      );
+
+    if (!newWindow) {
+
+      URL.revokeObjectURL(
+        objectUrl
+      );
+
+      throw new Error(
+        "El navegador bloqueó la nueva pestaña"
+      );
+    }
+
+    newWindow.document.title =
+      photoName ||
+      "Fotografía";
+
+    setTimeout(
+      () => URL.revokeObjectURL(
+        objectUrl
+      ),
+      60000
+    );
 
   } catch (error) {
 
@@ -564,10 +1031,6 @@ async function deletePhoto(
     );
   }
 }
-
-// =====================================
-// UPLOAD PHOTO
-// =====================================
 
 async function uploadPhoto(
   event
@@ -585,18 +1048,14 @@ async function uploadPhoto(
       "photoTags"
     );
 
-  const message =
-    document.getElementById(
-      "uploadPhotoMessage"
-    );
-
   const file =
-    fileInput.files[0];
+    fileInput?.files?.[0];
 
   if (!file) {
 
-    message.textContent =
-      "Debe seleccionar una imagen.";
+    window.alert(
+      "Debe seleccionar una imagen."
+    );
 
     return;
   }
@@ -609,19 +1068,17 @@ async function uploadPhoto(
     file
   );
 
-  const tags =
-    tagsInput.value.trim();
-
-  if (tags) {
+  if (
+    tagsInput
+      ?.value
+      ?.trim()
+  ) {
 
     formData.append(
       "tags",
-      tags
+      tagsInput.value.trim()
     );
   }
-
-  message.textContent =
-    "Subiendo imagen...";
 
   try {
 
@@ -637,91 +1094,825 @@ async function uploadPhoto(
         }
       );
 
-    const data =
-      await response.json();
+    await readJsonResponse(
+      response,
+      "No fue posible subir la fotografía"
+    );
 
-    if (
-      !response.ok ||
-      !data.success
-    ) {
+    window.alert(
+      "Fotografía almacenada correctamente."
+    );
 
-      throw new Error(
-        data.message ||
-        "No fue posible subir la imagen"
-      );
-    }
-
-    message.textContent =
-      "Imagen subida correctamente.";
-
-    fileInput.value =
-      "";
-
-    tagsInput.value =
-      "";
-
-    await loadPhotos();
+    await loadPhotos(
+      "owned"
+    );
 
   } catch (error) {
 
-    message.textContent =
-      error.message;
+    window.alert(
+      error.message
+    );
   }
 }
 
-// =====================================
-// PROTECTED IMAGE
-// =====================================
-
-async function loadProtectedImage(
-  imageElement,
-  photoId
+async function deletePhoto(
+  photoId,
+  photoName
 ) {
+
+  if (
+    !window.confirm(
+      `¿Eliminar "${photoName || "esta fotografía"}"?`
+    )
+  ) {
+    return;
+  }
 
   try {
 
     const response =
       await apiFetch(
-        `/api/photos/${photoId}/content`
+        `/api/photos/${encodeURIComponent(
+          photoId
+        )}`,
+        {
+          method:
+            "DELETE"
+        }
       );
 
-    if (!response.ok) {
+    await readJsonResponse(
+      response,
+      "No fue posible eliminar la fotografía"
+    );
 
-      throw new Error(
-        "No se pudo obtener la imagen"
-      );
-    }
+    window.alert(
+      "Fotografía eliminada correctamente."
+    );
 
-    const blob =
-      await response.blob();
-
-    const objectUrl =
-      URL.createObjectURL(
-        blob
-      );
-
-    imageElement.src =
-      objectUrl;
-
-    imageElement.onload =
-      () => {
-
-        URL.revokeObjectURL(
-          objectUrl
-        );
-      };
+    await refreshPhotoGrid();
 
   } catch (error) {
 
-    console.error(
-      "Error cargando imagen:",
-      error
+    window.alert(
+      error.message
     );
-
-    imageElement.alt =
-      "Imagen no disponible";
   }
 }
+
+async function togglePhotoSharing(
+  photo,
+  card
+) {
+
+  const existing =
+    card.querySelector(
+      ".photo-sharing-panel"
+    );
+
+  if (existing) {
+
+    existing.remove();
+
+    return;
+  }
+
+  const panel =
+    document.createElement(
+      "section"
+    );
+
+  panel.className =
+    "photo-sharing-panel";
+
+  panel.innerHTML = `
+    <div class="photo-sharing-header">
+      <div>
+        <strong>
+          Compartición de fotografía
+        </strong>
+
+        <small>
+          ACL interna y enlaces externos.
+        </small>
+      </div>
+
+      <button
+        type="button"
+        class="photo-share-close"
+      >
+        Cerrar
+      </button>
+    </div>
+
+    <div class="photo-sharing-columns">
+
+      <div class="photo-sharing-column">
+        <h4>
+          Compartir con usuario
+        </h4>
+
+        <form
+          class="internal-photo-share-form"
+        >
+          <label>
+            ID de usuario
+
+            <input
+              name="targetUserId"
+              type="text"
+              placeholder="user-002"
+              required
+            >
+          </label>
+
+          <button
+            type="submit"
+          >
+            Conceder lectura
+          </button>
+        </form>
+
+        <div
+          class="internal-photo-share-list"
+        >
+          Cargando ACL...
+        </div>
+      </div>
+
+      <div class="photo-sharing-column">
+        <h4>
+          Enlace externo
+        </h4>
+
+        <form
+          class="external-photo-share-form"
+        >
+          <label>
+            Vigencia en horas
+
+            <input
+              name="expiresInHours"
+              type="number"
+              min="0.01"
+              max="720"
+              step="0.01"
+              value="24"
+              required
+            >
+          </label>
+
+          <button
+            type="submit"
+          >
+            Crear enlace
+          </button>
+        </form>
+
+        <div
+          class="public-photo-link hidden"
+        ></div>
+
+        <div
+          class="external-photo-share-list"
+        >
+          Cargando enlaces...
+        </div>
+      </div>
+
+    </div>
+  `;
+
+  card.appendChild(
+    panel
+  );
+
+  panel
+    .querySelector(
+      ".photo-share-close"
+    )
+    .addEventListener(
+      "click",
+      () => panel.remove()
+    );
+
+  panel
+    .querySelector(
+      ".internal-photo-share-form"
+    )
+    .addEventListener(
+      "submit",
+      async event => {
+
+        event.preventDefault();
+
+        const form =
+          event.currentTarget;
+
+        const targetUserId =
+          form.elements
+            .targetUserId
+            .value
+            .trim();
+
+        if (!targetUserId) {
+          return;
+        }
+
+        try {
+
+          const response =
+            await apiFetch(
+              `/api/photos/${encodeURIComponent(
+                photo.id
+              )}/share`,
+              {
+                method:
+                  "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+                    targetUserId,
+                    canWrite:
+                      false,
+                    canShare:
+                      false
+                  })
+              }
+            );
+
+          await readJsonResponse(
+            response,
+            "No fue posible compartir la fotografía"
+          );
+
+          form.reset();
+
+          await refreshPhotoSharingPanel(
+            photo,
+            panel
+          );
+
+        } catch (error) {
+
+          window.alert(
+            error.message
+          );
+        }
+      }
+    );
+
+  panel
+    .querySelector(
+      ".external-photo-share-form"
+    )
+    .addEventListener(
+      "submit",
+      async event => {
+
+        event.preventDefault();
+
+        const form =
+          event.currentTarget;
+
+        const expiresInHours =
+          Number(
+            form.elements
+              .expiresInHours
+              .value
+          );
+
+        try {
+
+          const response =
+            await apiFetch(
+              `/api/photos/${encodeURIComponent(
+                photo.id
+              )}/external-shares`,
+              {
+                method:
+                  "POST",
+
+                headers: {
+                  "Content-Type":
+                    "application/json"
+                },
+
+                body:
+                  JSON.stringify({
+                    expiresInHours
+                  })
+              }
+            );
+
+          const data =
+            await readJsonResponse(
+              response,
+              "No fue posible crear el enlace externo"
+            );
+
+          const publicUrl =
+            new URL(
+              `/shared/photos/${encodeURIComponent(
+                data.token
+              )}`,
+              window.location.origin
+            ).href;
+
+          showCreatedPublicPhotoLink(
+            panel,
+            publicUrl
+          );
+
+          await refreshPhotoSharingPanel(
+            photo,
+            panel
+          );
+
+        } catch (error) {
+
+          window.alert(
+            error.message
+          );
+        }
+      }
+    );
+
+  await refreshPhotoSharingPanel(
+    photo,
+    panel
+  );
+}
+
+async function refreshPhotoSharingPanel(
+  photo,
+  panel
+) {
+
+  const internalContainer =
+    panel.querySelector(
+      ".internal-photo-share-list"
+    );
+
+  const externalContainer =
+    panel.querySelector(
+      ".external-photo-share-list"
+    );
+
+  try {
+
+    const [
+      internalResponse,
+      externalResponse
+    ] =
+      await Promise.all([
+        apiFetch(
+          `/api/photos/${encodeURIComponent(
+            photo.id
+          )}/shares`
+        ),
+
+        apiFetch(
+          `/api/photos/${encodeURIComponent(
+            photo.id
+          )}/external-shares`
+        )
+      ]);
+
+    const internalData =
+      await readJsonResponse(
+        internalResponse,
+        "No fue posible consultar ACL de fotografía"
+      );
+
+    const externalData =
+      await readJsonResponse(
+        externalResponse,
+        "No fue posible consultar enlaces externos"
+      );
+
+    renderInternalPhotoShares(
+      photo,
+      panel,
+      internalContainer,
+      internalData.shares ||
+        []
+    );
+
+    renderExternalPhotoShares(
+      photo,
+      panel,
+      externalContainer,
+      externalData.shares ||
+        []
+    );
+
+  } catch (error) {
+
+    internalContainer.textContent =
+      error.message;
+
+    externalContainer.textContent =
+      error.message;
+  }
+}
+
+function renderInternalPhotoShares(
+  photo,
+  panel,
+  container,
+  shares
+) {
+
+  container.innerHTML =
+    "";
+
+  if (
+    shares.length === 0
+  ) {
+
+    container.textContent =
+      "Sin usuarios compartidos.";
+
+    return;
+  }
+
+  for (
+    const share
+    of shares
+  ) {
+
+    const row =
+      document.createElement(
+        "div"
+      );
+
+    row.className =
+      "photo-share-row";
+
+    const description =
+      document.createElement(
+        "div"
+      );
+
+    const user =
+      document.createElement(
+        "strong"
+      );
+
+    user.textContent =
+      share.username ||
+      share.userId;
+
+    description.appendChild(
+      user
+    );
+
+    const detail =
+      document.createElement(
+        "small"
+      );
+
+    detail.textContent =
+      `${share.userId} · lectura`;
+
+    description.appendChild(
+      detail
+    );
+
+    row.appendChild(
+      description
+    );
+
+    row.appendChild(
+      createPhotoButton(
+        "Revocar",
+        async () => {
+
+          if (
+            !window.confirm(
+              `¿Revocar acceso a ${share.userId}?`
+            )
+          ) {
+            return;
+          }
+
+          try {
+
+            const response =
+              await apiFetch(
+                `/api/photos/${encodeURIComponent(
+                  photo.id
+                )}/share/${encodeURIComponent(
+                  share.userId
+                )}`,
+                {
+                  method:
+                    "DELETE"
+                }
+              );
+
+            await readJsonResponse(
+              response,
+              "No fue posible revocar el acceso"
+            );
+
+            await refreshPhotoSharingPanel(
+              photo,
+              panel
+            );
+
+          } catch (error) {
+
+            window.alert(
+              error.message
+            );
+          }
+        },
+        "danger-button"
+      )
+    );
+
+    container.appendChild(
+      row
+    );
+  }
+}
+
+function renderExternalPhotoShares(
+  photo,
+  panel,
+  container,
+  shares
+) {
+
+  container.innerHTML =
+    "";
+
+  if (
+    shares.length === 0
+  ) {
+
+    container.textContent =
+      "Sin enlaces externos.";
+
+    return;
+  }
+
+  for (
+    const share
+    of shares
+  ) {
+
+    const row =
+      document.createElement(
+        "div"
+      );
+
+    row.className =
+      "photo-share-row";
+
+    const description =
+      document.createElement(
+        "div"
+      );
+
+    const status =
+      document.createElement(
+        "strong"
+      );
+
+    status.textContent =
+      share.active
+        ? "Activo"
+        : share.revokedAt
+          ? "Revocado"
+          : "Expirado";
+
+    description.appendChild(
+      status
+    );
+
+    const detail =
+      document.createElement(
+        "small"
+      );
+
+    detail.textContent =
+      `Expira: ${formatPhotoShareDate(
+        share.expiresAt
+      )}`;
+
+    description.appendChild(
+      detail
+    );
+
+    row.appendChild(
+      description
+    );
+
+    if (
+      share.active
+    ) {
+
+      row.appendChild(
+        createPhotoButton(
+          "Revocar",
+          async () => {
+
+            if (
+              !window.confirm(
+                "¿Revocar este enlace externo?"
+              )
+            ) {
+              return;
+            }
+
+            try {
+
+              const response =
+                await apiFetch(
+                  `/api/photos/${encodeURIComponent(
+                    photo.id
+                  )}/external-shares/${encodeURIComponent(
+                    share.id
+                  )}`,
+                  {
+                    method:
+                      "DELETE"
+                  }
+                );
+
+              await readJsonResponse(
+                response,
+                "No fue posible revocar el enlace"
+              );
+
+              await refreshPhotoSharingPanel(
+                photo,
+                panel
+              );
+
+            } catch (error) {
+
+              window.alert(
+                error.message
+              );
+            }
+          },
+          "danger-button"
+        )
+      );
+    }
+
+    container.appendChild(
+      row
+    );
+  }
+}
+
+function showCreatedPublicPhotoLink(
+  panel,
+  publicUrl
+) {
+
+  const output =
+    panel.querySelector(
+      ".public-photo-link"
+    );
+
+  output.classList.remove(
+    "hidden"
+  );
+
+  output.innerHTML =
+    "";
+
+  const label =
+    document.createElement(
+      "strong"
+    );
+
+  label.textContent =
+    "Enlace creado";
+
+  const input =
+    document.createElement(
+      "input"
+    );
+
+  input.type =
+    "text";
+
+  input.readOnly =
+    true;
+
+  input.value =
+    publicUrl;
+
+  const copyButton =
+    createPhotoButton(
+      "Copiar enlace",
+      async () => {
+
+        try {
+
+          await navigator.clipboard
+            .writeText(
+              publicUrl
+            );
+
+          copyButton.textContent =
+            "Copiado";
+
+          setTimeout(
+            () => {
+              copyButton.textContent =
+                "Copiar enlace";
+            },
+            1800
+          );
+
+        } catch (error) {
+
+          input.select();
+
+          window.prompt(
+            "Copie el enlace:",
+            publicUrl
+          );
+        }
+      }
+    );
+
+  const openLink =
+    document.createElement(
+      "a"
+    );
+
+  openLink.href =
+    publicUrl;
+
+  openLink.target =
+    "_blank";
+
+  openLink.rel =
+    "noopener noreferrer";
+
+  openLink.textContent =
+    "Abrir enlace público";
+
+  output.appendChild(
+    label
+  );
+
+  output.appendChild(
+    input
+  );
+
+  output.appendChild(
+    copyButton
+  );
+
+  output.appendChild(
+    openLink
+  );
+}
+
+function formatPhotoShareDate(
+  value
+) {
+
+  if (!value) {
+    return "sin fecha";
+  }
+
+  const date =
+    new Date(
+      value
+    );
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return String(
+      value
+    );
+  }
+
+  return date
+    .toLocaleString(
+      "es-CO"
+    );
+}
+
 
 // =====================================
 // FILES

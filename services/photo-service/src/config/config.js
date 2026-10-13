@@ -1,3 +1,6 @@
+const path =
+  require("path");
+
 module.exports = {
   host:
     process.env.PHOTO_BIND_ADDRESS ||
@@ -19,5 +22,13 @@ module.exports = {
 
   fileServiceAddress:
     process.env.FILE_SERVICE_ADDRESS ||
-    "localhost:50053"
+    "localhost:50053",
+
+  sharedStorageRoot:
+    process.env.SHARED_STORAGE_ROOT ||
+    process.env.FILE_STORAGE_DIR ||
+    path.resolve(
+      __dirname,
+      "../../../file-service/data/shared-storage"
+    )
 };

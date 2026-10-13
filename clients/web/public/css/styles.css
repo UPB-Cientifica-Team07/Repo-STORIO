@@ -1245,3 +1245,268 @@ form button {
     flex-direction: column;
   }
 }
+
+
+/* R13 PHOTO SHARING */
+
+.photo-view-switch {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+}
+
+.photo-view-switch button.active {
+  font-weight: 700;
+  border-color: #4f5965;
+}
+
+.photo-search-form {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(180px, 1fr)
+    );
+  gap: 12px;
+  align-items: end;
+  margin-top: 16px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #dfe3e8;
+  border-radius: 10px;
+}
+
+.photo-search-form label,
+.internal-photo-share-form label,
+.external-photo-share-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.shared-photo-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 16px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #dfe3e8;
+  border-radius: 10px;
+}
+
+.shared-photo-info span,
+.shared-photo-owner {
+  color: #68707a;
+}
+
+.photo-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.danger-button {
+  border-color: #a72d2d;
+}
+
+.photo-sharing-panel {
+  grid-column: 1 / -1;
+  padding: 16px;
+  border-top: 1px solid #dfe3e8;
+  background: #f8f9fb;
+}
+
+.photo-sharing-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  margin-bottom: 14px;
+}
+
+.photo-sharing-header > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.photo-sharing-header small {
+  color: #68707a;
+}
+
+.photo-sharing-columns {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(240px, 1fr)
+    );
+  gap: 16px;
+}
+
+.photo-sharing-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  background: #ffffff;
+  border: 1px solid #dfe3e8;
+  border-radius: 9px;
+}
+
+.photo-sharing-column h4 {
+  margin: 0;
+}
+
+.internal-photo-share-form,
+.external-photo-share-form {
+  display: grid;
+  gap: 10px;
+}
+
+.photo-share-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding: 9px 0;
+  border-top: 1px solid #edf0f2;
+}
+
+.photo-share-row > div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.photo-share-row small {
+  color: #68707a;
+  overflow-wrap: anywhere;
+}
+
+.public-photo-link {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  background: #f4f6f8;
+  border: 1px solid #dfe3e8;
+  border-radius: 8px;
+}
+
+.public-photo-link input {
+  width: 100%;
+}
+
+.public-photo-link a {
+  overflow-wrap: anywhere;
+}
+
+/* Public external photo page */
+
+.public-share-body {
+  margin: 0;
+  min-height: 100vh;
+  background: #eef1f4;
+}
+
+.public-share-page {
+  width: min(960px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 48px 0;
+}
+
+.public-share-card {
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid #dfe3e8;
+  border-radius: 14px;
+}
+
+.public-share-heading {
+  padding: 24px;
+}
+
+.public-share-heading h1 {
+  margin: 10px 0 8px;
+  overflow-wrap: anywhere;
+}
+
+.public-share-heading p {
+  margin: 0;
+  color: #68707a;
+}
+
+.public-share-badge {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+
+.public-share-image {
+  display: flex;
+  min-height: 300px;
+  max-height: 70vh;
+  align-items: center;
+  justify-content: center;
+  background: #11151a;
+}
+
+.public-share-image img {
+  display: block;
+  max-width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+.public-share-metadata {
+  display: grid;
+  grid-template-columns:
+    repeat(
+      auto-fit,
+      minmax(180px, 1fr)
+    );
+  gap: 16px;
+  margin: 0;
+  padding: 20px 24px 24px;
+}
+
+.public-share-metadata div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.public-share-metadata dt {
+  font-size: 0.82rem;
+  color: #68707a;
+}
+
+.public-share-metadata dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.public-share-error {
+  max-width: 640px;
+  margin: 10vh auto 0;
+}
+
+@media (max-width: 640px) {
+  .public-share-page {
+    width: min(100% - 20px, 960px);
+    padding: 20px 0;
+  }
+
+  .photo-sharing-header {
+    flex-direction: column;
+  }
+
+  .photo-view-switch {
+    width: 100%;
+  }
+}
