@@ -1,8 +1,10 @@
 # UPB-CIENTIFICA
 # File Sync Client - Windows
 
-$env:SYNC_SERVER = "192.168.1.100:50055"
-$env:SYNC_AUTH_URL = "https://192.168.10.13:8081"
+$ServerAddress = "10.152.172.91"
+
+$env:SYNC_SERVER = "${ServerAddress}:50055"
+$env:SYNC_AUTH_URL = "https://${ServerAddress}:8081"
 
 $env:SYNC_USERNAME = "usuario"
 $env:SYNC_PASSWORD = "CAMBIAR_LOCALMENTE"

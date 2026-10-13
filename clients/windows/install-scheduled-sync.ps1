@@ -1,3 +1,7 @@
+param(
+    [string]$ServerAddress = "10.152.172.91"
+)
+
 $ErrorActionPreference = "Stop"
 
 $ScriptDir =
@@ -75,8 +79,8 @@ Copy-Item `
 if (-not (Test-Path $ConfigFile)) {
 
     @"
-`$env:SYNC_SERVER = "192.168.10.13:50055"
-`$env:SYNC_AUTH_URL = "https://192.168.10.13:8081"
+`$env:SYNC_SERVER = "${ServerAddress}:50055"
+`$env:SYNC_AUTH_URL = "https://${ServerAddress}:8081"
 
 `$env:SYNC_USERNAME = "CAMBIAR_LOCALMENTE"
 `$env:SYNC_PASSWORD = "CAMBIAR_LOCALMENTE"

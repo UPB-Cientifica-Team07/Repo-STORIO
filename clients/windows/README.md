@@ -65,8 +65,10 @@ Con Go instalado, abrir PowerShell desde la raíz del repositorio:
 
 Ejemplo PowerShell:
 
-    $env:SYNC_SERVER = "192.168.1.100:50055"
-    $env:SYNC_AUTH_URL = "https://192.168.1.100:8081"
+    $ServerAddress = "10.152.172.91"
+
+    $env:SYNC_SERVER = "${ServerAddress}:50055"
+    $env:SYNC_AUTH_URL = "https://${ServerAddress}:8081"
 
     $env:SYNC_USERNAME = "usuario"
     $env:SYNC_PASSWORD = "contraseña"
@@ -121,6 +123,14 @@ Se incluyen:
 
 `install-scheduled-sync.ps1` registra una tarea de Windows Task Scheduler
 que ejecuta File Sync cada 15 minutos.
+
+El servidor se especifica al instalar. Para la red actual del laboratorio:
+
+    .\clients\windows\install-scheduled-sync.ps1 `
+        -ServerAddress "10.152.172.91"
+
+Cuando la infraestructura se despliegue en CCA/VPS, únicamente debe cambiarse
+`ServerAddress`; no es necesario recompilar el cliente.
 
 El ejecutable y la configuración local se instalan bajo:
 
