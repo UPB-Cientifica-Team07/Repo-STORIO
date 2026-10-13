@@ -67,34 +67,37 @@ New-Item `
     Out-Null
 
 Copy-Item `
-    -Force `
-    $SourceClient `
-    $TargetClient
+    -LiteralPath $SourceClient `
+    -Destination $TargetClient `
+    -Force
 
 Copy-Item `
-    -Force `
-    $SourceRunner `
-    $TargetRunner
+    -LiteralPath $SourceRunner `
+    -Destination $TargetRunner `
+    -Force
 
-if (-not (Test-Path $ConfigFile)) {
+if (-not (Test-Path -LiteralPath $ConfigFile)) {
 
-    @"
-`$env:SYNC_SERVER = "${ServerAddress}:50055"
-`$env:SYNC_AUTH_URL = "https://${ServerAddress}:8081"
+    $ConfigLines = @(
+        ('$env:SYNC_SERVER = "{0}:50055"' -f $ServerAddress),
+        ('$env:SYNC_AUTH_URL = "https://{0}:8081"' -f $ServerAddress),
+        '',
+        '$env:SYNC_USERNAME = "CAMBIAR_LOCALMENTE"',
+        '$env:SYNC_PASSWORD = "CAMBIAR_LOCALMENTE"',
+        '',
+        '$env:SYNC_DEVICE_ID = "$env:COMPUTERNAME-windows-scheduled"',
+        '',
+        ('$env:SYNC_DIRECTORY = "{0}"' -f $SyncDirectory),
+        '',
+        '$env:SYNC_TLS_CA_FILE = "C:\RUTA\upb_dev_ca.crt"',
+        '$env:AUTH_TLS_CA_FILE = "C:\RUTA\upb_dev_ca.crt"'
+    )
 
-`$env:SYNC_USERNAME = "CAMBIAR_LOCALMENTE"
-`$env:SYNC_PASSWORD = "CAMBIAR_LOCALMENTE"
-
-`$env:SYNC_DEVICE_ID = "`$env:COMPUTERNAME-windows-scheduled"
-
-`$env:SYNC_DIRECTORY = "$SyncDirectory"
-
-`$env:SYNC_TLS_CA_FILE = "C:\RUTA\upb_dev_ca.crt"
-`$env:AUTH_TLS_CA_FILE = "C:\RUTA\upb_dev_ca.crt"
-"@ |
-        Set-Content `
-            -Encoding UTF8 `
-            $ConfigFile
+    [System.IO.File]::WriteAllLines(
+        $ConfigFile,
+        $ConfigLines,
+        [System.Text.UTF8Encoding]::new($true)
+    )
 
     Write-Host ""
     Write-Host "IMPORTANTE:"
@@ -108,7 +111,7 @@ $PowerShell =
     (Get-Command powershell.exe).Source
 
 $Arguments =
-    "-NoProfile -ExecutionPolicy Bypass -File `"$TargetRunner`""
+    '-NoProfile -ExecutionPolicy Bypass -File "{0}"' -f $TargetRunner
 
 $Action =
     New-ScheduledTaskAction `
@@ -154,7 +157,7 @@ Register-ScheduledTask `
 
 Write-Host ""
 Write-Host "========================================="
-Write-Host " PROGRAMACIÓN INSTALADA"
+Write-Host " PROGRAMACION INSTALADA"
 Write-Host "========================================="
 Write-Host "Task: $TaskName"
 Write-Host "Intervalo: 15 minutos"
