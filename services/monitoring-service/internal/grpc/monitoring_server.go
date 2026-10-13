@@ -333,10 +333,11 @@ func (s *MonitoringServer) GetNodeStatus(
 
 	if node == nil {
 
-		return &pb.NodeResponse{
-			NodeId: req.GetNodeId(),
-			Status: "NOT_FOUND",
-		}, nil
+		return nil,
+			status.Error(
+				codes.NotFound,
+				"nodo HPC no encontrado",
+			)
 	}
 
 	var lastUpdated int64

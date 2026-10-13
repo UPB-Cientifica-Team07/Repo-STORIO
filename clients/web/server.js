@@ -3764,7 +3764,11 @@ app.get(
       const status =
         error.code === 5
           ? 404
-          : 502;
+          : error.code === 7
+            ? 403
+            : error.code === 16
+              ? 401
+              : 502;
 
       return res
         .status(status)
